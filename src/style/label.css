@@ -1,0 +1,16 @@
+.label {
+  position: relative;
+  border: 1px solid #c3bfbf;
+}
+.boardcode_container {
+    cursor: pointer;
+    position: absolute;
+    z-index: 100;
+    width: 130px;
+    height: 25px;
+    text-wrap: nowrap;
+    top: 0;
+    left: 0;
+    border: 1px solid;
+    resize: inherit;
+}
