@@ -1,130 +1,161 @@
-import React, { useEffect, useRef, useState } from "react";
-import Memory from "./Memory";
+import React, { useRef, useState } from "react";
+import Memory from "../store/Memory";
+import Object from "../store/Object";
+import { observer } from "mobx-react-lite";
+import { PropertiesObj } from "./PropertiesObj";
+import { Barcode } from "./barcode/Barcode";
 
-export const Label = () => {
-  useEffect(() => {
-    // console.log(Memory.mm);
-  });
+export const Label = observer(() => {
   const lblRef = useRef(null);
-  const bcrdRef = useRef(null);
+  const [publicEditSize, setPublicEditSize] = useState(false);
 
-  const [editSize, setEditSize] = useState(false);
-
-  const [model, setModel] = useState([
-    {
-        id: 1,
-        typeObj: 'barcode',
-        x: 0,
-        y: 0,
-        body: 'IIIIiiiIIIIiIII',
-        zIndex: 1,
-        w: 10,
-        h: 10,
-    },
-    {
-        id: 2,
-        typeObj: 'text',
-        x: 0,
-        y: 0,
-        body: 'Дата производства',
-        zIndex: 1,
-        w: 10,
-        h: 10,
-    },
-    {
-        id: 3,
-        typeObj: 'text',
-        x: 0,
-        y: 0,
-        body: '15.02.2023',
-        zIndex: 1,
-        w: 10,
-        h: 10,
-    },
-  ])
-
-  const [obj, setObj] =useState(null)
+  // Переменные размера этикетки (холста)
+  const [canvasX, setCanvasX] = useState(null);
+  const [canvasY, setCanvasY] = useState(null);
   let x, y;
-  let xObj, yObj;
-  let w, h;
-  let wObj, hObj;
-  //   let intervalSize;
 
-  //   Считываем и записываем координаты в переменные во время
-  const dragOver = (e, obj) => {
-    x = e.nativeEvent.offsetX;
-    y = e.nativeEvent.offsetY;
-    if (editSize) {
-      obj.target.style.width = x - obj.target.offsetLeft + "px";
-      obj.target.style.height = y - obj.target.offsetTop + "px";
-    }
-    // else {
-    //   x = e.nativeEvent.offsetX;
-    //   y = e.nativeEvent.offsetY;
-    // }
-  };
-  // Записываем новые координаты, в конце перетягивания
-  const onDragEndFunc = (obj) => {
-    if (!editSize) {
-    //   console.log(e.target.id);
-      if (x - xObj < 0 || y - yObj < 0) {
-        return;
+  // Считываем и записываем координаты в переменные во время
+  const dragOver = (e) => {
+    x = e.clientX;
+    y = e.clientY;
+
+    Object.objects.find((el) => {
+      if (el.id === Number(Object.obj.target.id)) {
+        if (el.editSize === true) {
+          Object.getAttrW(x, canvasX);
+          Object.getAttrH(y, canvasY);
+        }
       }
-      obj.target.style.left = x - xObj + "px";
-      obj.target.style.top = y - yObj + "px";
-    }
-    setEditSize(false);
+    });
+  };
+  // Флаг свойств объекта
+  const [properties, setProperties] = useState(false);
+
+  // Записываем новые координаты, в конце перетягивания
+  const onDragEndFunc = () => {
+    Object.objects.forEach((el) => {
+      if (el.id === Number(Object.obj.target.id)) {
+        if (el.editSize !== true) {
+          Object.getCoordX(x, canvasX);
+          Object.getCoordY(y, canvasY);
+        } else {
+          Object.getFlagEditSize(false);
+          setPublicEditSize(false);
+        }
+      }
+    });
   };
 
-  // При начале перетягивания считываем, координаты на перетаскиваемом объекте
+  // // При начале перетягивания считываем, координаты на перетаскиваемом объекте
   const onDragStartFunc = (e) => {
-    if (!editSize) {
-      xObj = e.nativeEvent.offsetX;
-      yObj = e.nativeEvent.offsetY;
+    setCanvasX(lblRef.current.getBoundingClientRect().x);
+    setCanvasY(lblRef.current.getBoundingClientRect().y);
+    Object.obj = e;
+
+    Object.yObj = Object.obj.nativeEvent.offsetY;
+    Object.xObj = Object.obj.nativeEvent.offsetX;
+
+    Object.wObj = Object.obj.target.offsetWidth;
+    Object.hObj = Object.obj.target.offsetHeight;
+    if (
+      Object.obj.target.offsetHeight - Object.obj.nativeEvent.offsetY < 5 &&
+      Object.obj.target.offsetWidth - Object.obj.nativeEvent.offsetX < 5
+    ) {
+      Object.objects.find((el) => {
+        if (el.id === Number(Object.obj.target.id)) {
+          Object.getFlagEditSize(true);
+          setPublicEditSize(true);
+        }
+      });
     }
   };
-  //
-
-  const onMouseDownFunc = (e) => {
-    setObj(e)
-    console.log(obj);
-    if (e.target.offsetWidth - e.nativeEvent.offsetX < 10) {
-      setEditSize(true);
+  // Подсветить при наведение на точки масщтабирования
+  const onMouseMoveFunc = (e) => {
+    Object.obj = e;
+    if (
+      Object.obj.target.offsetHeight - Object.obj.nativeEvent.offsetY < 5 &&
+      Object.obj.target.offsetWidth - Object.obj.nativeEvent.offsetX < 5
+    ) {
+      Object.obj.target.style.borderBottom = "1px solid #e1b82c";
+      Object.obj.target.style.borderRight = "1px solid #e1b82c";
+    } else {
+      Object.obj.target.style.borderBottom = "1px solid";
+      Object.obj.target.style.borderRight = "1px solid";
     }
+  };
+  // Курсор покидает границы объекта
+  const onMouseOutFunc = () => {
+    Object.obj.target.style.borderBottom = "1px solid";
+    Object.obj.target.style.borderRight = "1px solid";
+  };
+
+  const editBodyFunc = (e) => {
+    Object.obj = e;
+    let reg = Object.obj.target.id.replace(/\D/gm, "");
+    Object.objects.find((el) => {
+      if (el.id === Number(reg)) {
+        Object.prop_obj = el;
+      }
+    });
+    setProperties(true);
+    Object.obj = e;
+    Object.editBody();
+    console.log(Object.obj.target);
   };
 
   return (
-    <div
-      id="label"
-      // draggable={!editSize ? true : false}
-      onDragEnd={() => onDragEndFunc(obj)}
-      onDragOver={(e) => dragOver(e, obj)}
-      onDragStart={(e) => onDragStartFunc(e)}
-      ref={lblRef}
-      style={{
-        width: 58 * Memory.mm + "px",
-        height: 40 * Memory.mm + "px",
-        // borderRadius: "5%",
-      }}
-      className="label"
-    >
-      <div
-        draggable={!editSize ? true : false}
-        ref={bcrdRef}
-        onMouseDown={onMouseDownFunc}
-        className="boardcode_container"
-        style={
-          editSize
-            ? {
-                borderBottom: "2px solid #e1b82c",
-                borderRight: "2px solid #e1b82c",
-              }
-            : {}
-        }
-      >
-        Это штрихкод
+    <div className="label_container">
+      <div className="label_line">
+        <div
+          onDragEnd={() => onDragEndFunc()}
+          onDragOver={(e) => dragOver(e)}
+          id="label"
+          ref={lblRef}
+          style={{
+            width: Memory.width_label * Memory.mm + "px",
+            height: Memory.height_label * Memory.mm + "px",
+            zIndex: 4,
+            borderRadius: Memory.radius_label + "%",
+          }}
+          className="label"
+        >
+          {Object.objects.map((obj) => (
+            <div
+              onDoubleClick={editBodyFunc}
+              onMouseMove={onMouseMoveFunc}
+              onMouseOut={onMouseOutFunc}
+              key={obj.id}
+              draggable={!obj.editSize ? true : false}
+              onDragStart={(e) => onDragStartFunc(e)}
+              id={obj.id}
+              ref={obj.refObj}
+              className={obj.cls}
+              style={{
+                width: obj.pxW * Memory.mm + "px",
+                height: obj.pxH * Memory.mm + "px",
+                zIndex: obj.zIndex,
+                left: obj.pxX + "px",
+                top: obj.pxY + "px",
+                borderBottom: obj.editSize ? "1px solid #e1b82c" : "1px solid",
+                borderRight: obj.editSize ? "1px solid #e1b82c" : "1px solid",
+              }}
+            >
+              {obj.typeObj === "text" ? (
+                obj.body
+              ) : (
+                <Barcode
+                  body={obj.body}
+                  typeBarcode={obj.typeBarcode}
+                  w={obj.pxW}
+                  h={obj.pxH}
+                  id={obj.id}
+                />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-
+      {properties ? <PropertiesObj setProperties={setProperties} /> : <></>}
     </div>
   );
-};
+});

@@ -1,16 +1,53 @@
+.label_container {
+ display: flex;
+ gap: 15px;
+}
+.label_line {
+  height: 100%;
+  display: flex;
+  background: #ddb56678;
+  padding: 0 8px;
+  align-items: center;
+}
 .label {
+  background: #fff;
+  overflow: hidden;
   position: relative;
   border: 1px solid #c3bfbf;
 }
-.boardcode_container {
-    cursor: pointer;
-    position: absolute;
-    z-index: 100;
-    width: 130px;
-    height: 25px;
-    text-wrap: nowrap;
-    top: 0;
-    left: 0;
-    border: 1px solid;
-    resize: inherit;
+.bardcode_container-text {
+  cursor: pointer;
+  position: absolute;
+  z-index: 100;
+  width: 130px;
+  height: 25px;
+  text-wrap: nowrap;
+  top: 0;
+  left: 0;
+  border: 1px solid;
+  resize: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bardcode_container-barcode {
+  cursor: pointer;
+  position: absolute;
+  z-index: 100;
+  width: 130px;
+  height: 25px;
+  text-wrap: nowrap;
+  top: 0;
+  left: 0;
+  resize: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* border: 1px solid; */
+}
+.barlabel_title {
+  display: block;
+}
+.barlabel_number {
+  width: 45px;
 }

@@ -1,0 +1,26 @@
+.editor_container {
+  display: flex;
+  flex-direction: column;
+  gap: 2vw;
+  width: 742px;
+  align-items: center;
+}
+.editor_list_viewer {
+  height: 350px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  gap: 3vw;
+}
+.properties_container {
+  width: 210px;
+  border: var(--grey_border);
+  padding: 15px 8px;
+}
+.editor_list_obj_container {
+  display: flex;
+  flex-direction: column;
+  min-width: 100px;
+  border: var(--grey_border);
+  align-items: stretch;
+}

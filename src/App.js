@@ -1,10 +1,10 @@
 import ".//style/App.css";
-import { Label } from "./components/Label";
+import { Editor } from "./components/Editor";
 
 function App() {
   return (
     <div className="App">
-      <Label />
+      <Editor />
     </div>
   );
 }
