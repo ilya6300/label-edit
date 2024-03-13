@@ -1,0 +1,26 @@
+.item_font_family {
+  cursor: pointer;
+  font-size: 14px;
+  margin: 4px 0;
+}
+.item_font_family:hover {
+  color: var(--mast-yellow);
+}
+.list_font_family {
+  padding: 8px;
+  border: 1px solid var(--mast-yellow);
+  max-height: 350px;
+  overflow: auto;
+  border-radius: 4px;
+  position: absolute;
+  z-index: 5;
+  background: white;
+  width: 210px;
+}
+.prop_obj_font_family {
+  cursor: pointer;
+  font-size: 14px;
+}
+.prop_obj_font_family:hover {
+  color: var(--mast-yellow);
+}

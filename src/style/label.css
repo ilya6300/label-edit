@@ -1,13 +1,18 @@
 .label_container {
- display: flex;
- gap: 15px;
+  min-width: 785px;
+  display: flex;
+  justify-content: space-between;
 }
 .label_line {
+  position: relative;
+  z-index: 2;
   height: 100%;
   display: flex;
-  background: #ddb56678;
+  flex-direction: column;
+  background: #f6e3bd;
   padding: 0 8px;
   align-items: center;
+  overflow: hidden;
 }
 .label {
   background: #fff;
@@ -30,6 +35,34 @@
   align-items: center;
   justify-content: center;
 }
+.bardcode_container-block {
+  cursor: pointer;
+  position: absolute;
+  z-index: 100;
+  width: 130px;
+  height: 25px;
+  text-wrap: nowrap;
+  top: 0;
+  left: 0;
+  border: 1px solid;
+  resize: inherit;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  text-wrap: wrap;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+}
+/* .bardcode_container-block::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background: var(--mast-yellow);
+  border-radius: 50%;
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+} */
 .bardcode_container-barcode {
   cursor: pointer;
   position: absolute;
@@ -46,8 +79,24 @@
   /* border: 1px solid; */
 }
 .barlabel_title {
+  font-size: 15px;
   display: block;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #0000001f;
 }
 .barlabel_number {
   width: 45px;
+  margin: 0 6% 0 3px;
+  border: none;
+  border-radius: 4px;
+  border-bottom: 1px solid var(--mast-blue);
+  background: var(--lg-main-blue);
+  color: var(--mast-blue);
+  text-align: right;
+}
+.bar_label {
+  border: var(--grey_border);
+  padding: 5px 4px;
+  color: #8f8c8ce0;
+  font-size: 13px;
 }

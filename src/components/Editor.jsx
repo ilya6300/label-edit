@@ -10,12 +10,16 @@ import { BarLabel } from "./BarLabel";
 export const Editor = observer(() => {
   return (
     <div className="editor_container">
-        <BarLabel />
+      <h1 className="title_editor">Редактор этикеток</h1>
+      <BarLabel />
       <div className="editor_list_viewer">
         <AddContainer />
         <Label />
       </div>
-      <button onClick={() => console.log(toJS(Object.objects))}>
+      <button
+        style={{ width: "50px" }}
+        onClick={() => console.log("objects", toJS(Object.objects), 'obj', toJS(Object.obj))}
+      >
         Check model
       </button>
     </div>

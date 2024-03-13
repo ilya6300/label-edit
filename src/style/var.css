@@ -1,3 +1,9 @@
 :root {
     --grey_border: 1px solid #0000001f;
+    --mast-blue-1: #2196f3;
+    --mast-blue: #236192;
+    --mast-yellow: #f0b323;
+    --main-lg-bl: rgb(35 37 40);
+    --error: #df2727;
+    --lg-main-blue: #63b4ff29;
 }
