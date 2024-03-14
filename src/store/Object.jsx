@@ -22,62 +22,7 @@ class Object {
   getCoordX = (x, canvasX) => {
     this.objects.forEach((el) => {
       if (el.id === Number(this.obj.target.id)) {
-        console.log(
-          x,
-          canvasX,
-          this.obj.target.getBoundingClientRect().width,
-          this.obj.target.getBoundingClientRect().height,
-          this.obj.nativeEvent.offsetX,
-          this.obj.nativeEvent.offsetY,
-          this.obj
-        );
-        if (el.style.rotate === "90") {
-          if (el.h !== el.w) {
-            el.pxX =
-              x -
-              canvasX -
-              (this.obj.target.getBoundingClientRect().width -
-                this.obj.nativeEvent.offsetY) -
-              this.obj.target.getBoundingClientRect().width;
-          } else {
-            el.pxX =
-              x -
-              canvasX -
-              (this.obj.target.getBoundingClientRect().width -
-                this.obj.nativeEvent.offsetY);
-          }
-        }
-        if (el.style.rotate === "180") {
-          el.pxX =
-            x -
-            canvasX -
-            (this.obj.target.offsetWidth - this.obj.nativeEvent.offsetX);
-        }
-        if (el.style.rotate === "270") {
-          // console.log(
-          //   this.obj.target.getBoundingClientRect().width,
-          //   this.obj.target.getBoundingClientRect().height,
-          //   this.obj.nativeEvent.offsetY,
-          //   this.obj.nativeEvent.offsetX
-          // );
-          if (el.h !== el.w) {
-            el.pxX =
-              x -
-              canvasX -
-              this.obj.target.getBoundingClientRect().width -
-              this.obj.nativeEvent.offsetY;
-          } else {
-            el.pxX =
-              x -
-              canvasX -
-              (this.obj.target.getBoundingClientRect().width -
-                (this.obj.target.getBoundingClientRect().width -
-                  this.obj.nativeEvent.offsetY));
-          }
-        }
-        if (Number(el.style.rotate) === 0) {
-          el.pxX = x - canvasX - this.xObj;
-        }
+        el.pxX = x - canvasX - this.obj.nativeEvent.layerX;
         el.x = el.pxX / Memory.mm;
       }
     });
@@ -86,32 +31,7 @@ class Object {
   getCoordY = (y, canvasY) => {
     this.objects.forEach((el) => {
       if (el.id === Number(this.obj.target.id)) {
-        console.log(this.obj.target.getBoundingClientRect());
-        if (el.style.rotate === "90" || el.style.rotate === "270") {
-          // if (el.h !== el.w) {
-            el.pxY = y - canvasY - this.obj.nativeEvent.layerY;
-          // } else {
-          //   el.pxY = y - canvasY - this.obj.nativeEvent.layerY;
-          // }
-        }
-        if (el.style.rotate === "180") {
-          el.pxY =
-            y -
-            canvasY -
-            (this.obj.target.offsetHeight - this.obj.nativeEvent.offsetY);
-        }
-        // if (el.style.rotate === "270") {
-          // if (el.h !== el.w) {
-          //   el.pxY =
-            // el.pxY = y - canvasY - this.obj.nativeEvent.layerY;
-          // } else {
-          //   el.pxY =
-          //   el.pxY = y - canvasY - this.obj.nativeEvent.layerY;
-          // }
-        // }
-        if (Number(el.style.rotate) === 0) {
-          el.pxY = y - canvasY - this.yObj;
-        }
+        el.pxY = y - canvasY - this.obj.nativeEvent.layerY;
         el.y = el.pxY / Memory.mm;
       }
     });
@@ -209,18 +129,18 @@ class Object {
     this.objects.forEach((el) => {
       let reg = this.obj.target.id.replace(/\D/gm, "");
       if (el.id === Number(reg)) {
-        el.style.rotate = deg;
         const this_obj = { ...el };
+        console.log(typeof el.style.rotate);
         if (
           (deg === "90" || deg === "270") &&
           el.style.rotate !== "90" &&
           el.style.rotate !== "180"
         ) {
+          console.log("rotate");
           el.w = this_obj.h;
           el.h = this_obj.w;
-          // el.pxW = this_obj.pxH;
-          // el.pxH = this_obj.pxW;
         }
+        el.style.rotate = deg;
       }
     });
   };

@@ -105,8 +105,8 @@ export const AddContainer = observer(() => {
       body: barcode,
       file: null,
       zIndex: 1,
-      w: 10,
-      h: width,
+      w: width,
+      h: 10,
       editSize: false,
       cls: "bardcode_container-barcode",
       style: {

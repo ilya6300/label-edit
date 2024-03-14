@@ -11,6 +11,7 @@ export const Label = observer(() => {
     "editor_list_obj_container_prop-start"
   );
   const lblRef = useRef(null);
+  const objRef = useRef(null);
 
   // Переменные размера этикетки (холста)
   const [canvasX, setCanvasX] = useState(null);
@@ -18,24 +19,57 @@ export const Label = observer(() => {
   let x, y;
 
   const handlerBorderError = () => {
-    if (
-      x - Object.xObj < lblRef.current.getBoundingClientRect().x ||
-      y - Object.yObj < lblRef.current.getBoundingClientRect().y ||
-      x - Object.xObj + Object.obj.nativeEvent.target.clientWidth >
-        lblRef.current.getBoundingClientRect().x +
-          lblRef.current.getBoundingClientRect().width ||
-      y - Object.yObj + Object.obj.nativeEvent.target.clientHeight >
-        lblRef.current.getBoundingClientRect().y +
-          lblRef.current.getBoundingClientRect().height
-    ) {
-      Object.obj.target.style.boxShadow = "0 0 1px 1px var(--error)";
-    } else {
-      Object.obj.target.style.boxShadow = "none";
-    }
+    let reg = Object.obj.target.id.replace(/\D/gm, "");
+    Object.objects.forEach((el) => {
+      if (el.id === Number(reg)) {
+        // console.log(
+        //   x - Object.xObj + el.w * Memory.mm >
+        //     lblRef.current.getBoundingClientRect().x +
+        //       lblRef.current.getBoundingClientRect().width,
+        //   y - Object.yObj + el.h * Memory.mm >
+        //     lblRef.current.getBoundingClientRect().y +
+        //       lblRef.current.getBoundingClientRect().height
+        // );
+        console.log(
+          x, Object.yObj, el.w * Memory.mm,
+            lblRef.current.getBoundingClientRect().x, Object.obj.nativeEvent.layerX
+        );
+        console.log(x - lblRef.current.getBoundingClientRect().x - Object.obj.nativeEvent.layerX)
+        if (
+          x - Object.xObj < lblRef.current.getBoundingClientRect().x ||
+          y - Object.yObj < lblRef.current.getBoundingClientRect().y ||
+          x - Object.xObj + el.w * Memory.mm >
+            lblRef.current.getBoundingClientRect().x +
+              lblRef.current.getBoundingClientRect().width ||
+          y - Object.yObj + el.h * Memory.mm >
+            lblRef.current.getBoundingClientRect().y +
+              lblRef.current.getBoundingClientRect().height
+        ) {
+          Object.obj.target.style.boxShadow = "0 0 1px 1px var(--error)";
+        } else {
+          Object.obj.target.style.boxShadow = "none";
+        }
+      }
+    });
+    // if (
+    //   x - Object.xObj < lblRef.current.getBoundingClientRect().x ||
+    //   y - Object.yObj < lblRef.current.getBoundingClientRect().y ||
+    //   x - Object.xObj + Object.obj.nativeEvent.target.clientWidth >
+    //     lblRef.current.getBoundingClientRect().x +
+    //       lblRef.current.getBoundingClientRect().width ||
+    //   y - Object.yObj + Object.obj.nativeEvent.target.clientHeight >
+    //     lblRef.current.getBoundingClientRect().y +
+    //       lblRef.current.getBoundingClientRect().height
+    // ) {
+    //   Object.obj.target.style.boxShadow = "0 0 1px 1px var(--error)";
+    // } else {
+    //   Object.obj.target.style.boxShadow = "none";
+    // }
   };
 
   // Считываем и записываем координаты в переменные во время
   const dragOver = (e) => {
+    // console.log(Object.obj.this.getBoundingClientRect())
     x = e.clientX;
     y = e.clientY;
     Object.objects.find((el) => {
@@ -60,13 +94,10 @@ export const Label = observer(() => {
         }
       }
     });
-    Object.obj.target.style.display = 'block'
+    Object.obj.target.style.display = "block";
   };
   // // При начале перетягивания считываем, координаты на перетаскиваемом объекте
   const onDragStartFunc = (e) => {
-    setTimeout(() => {
-      // e.target.style.display = 'none'
-    }, 5);
     setCanvasX(lblRef.current.getBoundingClientRect().x);
     setCanvasY(lblRef.current.getBoundingClientRect().y);
     Object.obj = e;
@@ -74,16 +105,6 @@ export const Label = observer(() => {
     Object.xObj = Object.obj.nativeEvent.offsetX;
     Object.wObj = Object.obj.target.offsetWidth;
     Object.hObj = Object.obj.target.offsetHeight;
-    // console.log(
-    //   "x",
-    //   Object.xObj,
-    //   "y",
-    //   Object.yObj,
-    //   "w",
-    //   Object.wObj,
-    //   "h",
-    //   Object.hObj
-    // );
     if (
       Object.obj.target.offsetHeight - Object.obj.nativeEvent.offsetY < 5 &&
       Object.obj.target.offsetWidth - Object.obj.nativeEvent.offsetX < 5
@@ -93,6 +114,10 @@ export const Label = observer(() => {
           Object.getFlagEditSize(true);
         }
       });
+    } else {
+      setTimeout(() => {
+        e.target.style.display = "none";
+      }, 5);
     }
   };
   // Подсветить при наведение на точки масщтабирования
