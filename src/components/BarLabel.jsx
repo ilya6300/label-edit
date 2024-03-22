@@ -3,7 +3,16 @@ import Memory from "../store/Memory";
 import { observer } from "mobx-react-lite";
 import Object from "../store/Object";
 
-export const BarLabel = observer(() => {
+export const BarLabel = observer(({ setFlagPrevier, flagPreview }) => {
+  //
+  // useEffect(() => {
+  //   const myFont = new FontFace("Pacifico", `url(${Request.testBase64})`);
+  //   myFont.load();
+  //   document.fonts.add(myFont);
+  //   // console.log(Request.testBase64)
+  // }, []);
+  //
+
   const [wValuse, setWValue] = useState(Memory.width_label);
   const [hValuse, setHValue] = useState(Memory.height_label);
   const [rValuse, setRValue] = useState(Memory.radius_label);
@@ -63,6 +72,10 @@ export const BarLabel = observer(() => {
     Object.setPropObj(null);
   };
 
+  const preview = () => {
+    flagPreview ? setFlagPrevier(false) : setFlagPrevier(true);
+  };
+
   return (
     <div className="bar_label">
       <span className="barlabel_title">Параметры этикетки</span>
@@ -107,6 +120,7 @@ export const BarLabel = observer(() => {
       <span onClick={reset} className="barlabel_reset_editor">
         Очистить
       </span>
+      <span onClick={preview} className="barlabel_reset_editor">Предпросмотр</span>
     </div>
   );
 });

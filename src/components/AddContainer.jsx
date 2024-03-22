@@ -1,41 +1,45 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import Memory from "../store/Memory";
 import Object from "../store/Object";
 import { observer } from "mobx-react-lite";
+import { ImgContainer } from "./img_components/ImgContainer";
 
 export const AddContainer = observer(() => {
   const inpFile = useRef(null);
+  const [imgBD, setImgBD] = useState(false);
 
   let num = 1;
   while (num <= Object.objects.length) {
     num++;
   }
 
-
-
   const addText = () => {
     const obj = {
       id: num,
+      name: "text",
       typeObj: "text",
       typeBarcode: "",
       pxX: 0,
       pxY: 0,
-      pxW: 'fit-content',
+      pxW: "fit-content",
       pxH: 10,
       x: 0,
       y: 0,
       body: "Текст",
       file: null,
-      zIndex: 1,
-      w: 'fit-content',
+      zIndex: 2,
+      w: "fit-content",
       h: 10,
-      editSize: false,
-      cls: "bardcode_container-text",
+      editSizeW: false,
+      editSizeH: false,
+      active: true,
+      cls: ["bardcode_container-text "],
       style: {
         fontSize: 12,
         fontFamily: "Times New Roman",
         position: "left",
         rotate: 0,
+        boxShadow: "none",
       },
     };
     Object.addObj(obj);
@@ -44,6 +48,7 @@ export const AddContainer = observer(() => {
   const addTextBlock = () => {
     const obj = {
       id: num,
+      name: "block",
       typeObj: "block",
       typeBarcode: "",
       pxX: 0,
@@ -54,16 +59,19 @@ export const AddContainer = observer(() => {
       y: 0,
       body: "Текст",
       file: null,
-      zIndex: 1,
+      zIndex: 2,
       w: 50,
       h: 20,
-      editSize: false,
-      cls: "bardcode_container-block",
+      editSizeW: false,
+      editSizeH: false,
+      active: true,
+      cls: ["bardcode_container-block"],
       style: {
         fontSize: 12,
         fontFamily: "Times New Roman",
         position: "left",
         rotate: 0,
+        boxShadow: "none",
       },
     };
     Object.addObj(obj);
@@ -92,6 +100,7 @@ export const AddContainer = observer(() => {
 
     const obj = {
       id: num,
+      name: "barcode",
       typeObj: "barcode",
       fontSize: 12,
       fontFamily: "none",
@@ -104,37 +113,29 @@ export const AddContainer = observer(() => {
       y: 0,
       body: barcode,
       file: null,
-      zIndex: 1,
+      zIndex: 2,
       w: width,
       h: 10,
-      editSize: false,
-      cls: "bardcode_container-barcode",
+      editSizeW: false,
+      editSizeH: false,
+      active: true,
+      cls: ["bardcode_container-barcode"],
       style: {
         fontSize: 12,
         fontFamily: "Times New Roman",
         position: "left",
         rotate: 0,
+        boxShadow: "none",
       },
     };
     Object.addObj(obj);
   };
 
-  const selectedFile = (e) => {
-    if (e.target.files.length === 0) {
-      return;
-    }
-    if (e.target.files[0].type !== "image/bmp") {
-      return alert(
-        "Вы пытаетесь добавить файл " +
-          e.target.files[0].type +
-          ". Вы можете загрузить только изображение с форматом .bmp"
-      );
-    }
-    console.log(e.target.files[0].type);
-    // Object.img = URL.createObjectURL(e.target.files[0])
+  const createImg = (data) => {
 
     const obj = {
       id: num,
+      name: "img",
       typeObj: "img",
       fontSize: 12,
       fontFamily: "none",
@@ -145,26 +146,27 @@ export const AddContainer = observer(() => {
       pxH: 10,
       x: 0,
       y: 0,
-      body: URL.createObjectURL(e.target.files[0]),
-      file: e.target.files[0],
-      zIndex: 1,
+      body: data,
+      // file: e.target.files[0],
+      zIndex: 2,
       w: 10,
       h: 10,
       editSize: false,
-      cls: "bardcode_container-barcode",
+      editSizeW: false,
+      editSizeH: false,
+      active: true,
+      cls: ["bardcode_container-barcode"],
       style: {
         fontSize: 12,
         fontFamily: "Times New Roman",
         position: "left",
         rotate: 0,
+        boxShadow: "none",
       },
     };
     Object.addObj(obj);
   };
 
-  const addImg = () => {
-    inpFile.current.click();
-  };
 
   return (
     <ul className="editor_list_obj_container">
@@ -187,8 +189,8 @@ export const AddContainer = observer(() => {
       <li className="add_obj" onClick={addBarcode} id="qrcode">
         QR code
       </li>
-      <li className="add_obj" onClick={addImg} id="qrcode">
-        Изображение
+      {/* <li className="add_obj" onClick={addImg} id="qrcode">
+        Изображение input
         <input
           ref={inpFile}
           onChange={selectedFile}
@@ -196,7 +198,12 @@ export const AddContainer = observer(() => {
           accept="image/.bmp"
           className="hidden"
         />
+      </li> */}
+      <li className="add_obj" onClick={() => setImgBD(true)} id="qrcode">
+        Изображение из бд
       </li>
+
+      {imgBD ? <ImgContainer setImgBD={setImgBD} createImg={createImg}/> : <></>}
     </ul>
   );
 });

@@ -2,25 +2,29 @@ import React, { useEffect, useRef, useState } from "react";
 import Object from "../store/Object";
 import { observer } from "mobx-react-lite";
 import Memory from "../store/Memory";
-import { ListFontFamily } from "./obj/ListFontFamily";
 
-export const PropertiesObj = observer(({ setClsContainer, clsContainer }) => {
+export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
   const [value, setValue] = useState(Object.prop_obj.body);
   const [fontSize, setFontSize] = useState(Object.prop_obj.style.fontSize);
+  const [newName, setNewName] = useState(Object.prop_obj.name);
   // Флаги отображения свойств
-  const [flagFontFamily, setFlagFontFamily] = useState(false);
+  // const [flagFontFamily, setFlagFonts] = useState(false);
   const [blockTextPosition, setBlockTextPosition] = useState(false);
   const [rotate, setRotate] = useState(false);
+  const [nameFlag, setNameFlag] = useState(false);
 
-  const fontFamilyRef = useRef(null);
+  // const fontFamilyRef = useRef(null);
   const blockTextPositionRef = useRef(null);
   const rotateRef = useRef(null);
 
   useEffect(() => {
-    document.addEventListener("mousedown", closedListFontFamily);
+    // document.addEventListener("mousedown", closedListFontFamily);
     document.addEventListener("mousedown", closedBlockTextPosition);
     document.addEventListener("mousedown", closedRotateBlock);
   }, []);
+  useEffect(() => {
+    setNewName(Object.prop_obj.name);
+  }, [Object.prop_obj.name]);
 
   // Закрытие списка с стилями текста
   const closedBlockTextPosition = (e) => {
@@ -31,11 +35,11 @@ export const PropertiesObj = observer(({ setClsContainer, clsContainer }) => {
       setBlockTextPosition(false);
     }
   };
-  const closedListFontFamily = (e) => {
-    if (fontFamilyRef.current && !fontFamilyRef.current.contains(e.target)) {
-      setFlagFontFamily(false);
-    }
-  };
+  // const closedListFontFamily = (e) => {
+  //   if (fontFamilyRef.current && !fontFamilyRef.current.contains(e.target)) {
+  //     setFlagFonts(false);
+  //   }
+  // };
   const closedRotateBlock = (e) => {
     if (rotateRef.current && !rotateRef.current.contains(e.target)) {
       setRotate(false);
@@ -49,12 +53,12 @@ export const PropertiesObj = observer(({ setClsContainer, clsContainer }) => {
   };
 
   // Закрать свойства объекта
-  const closedProperties = () => {
-    setClsContainer("editor_list_obj_container_prop_closed");
-    setTimeout(() => {
-      Memory.updateFlagPropsObj(false);
-    }, 1100);
-  };
+  // const closedProperties = () => {
+  //   setClsContainer("editor_list_obj_container_prop_closed");
+  //   setTimeout(() => {
+  //     Memory.updateFlagPropsObj(false);
+  //   }, 1100);
+  // };
 
   // сбросить боди текстового объекта и сохранить в буфер
   const resetBody = () => {
@@ -92,25 +96,70 @@ export const PropertiesObj = observer(({ setClsContainer, clsContainer }) => {
   const rotateFunc = (e) => {
     Object.updateRotate(e.target.id);
   };
+  // Записать имя
+  const saveNewName = () => {
+    if (!nameFlag) {
+      setNameFlag(true);
+    } else {
+      console.log(nameFlag);
+      setNameFlag(false);
+      Object.saveName(newName);
+    }
+  };
+  // Активировать или деактивировать объект
+  const activeObjFunc = () => {
+    if (Object.prop_obj.active) {
+      Object.activeObj(false);
+    } else {
+      Object.activeObj(true);
+    }
+  };
 
   return (
-    <ul className={clsContainer}>
-      <li className="add_obj-title">Свойства:</li>
+    <ul className="list_props">
+      <li className="add_obj-title">
+        <span className="btn_title_props-active"> Свойства</span>{" "}
+        <span className="btn_title_props" onClick={() => setPropActive(false)}>
+          {" "}
+          Слои
+        </span>
+      </li>
+      {!nameFlag ? (
+        <li onClick={saveNewName} className="prop_obj">
+          <span className="prop_obj_info">Имя: </span>
+          {Object.prop_obj.name}
+        </li>
+      ) : (
+        <li className="prop_obj">
+          {" "}
+          <input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="введите имя"
+            className="prop_obj_new_name"
+            type="text"
+          />{" "}
+          <span className="btn_ok_new_name" onClick={saveNewName}>
+            ок
+          </span>
+        </li>
+      )}
+
       <li className="prop_obj">
         <span className="prop_obj_info">Ширина:</span>{" "}
-        {Math.round(Object.prop_obj.w)} мм
+        {Math.round(Object.prop_obj.w * 0.3 * 100) / 100} мм
       </li>
       <li className="prop_obj">
         <span className="prop_obj_info">Высота:</span>{" "}
-        {Math.round(Object.prop_obj.h)} мм
+        {Math.round(Object.prop_obj.h * 0.3 * 100) / 100} мм
       </li>
       <li className="prop_obj">
         <span className="prop_obj_info">X:</span>{" "}
-        {Math.round(Object.prop_obj.x)} мм
+        {Math.round(Object.prop_obj.x * 0.3 * 100) / 100} мм
       </li>
       <li className="prop_obj">
         <span className="prop_obj_info">Y:</span>{" "}
-        {Math.round(Object.prop_obj.y)} мм
+        {Math.round(Object.prop_obj.y * 0.3 * 100) / 100} мм
       </li>
       <li className="prop_obj">
         {rotate ? (
@@ -211,13 +260,13 @@ export const PropertiesObj = observer(({ setClsContainer, clsContainer }) => {
           <li className="prop_obj">
             Шрифт:{" "}
             <span
-              onClick={() => setFlagFontFamily(true)}
+              onClick={() => setFlagFonts(true)}
               className="prop_obj_font_family"
             >
               {Object.prop_obj.style.fontFamily}
             </span>
           </li>
-          {flagFontFamily ? (
+          {/* {flagFontFamily ? (
             <li>
               <div ref={fontFamilyRef}>
                 <ListFontFamily />
@@ -225,7 +274,7 @@ export const PropertiesObj = observer(({ setClsContainer, clsContainer }) => {
             </li>
           ) : (
             <></>
-          )}
+          )} */}
         </>
       ) : (
         <></>
@@ -263,11 +312,16 @@ export const PropertiesObj = observer(({ setClsContainer, clsContainer }) => {
       ) : (
         <></>
       )}
+      <li className="prop_obj">
+        <span className="prop_obj_info">Активен</span>
+        {Object.prop_obj.active ? (
+          <span onClick={activeObjFunc} className="my_chexbox-active"></span>
+        ) : (
+          <span onClick={activeObjFunc} className="my_chexbox"></span>
+        )}
+      </li>
       <li className="prop_obj-delete" onClick={deleteObj}>
         Удалить
-      </li>
-      <li className="prop_obj-closed" onClick={closedProperties}>
-        Закрыть
       </li>
     </ul>
   );

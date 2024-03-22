@@ -1,0 +1,109 @@
+.img_container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 5px 0;
+}
+.img_item {
+  max-width: 58px;
+  cursor: pointer;
+}
+.prop_layers_img {
+  cursor: pointer;
+  width: 18px;
+}
+.add_obj_img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: aliceblue;
+  padding: 0 4px 4px 4px;
+}
+.add_obj_img_preview_container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: aliceblue;
+  padding: 0 4px 4px 4px;
+}
+.window_preview {
+  display: flex;
+  justify-content: center;
+  min-height: 200px;
+  align-items: center;
+  border: var(--grey_border);
+  border-radius: 8px;
+  margin: 35px 0 15px;
+}
+.window_preview_img {
+  max-width: 195px;
+  max-height: 195px;
+}
+.preview_container_btn {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 5px;
+  cursor: pointer;
+  transition: color 0.5s ease-in;
+}
+.btn_prev {
+  cursor: pointer;
+  transition: all 0.5s ease-in;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px double var(--mast-blue-1);
+  padding: 4px 0;
+  width: 85px;
+  text-align: center;
+  border-radius: 4px;
+  color: var(--mast-blue-1);
+}
+.btn_prev:hover {
+  color: white;
+  background-color: var(--mast-blue-1);
+  box-shadow: 0 1px 5px 1px var(--mast-blue-1);
+}
+.container_list_img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+}
+.add_img_name_container {
+  padding: 0 5px;
+  margin: 0 0 75px 0;
+}
+.add_img_name_container-text {
+  color: #8f8c8ce0;
+  font-size: 13px;
+  margin-bottom: 15px;
+}
+.add_img_name_container-inp {
+  font-size: 12px;
+  width: 100%;
+  height: 25px;
+  border: none;
+  border-bottom: var(--grey_border);
+  border-radius: 4px;
+  background: #0000000f;
+  padding: 0 3px;
+}
+.img_item_text {
+  text-align: center;
+}
+.img_item_container {
+  margin: auto;
+  padding: 4px 0;
+}
+.add_img_prev_select_text {
+  text-align: center;
+  font-size: 14px;
+  margin: 25px 0 85px;
+  color: #3a3939e6;
+}

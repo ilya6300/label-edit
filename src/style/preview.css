@@ -1,0 +1,11 @@
+.preview_label_container {
+ border: 1px solid;
+ width: 200px;
+ height: 150px;
+ position: absolute;
+ top: 0;
+ right: 0;
+ z-index: 99;
+ background: white;
+ cursor: pointer;
+}

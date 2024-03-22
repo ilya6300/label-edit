@@ -6,7 +6,8 @@
   /* align-items: center; */
   justify-content: center;
 }
-input, textarea {
+input,
+textarea {
   outline: 0;
   resize: none;
 }
@@ -22,14 +23,20 @@ textarea {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+* {
+  webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
 a {
   color: black;
   text-decoration: none;
 }
 
-@import url('./var.css');
-@import url('./label.css');
-@import url('./editor.css');
-@import url('./fontfamily.css');
-
-
+@import url("./var.css");
+@import url("./label.css");
+@import url("./editor.css");
+@import url("./fontfamily.css");
+@import url("./img.css");
+@import url("./loader.css");
+@import url("./preview.css");

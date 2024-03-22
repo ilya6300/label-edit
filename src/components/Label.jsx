@@ -2,144 +2,127 @@ import React, { useEffect, useRef, useState } from "react";
 import Memory from "../store/Memory";
 import Object from "../store/Object";
 import { observer } from "mobx-react-lite";
-import { PropertiesObj } from "./PropertiesObj";
 import { Barcode } from "./barcode/Barcode";
+import { NoneProps } from "./NoneProps";
+import { PropertiesPanel } from "./PropertiesPanel";
+import { PreviewLabel } from "./PreviewLabel";
 
-export const Label = observer(() => {
+export const Label = observer(({ flagPreview }) => {
   // Класс для контейнера свойств
   const [clsContainer, setClsContainer] = useState(
     "editor_list_obj_container_prop-start"
   );
   const lblRef = useRef(null);
-  const objRef = useRef(null);
+
+  const [previewObj, setPreviewObj] = useState(null);
+  useEffect(() => {
+    setPreviewObj(lblRef.current.cloneNode());
+  }, []);
 
   // Переменные размера этикетки (холста)
   const [canvasX, setCanvasX] = useState(null);
   const [canvasY, setCanvasY] = useState(null);
   let x, y;
 
-  const handlerBorderError = () => {
-    let reg = Object.obj.target.id.replace(/\D/gm, "");
-    Object.objects.forEach((el) => {
-      if (el.id === Number(reg)) {
-        // console.log(
-        //   x - Object.xObj + el.w * Memory.mm >
-        //     lblRef.current.getBoundingClientRect().x +
-        //       lblRef.current.getBoundingClientRect().width,
-        //   y - Object.yObj + el.h * Memory.mm >
-        //     lblRef.current.getBoundingClientRect().y +
-        //       lblRef.current.getBoundingClientRect().height
-        // );
-        console.log(
-          x, Object.yObj, el.w * Memory.mm,
-            lblRef.current.getBoundingClientRect().x, Object.obj.nativeEvent.layerX
-        );
-        console.log(x - lblRef.current.getBoundingClientRect().x - Object.obj.nativeEvent.layerX)
-        if (
-          x - Object.xObj < lblRef.current.getBoundingClientRect().x ||
-          y - Object.yObj < lblRef.current.getBoundingClientRect().y ||
-          x - Object.xObj + el.w * Memory.mm >
-            lblRef.current.getBoundingClientRect().x +
-              lblRef.current.getBoundingClientRect().width ||
-          y - Object.yObj + el.h * Memory.mm >
-            lblRef.current.getBoundingClientRect().y +
-              lblRef.current.getBoundingClientRect().height
-        ) {
-          Object.obj.target.style.boxShadow = "0 0 1px 1px var(--error)";
-        } else {
-          Object.obj.target.style.boxShadow = "none";
-        }
-      }
-    });
-    // if (
-    //   x - Object.xObj < lblRef.current.getBoundingClientRect().x ||
-    //   y - Object.yObj < lblRef.current.getBoundingClientRect().y ||
-    //   x - Object.xObj + Object.obj.nativeEvent.target.clientWidth >
-    //     lblRef.current.getBoundingClientRect().x +
-    //       lblRef.current.getBoundingClientRect().width ||
-    //   y - Object.yObj + Object.obj.nativeEvent.target.clientHeight >
-    //     lblRef.current.getBoundingClientRect().y +
-    //       lblRef.current.getBoundingClientRect().height
-    // ) {
-    //   Object.obj.target.style.boxShadow = "0 0 1px 1px var(--error)";
-    // } else {
-    //   Object.obj.target.style.boxShadow = "none";
-    // }
-  };
-
-  // Считываем и записываем координаты в переменные во время
-  const dragOver = (e) => {
-    // console.log(Object.obj.this.getBoundingClientRect())
-    x = e.clientX;
-    y = e.clientY;
-    Object.objects.find((el) => {
-      if (el.id === Number(Object.obj.target.id)) {
-        if (el.editSize === true) {
-          Object.getAttrW(x, canvasX);
-          Object.getAttrH(y, canvasY);
-        }
-      }
-    });
-  };
-  // Записываем новые координаты, в конце перетягивания
-  const onDragEndFunc = (e) => {
-    Object.objects.forEach((el) => {
-      if (el.id === Number(Object.obj.target.id)) {
-        if (el.editSize !== true) {
-          Object.getCoordX(x, canvasX);
-          Object.getCoordY(y, canvasY);
-          handlerBorderError();
-        } else {
-          Object.getFlagEditSize(false);
-        }
-      }
-    });
-    Object.obj.target.style.display = "block";
-  };
-  // // При начале перетягивания считываем, координаты на перетаскиваемом объекте
-  const onDragStartFunc = (e) => {
-    setCanvasX(lblRef.current.getBoundingClientRect().x);
-    setCanvasY(lblRef.current.getBoundingClientRect().y);
-    Object.obj = e;
-    Object.yObj = Object.obj.nativeEvent.offsetY;
-    Object.xObj = Object.obj.nativeEvent.offsetX;
-    Object.wObj = Object.obj.target.offsetWidth;
-    Object.hObj = Object.obj.target.offsetHeight;
-    if (
-      Object.obj.target.offsetHeight - Object.obj.nativeEvent.offsetY < 5 &&
-      Object.obj.target.offsetWidth - Object.obj.nativeEvent.offsetX < 5
-    ) {
-      Object.objects.find((el) => {
-        if (el.id === Number(Object.obj.target.id)) {
-          Object.getFlagEditSize(true);
-        }
-      });
-    } else {
-      setTimeout(() => {
-        e.target.style.display = "none";
-      }, 5);
-    }
-  };
   // Подсветить при наведение на точки масщтабирования
   const onMouseMoveFunc = (e) => {
-    if (e.target.style.boxShadow !== "0 0 1px 1px var(--error)") {
-      if (
-        e.target.offsetHeight - e.nativeEvent.offsetY < 5 &&
-        e.target.offsetWidth - e.nativeEvent.offsetX < 5
-      ) {
-        e.target.style.boxShadow = " 1px 1px 3px 0px var(--mast-yellow)";
+    x = e.clientX;
+    y = e.clientY;
+    if (Object.obj !== null) {
+      //
+      const reg = Object.obj.target.id.replace(/\D/gm, "");
+
+      Object.objects.find((el) => {
+        if (el.id === Number(reg)) {
+          if (el.editSize === true) {
+            Object.getAttributeClone(x, y);
+          } else {
+            Object.getCoordClone(x, canvasX, y, canvasY);
+          }
+        }
+      });
+      if (e.target.style.boxShadow !== "0 0 1px 1px var(--error)") {
+        if (
+          e.target.offsetHeight - e.nativeEvent.offsetY < 7 &&
+          e.target.offsetWidth - e.nativeEvent.offsetX < 7
+        ) {
+          Object.hoverElementShadow(e, "1px 1px 3px 0px var(--mast-blue-1)");
+        } else if (e.target.offsetHeight - e.nativeEvent.offsetY < 7) {
+          Object.hoverElementShadow(e, "0 2px 2px 0px var(--mast-blue-1)");
+        } else if (e.target.offsetWidth - e.nativeEvent.offsetX < 7) {
+          Object.hoverElementShadow(e, "2px 0 2px 0px var(--mast-blue-1)");
+        }
+      }
+    }
+    if (
+      e.clientX - lblRef.current.getBoundingClientRect().x <= 4 ||
+      e.clientX - lblRef.current.getBoundingClientRect().x >=
+        Math.floor(lblRef.current.getBoundingClientRect().width - 4) ||
+      e.clientY - lblRef.current.getBoundingClientRect().y <= 4 ||
+      e.clientY - lblRef.current.getBoundingClientRect().y >=
+        Math.floor(lblRef.current.getBoundingClientRect().height - 4)
+    ) {
+      if (Object.obj !== null) {
+        Object.obj.target.style.visibility = "visible";
+        Object.deleteClone();
       }
     }
   };
   // Курсор покидает границы объекта
-  const onMouseOutFunc = (e) => {
-    if (e.target.style.boxShadow !== "0 0 1px 1px var(--error)") {
-      e.target.style.boxShadow = "none";
+  const onMouseOutFunc = () => {
+    if (Object.obj !== null) {
+      let reg = Object.obj.target.id.replace(/\D/gm, "");
+      Object.objects.forEach((el) => {
+        if (el.id === Number(reg)) {
+          if (
+            el.style.boxShadow === "0 0 1px 1px var(--error)" ||
+            el.style.boxShadow === "#1d8306 0px 0px 3px 2px"
+          ) {
+            return;
+          } else {
+            Object.hoverElementShadow(Object.obj, "none");
+          }
+        } else {
+          if (el.style.boxShadow === "0 0 1px 1px var(--error)") {
+            return;
+          } else {
+            Object.hoverElementShadow(Object.obj, "none");
+          }
+        }
+      });
     }
+  };
+  //
+  const handlerBorderError = () => {
+    let reg = Object.obj.target.id.replace(/\D/gm, "");
+    Object.objects.forEach((el) => {
+      if (el.id === Number(reg)) {
+        if (
+          (el.w >= el.h && el.pxX < 0) ||
+          (el.w < el.h && el.pxX < 0) ||
+          (el.w >= el.h && el.pxY < 0) ||
+          (el.w < el.h && el.pxW / 2 - el.pxX < 0) ||
+          (el.w >= el.h &&
+            el.pxX + el.w * Memory.mm >
+              lblRef.current.getBoundingClientRect().width) ||
+          (el.w < el.h &&
+            el.w * 2 * Memory.mm + el.pxX >
+              lblRef.current.getBoundingClientRect().width) ||
+          (el.w >= el.h &&
+            el.pxY + el.h * Memory.mm >
+              lblRef.current.getBoundingClientRect().height) ||
+          (el.w < el.h &&
+            el.pxY / 2 + el.h * Memory.mm >
+              lblRef.current.getBoundingClientRect().height)
+        ) {
+          el.style.boxShadow = "0 0 1px 1px var(--error)";
+        }
+      }
+    });
   };
   // Открыть окно с свойствами
   const editBodyFunc = (e) => {
-    Object.obj = e;
+    Object.getObject(e);
     let reg = Object.obj.target.id.replace(/\D/gm, "");
     Object.objects.find((el) => {
       if (el.id === Number(reg)) {
@@ -147,25 +130,82 @@ export const Label = observer(() => {
       }
     });
     Memory.updateFlagPropsObj(true);
-    Object.obj = e;
     Object.editBody();
     setClsContainer("editor_list_obj_container_prop");
   };
-  // Закрытие окошка с свойствами
-  const onClickClosedProps = (e) => {
-    Object.obj = e;
-    if (Memory.properties) {
-      let reg = Object.obj.target.id.replace(/\D/gm, "");
-      Object.objects.find((el) => {
-        if (el.id === Number(reg)) {
-          Object.setPropObj(el);
+
+  const onMouseDownFunc = (e) => {
+    refOut.current.style.display = "block";
+    setCanvasX(lblRef.current.getBoundingClientRect().x);
+    setCanvasY(lblRef.current.getBoundingClientRect().y);
+    Object.getObject(e);
+    const reg = Object.obj.target.id.replace(/\D/gm, "");
+    Object.objects.forEach((active) => {
+      if (active.id === Number(reg)) {
+        if (!active.active) {
+          editBodyFunc(e);
+          return;
+        } else {
+          editBodyFunc(e);
+          if (
+            Object.obj.target.offsetHeight - Object.obj.nativeEvent.offsetY <
+              7 &&
+            Object.obj.target.offsetWidth - Object.obj.nativeEvent.offsetX < 7
+          ) {
+            Object.getFlagEditSize(true, true, true);
+          } else if (
+            Object.obj.target.offsetHeight - Object.obj.nativeEvent.offsetY <
+            7
+          ) {
+            Object.getFlagEditSize(true, false, true);
+          } else if (
+            Object.obj.target.offsetWidth - Object.obj.nativeEvent.offsetX <
+            7
+          ) {
+            Object.getFlagEditSize(true, true, false);
+          }
+          // else {
+          Object.objects.forEach((el) => {
+            let reg = Object.obj.target.id.replace(/\D/gm, "");
+            if (el.id === Number(reg)) {
+              const clone_obj = { ...el };
+              clone_obj.id = 9999;
+              clone_obj.zIndex = 1;
+              Object.addObj(clone_obj);
+            }
+          });
+          Object.obj.target.style.visibility = "hidden";
         }
-      });
+      }
+    });
+  };
+
+  const onMouseUpFunc = () => {
+    if (Object.obj !== null) {
+      Object.obj.target.style.visibility = "visible";
+      Object.getFlagEditSize(false);
+      Object.getCoordXY();
+      Object.saveAttributeWH();
+      handlerBorderError();
+      Object.deleteClone();
+      refOut.current.style.display = "none";
+      Object.boxShadowObj();
     }
+  };
+
+  const refOut = useRef(null);
+  const outLabel = (e) => {
+    if (Object.obj !== null) {
+      Object.obj.target.style.visibility = "visible";
+      Object.deleteClone();
+    }
+    refOut.current.style.display = "none";
   };
 
   return (
     <div className="label_container">
+      {!flagPreview ? <PreviewLabel previewObj={previewObj} /> : <></>}
+      <div className="out_contaiber" onMouseMove={outLabel} ref={refOut}></div>
       <div
         className="label_line"
         style={{
@@ -190,14 +230,13 @@ export const Label = observer(() => {
           }}
         ></div>
         <div
-          onDragEnd={() => onDragEndFunc()}
-          onDragOver={(e) => dragOver(e)}
+          onMouseUp={onMouseUpFunc}
+          onMouseMove={(e) => onMouseMoveFunc(e)}
           id="label"
           ref={lblRef}
           style={{
             width: Memory.width_label * Memory.mm + "px",
             height: Memory.height_label * Memory.mm + "px",
-            // zIndex: 4,
             borderRadius: Memory.radius_label + "px",
           }}
           className="label"
@@ -205,15 +244,13 @@ export const Label = observer(() => {
           {Memory.visible_objects ? (
             Object.objects.map((obj) => (
               <div
-                onClick={onClickClosedProps}
-                onDoubleClick={editBodyFunc}
-                onMouseMove={onMouseMoveFunc}
+                onDragStart={(e) => e.preventDefault()}
+                onMouseUp={onMouseUpFunc}
+                onMouseDown={onMouseDownFunc}
                 onMouseOut={onMouseOutFunc}
                 key={obj.id}
-                draggable={!obj.editSize ? true : false}
-                onDragStart={(e) => onDragStartFunc(e)}
                 id={obj.id}
-                className={obj.cls}
+                className={obj.cls.join(" ")}
                 style={{
                   width:
                     obj.typeObj === "text"
@@ -227,7 +264,8 @@ export const Label = observer(() => {
                   fontFamily: obj.style.fontFamily,
                   justifyContent: obj.style.position,
                   rotate: obj.style.rotate + "deg",
-                  // transform: "rotate(" + obj.style.rotate + "deg)",
+                  opacity: obj.active ? 1 : 0.2,
+                  boxShadow: obj.style.boxShadow,
                 }}
               >
                 {obj.typeObj === "text" || obj.typeObj === "block" ? (
@@ -242,8 +280,7 @@ export const Label = observer(() => {
                     w={obj.pxW}
                     h={obj.pxH}
                     id={obj.id}
-
-                    // draggable={!obj.editSize ? true : false}
+                    active={obj.active}
                   />
                 ) : (
                   <></>
@@ -289,14 +326,10 @@ export const Label = observer(() => {
           <></>
         )}
       </div>
-      {Memory.properties ? (
-        <PropertiesObj
-          // setProperties={setProperties}
-          clsContainer={clsContainer}
-          setClsContainer={setClsContainer}
-        />
+      {Object.obj !== null ? (
+        <PropertiesPanel clsContainer={clsContainer} />
       ) : (
-        <></>
+        <NoneProps />
       )}
     </div>
   );

@@ -3,7 +3,7 @@ import bwipjs from "bwip-js";
 import Memory from "../../store/Memory";
 import { observer } from "mobx-react-lite";
 
-export const Barcode = observer(({ typeBarcode, body, w, h, id }) => {
+export const Barcode = observer(({ typeBarcode, body, w, h, id, active }) => {
   try {
     let canvas = bwipjs.toCanvas("mycanvas" + id, {
       // scale: 1.5, // 3x scaling factor
@@ -21,7 +21,9 @@ export const Barcode = observer(({ typeBarcode, body, w, h, id }) => {
       style={{
         height: h * Memory.mm + "px",
         width: w * Memory.mm + "px",
-        border: 'none'
+        border: 'none',
+        // opacity: active ? 1 : 0.2,
+
       }}
     ></canvas>
   );
