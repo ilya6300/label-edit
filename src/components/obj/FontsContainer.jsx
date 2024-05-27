@@ -10,9 +10,10 @@ export const FontsContainer = observer(({ setFlagFonts }) => {
   const [fileFont, setFileFont] = useState(null);
   const refInpFile = useRef(null);
 
-  useEffect(() => {
-    service.getFonts();
-  }, []);
+  // useEffect(() => {
+    // service.getFonts();
+    // setFlagFonts(true);
+  // }, []);
 
   const addFont = () => {
     refInpFile.current.click();
@@ -46,7 +47,6 @@ export const FontsContainer = observer(({ setFlagFonts }) => {
     setNameFont("");
     setNewFont(false);
   };
-
 
   return (
     <ul className="editor_list_obj_container_prop">
@@ -96,7 +96,11 @@ export const FontsContainer = observer(({ setFlagFonts }) => {
           </span>
         </li>
       )}
-      {service.fontsLoading ? <Loader /> : <ListFontFamily selectFontFamily={() => setFlagFonts(false)}/>}
+      {/* {service.fontsLoading ? (
+        <Loader />
+      ) : ( */}
+        <ListFontFamily selectFontFamily={() => setFlagFonts(false)} />
+      {/* // )} */}
     </ul>
   );
 });

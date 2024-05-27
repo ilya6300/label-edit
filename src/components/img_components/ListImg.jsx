@@ -6,7 +6,7 @@ import { observer } from "mobx-react-lite";
 export const ListImg = observer(({getThisImg}) => {
   return (
     <div className="img_container">
-      {service.images.length ? (
+      {service.images.length > 0 ?  (
         service.images.map((img) => <ItemImg key={img.name} img={img} getThisImg={getThisImg}/>)
       ) : (
         <p className="prop_obj_none">Добавьте первое изображение</p>

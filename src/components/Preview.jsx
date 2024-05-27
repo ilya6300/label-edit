@@ -1,6 +1,7 @@
+import { observer } from "mobx-react-lite";
 import React, { useRef, useState } from "react";
 
-export const Preview = ({
+export const Preview = observer(({
   valueImg,
   actionImg,
   name_btn,
@@ -10,9 +11,6 @@ export const Preview = ({
   closedContainer,
 }) => {
   const refPreview = useRef(null);
-
-
-
   return (
     <div className="add_obj_img_preview_container">
       <p className="add_obj-title">Предпросмотр</p>
@@ -47,4 +45,4 @@ export const Preview = ({
       </div>
     </div>
   );
-};
+});

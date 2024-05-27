@@ -1,0 +1,30 @@
+.message_exchange_with_server_container {
+  position: absolute;
+  display: flex;
+  width: 230px;
+  height: 110px;
+  right: 5px;
+  bottom: 5px;
+  border: 1px solid var(--mast-yellow);
+  padding: 10px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 8px;
+}
+.message_loader {
+    background: var(--mast-yellow);
+    width: 0;
+    height: 20px;
+    border-radius: 4px;
+    animation: message_loader_anim 4s infinite ease-in-out;
+    text-align: center;
+}
+@keyframes message_loader_anim {
+    0% {
+        width: 0%
+    }
+    100% {
+        width: 100%
+    }
+}

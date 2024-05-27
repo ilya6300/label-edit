@@ -2,8 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import Object from "../store/Object";
 import { observer } from "mobx-react-lite";
 import Memory from "../store/Memory";
+import HistoryStore from "../store/HistoryStore";
+// import Fonts from "../store/Fonts";
+// import { FontsContainer } from "./obj/FontsContainer";
 
-export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
+export const PropertiesObj = observer(({ setFlagFonts, inputPropRef }) => {
+  // Переменные свойств
+  const [valueX, setValueX] = useState(Object.prop_obj.x);
+  const [valueY, setValueY] = useState(Object.prop_obj.y);
+  const [valueW, setValueW] = useState(Object.prop_obj.w);
+  const [valueH, setValueH] = useState(Object.prop_obj.h);
   const [value, setValue] = useState(Object.prop_obj.body);
   const [fontSize, setFontSize] = useState(Object.prop_obj.style.fontSize);
   const [newName, setNewName] = useState(Object.prop_obj.name);
@@ -17,7 +25,9 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
   const blockTextPositionRef = useRef(null);
   const rotateRef = useRef(null);
 
+
   useEffect(() => {
+    // console.log(Fonts.default_font.name)
     // document.addEventListener("mousedown", closedListFontFamily);
     document.addEventListener("mousedown", closedBlockTextPosition);
     document.addEventListener("mousedown", closedRotateBlock);
@@ -35,11 +45,6 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
       setBlockTextPosition(false);
     }
   };
-  // const closedListFontFamily = (e) => {
-  //   if (fontFamilyRef.current && !fontFamilyRef.current.contains(e.target)) {
-  //     setFlagFonts(false);
-  //   }
-  // };
   const closedRotateBlock = (e) => {
     if (rotateRef.current && !rotateRef.current.contains(e.target)) {
       setRotate(false);
@@ -52,49 +57,46 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
     Object.editBody(e.target.value);
   };
 
-  // Закрать свойства объекта
-  // const closedProperties = () => {
-  //   setClsContainer("editor_list_obj_container_prop_closed");
-  //   setTimeout(() => {
-  //     Memory.updateFlagPropsObj(false);
-  //   }, 1100);
-  // };
-
   // сбросить боди текстового объекта и сохранить в буфер
   const resetBody = () => {
     Memory.setTextBuffer();
     Memory.setBufferPropObj();
     Object.editBody("");
     Memory.updateFlagPropsBuffer(true);
+    HistoryStore.addHistory();
   };
 
   // Восстановить содежимое боди из буфера
   const restoryBody = () => {
     Object.editBody(Memory.buffer_text);
     Memory.updateFlagPropsBuffer(false);
+    HistoryStore.addHistory();
   };
 
   // Удалить объект
   const deleteObj = () => {
-    // Object.setPropObj(null);
     Memory.updateFlagPropsObj(false);
     Object.deleteObject(Object.prop_obj);
+    HistoryStore.addHistory();
   };
 
   // Изменение размера шрифта у объекта
   const updateFontSizeFunc = (e) => {
     setFontSize(e.target.value);
     Object.updateFontSize(e.target.value);
+    HistoryStore.addHistory();
   };
 
   // Изменение позиции блока
   const blockAlign = (e) => {
     Object.textAlign(e.target.id);
+    HistoryStore.addHistory();
   };
 
   // Изменение поворота
   const rotateFunc = (e) => {
     Object.updateRotate(e.target.id);
+    HistoryStore.addHistory();
   };
   // Записать имя
   const saveNewName = () => {
@@ -105,6 +107,7 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
       setNameFlag(false);
       Object.saveName(newName);
     }
+    HistoryStore.addHistory();
   };
   // Активировать или деактивировать объект
   const activeObjFunc = () => {
@@ -113,17 +116,44 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
     } else {
       Object.activeObj(true);
     }
+    HistoryStore.addHistory();
+  };
+
+  // Ручное изменение координат
+  const rewriteManualX = (e) => {
+    if (e.target.value > 0) {
+      setValueX(e.target.value);
+      Object.manualX(e.target.value * Memory.mm);
+      HistoryStore.addHistory();
+    }
+  };
+
+  const rewriteManualY = (e) => {
+    if (e.target.value > 0) {
+      setValueY(e.target.value);
+      Object.manualY(e.target.value * Memory.mm);
+      HistoryStore.addHistory();
+    }
+  };
+
+  const rewriteManualW = (e) => {
+    if (e.target.value > 5.1) {
+      setValueW(e.target.value);
+      Object.manualW(e.target.value);
+      HistoryStore.addHistory();
+    }
+  };
+
+  const rewriteManualH = (e) => {
+    if (e.target.value > 5.1) {
+      setValueH(e.target.value);
+      Object.manualH(e.target.value);
+      HistoryStore.addHistory();
+    }
   };
 
   return (
     <ul className="list_props">
-      <li className="add_obj-title">
-        <span className="btn_title_props-active"> Свойства</span>{" "}
-        <span className="btn_title_props" onClick={() => setPropActive(false)}>
-          {" "}
-          Слои
-        </span>
-      </li>
       {!nameFlag ? (
         <li onClick={saveNewName} className="prop_obj">
           <span className="prop_obj_info">Имя: </span>
@@ -147,19 +177,57 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
 
       <li className="prop_obj">
         <span className="prop_obj_info">Ширина:</span>{" "}
-        {Math.round(Object.prop_obj.w * 0.3 * 100) / 100} мм
+        {Object.prop_obj.w !== "fit-content" ? (
+          <>
+            {" "}
+            <input
+              className="input_coord_prop_obj"
+              type="number"
+              value={Math.round(Object.prop_obj.w * 100) / 100}
+              onChange={rewriteManualW}
+            />{" "}
+            мм
+          </>
+        ) : (
+          "Нет"
+        )}
       </li>
       <li className="prop_obj">
         <span className="prop_obj_info">Высота:</span>{" "}
-        {Math.round(Object.prop_obj.h * 0.3 * 100) / 100} мм
+        {Object.prop_obj.w !== "fit-content" ? (
+          <>
+            {" "}
+            <input
+              className="input_coord_prop_obj"
+              type="number"
+              value={Math.round(Object.prop_obj.h * 100) / 100}
+              onChange={rewriteManualH}
+            />{" "}
+            мм
+          </>
+        ) : (
+          "Нет"
+        )}
       </li>
       <li className="prop_obj">
         <span className="prop_obj_info">X:</span>{" "}
-        {Math.round(Object.prop_obj.x * 0.3 * 100) / 100} мм
+        <input
+          className="input_coord_prop_obj"
+          type="number"
+          value={Math.round(Object.prop_obj.x * 100) / 100}
+          onChange={rewriteManualX}
+        />
+        мм
       </li>
       <li className="prop_obj">
         <span className="prop_obj_info">Y:</span>{" "}
-        {Math.round(Object.prop_obj.y * 0.3 * 100) / 100} мм
+        <input
+          className="input_coord_prop_obj"
+          type="number"
+          value={Math.round(Object.prop_obj.y * 100) / 100}
+          onChange={rewriteManualY}
+        />{" "}
+        мм
       </li>
       <li className="prop_obj">
         {rotate ? (
@@ -209,7 +277,13 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
             className="prop_obj_position_label"
           >
             <span className="prop_obj_info_modal">
-              {Object.prop_obj.style.position}
+              {Object.prop_obj.style.position === "left" ? "слева" : <></>}
+              {Object.prop_obj.style.position === "center" ? (
+                "в центре"
+              ) : (
+                <></>
+              )}{" "}
+              {Object.prop_obj.style.position === "right" ? "справа" : <></>}
             </span>
             {blockTextPosition ? (
               <span className="prop_obj_position">
@@ -266,15 +340,6 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
               {Object.prop_obj.style.fontFamily}
             </span>
           </li>
-          {/* {flagFontFamily ? (
-            <li>
-              <div ref={fontFamilyRef}>
-                <ListFontFamily />
-              </div>
-            </li>
-          ) : (
-            <></>
-          )} */}
         </>
       ) : (
         <></>
@@ -283,6 +348,7 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
       <li>
         {Object.prop_obj.typeObj === "block" ? (
           <textarea
+            onBlur={() => HistoryStore.addHistory()}
             className="prop_obj-inp"
             type="text"
             value={Object.prop_obj.body}
@@ -291,6 +357,8 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
           ></textarea>
         ) : (
           <input
+            ref={inputPropRef}
+            onBlur={() => HistoryStore.addHistory()}
             className="prop_obj-inp"
             type="text"
             value={Object.prop_obj.body}
@@ -302,11 +370,12 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
       {Object.prop_obj.typeObj === "text" ||
       Object.prop_obj.typeObj === "block" ? (
         <li className="prop_obj-reset_text">
+          <span onClick={resetBody}>Сбросить текст</span>
           {Memory.buffer_text_flag &&
           Memory.buffer_obj.id === Object.prop_obj.id ? (
             <span onClick={restoryBody}>Восстановить</span>
           ) : (
-            <span onClick={resetBody}>Сбросить текст</span>
+            ""
           )}
         </li>
       ) : (
@@ -321,7 +390,7 @@ export const PropertiesObj = observer(({ setPropActive, setFlagFonts }) => {
         )}
       </li>
       <li className="prop_obj-delete" onClick={deleteObj}>
-        Удалить
+        Удалить ( Del )
       </li>
     </ul>
   );

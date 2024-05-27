@@ -1,11 +1,74 @@
 .preview_label_container {
- border: 1px solid;
- width: 200px;
- height: 150px;
- position: absolute;
- top: 0;
- right: 0;
- z-index: 99;
- background: white;
- cursor: pointer;
+  border: var(--grey_border);
+  position: fixed;
+  top: 7vh;
+  left: 70vw;
+  z-index: 99;
+  background: #f6e3bd;
+  cursor: pointer;
+  border-radius: 8px;
+  width: -moz-fit-content;
+  width: fit-content;
+  box-shadow: 0 0 4px 0 black;
+  min-width: 220px;
+}
+.preview_label_window {
+  margin: 3px 0 0 0;
+  display: flex;
+  justify-content: center;
+}
+.preview_label_container_reletive {
+  position: relative;
+  /* background: #f6e3bd;
+  display: flex; */
+}
+.bardcode_container-block-preview {
+  cursor: pointer;
+  position: absolute;
+  z-index: 100;
+  width: 130px;
+  height: 25px;
+  text-wrap: nowrap;
+  top: 0;
+  left: 0;
+  /* border: 1px solid; */
+  resize: inherit;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  text-wrap: wrap;
+  overflow-wrap: anywhere;
+  overflow: hidden;
+}
+.preview_label_title {
+  padding: 5px 4px;
+  color: #8f8c8ce0;
+  font-size: 13px;
+}
+.nav_preview {
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px 0 5px;
+}
+.preview_label_scale_container {
+  background: white;
+  display: flex;
+  align-items: center;
+}
+.preview_btn {
+  width: 23px;
+  height: 23px;
+  text-align: center;
+  border: var(--grey_border);
+  border-radius: 50%;
+  font-size: 17px;
+  padding: 0;
+  font-weight: 700;
+  margin: 0 2px;
+  transition: all 0.4s ease;
+}
+.preview_btn:hover {
+  background: #0000001f;
+  color: white;
 }

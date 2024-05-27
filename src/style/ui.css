@@ -1,0 +1,38 @@
+.btn_ver_1 {
+    cursor: pointer;
+    /* background: var(--lg-main-blue); */
+    border: 1px solid var(--mast-blue-1);
+    padding: 3px 5px;
+    border-radius: 4px;
+    color: #767574;
+    transition: all 0.4s ease-in-out;
+    /* margin-left: 25px; */
+    padding: 4px 6px;
+    font-weight: 500;
+  }
+  .btn_ver_1_activ {
+    cursor: pointer;
+    background: var(--mast-blue-1);
+    border: 1px solid var(--mast-blue-1);
+    padding: 3px 5px;
+    border-radius: 4px;
+    color: white;
+    transition: all 0.4s ease-in-out;
+    /* margin-left: 25px; */
+    padding: 4px 6px;
+  }
+  .btn_ver_1:hover {
+    background: var(--mast-blue-1);
+    border: 1px solid var(--mast-blue-1);
+    color: white;
+  }
+  .barlabel_number {
+    width: 45px;
+    margin: 0 15px 0 3px;
+    border: none;
+    border-radius: 4px;
+    border-bottom: 1px solid var(--mast-blue-1);
+    background: var(--lg-main-blue);
+    color: var(--mast-blue-1);
+    text-align: right;
+  } 

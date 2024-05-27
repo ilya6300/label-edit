@@ -24,12 +24,27 @@
   cursor: pointer;
   position: absolute;
   z-index: 100;
-  width: 130px;
+  /* width: 130px; */
   height: 25px;
   text-wrap: nowrap;
   top: 0;
   left: 0;
   border: 1px solid;
+  resize: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bardcode_container-text-preview {
+  cursor: pointer;
+  position: absolute;
+  z-index: 100;
+  /* width: 130px; */
+  height: 25px;
+  text-wrap: nowrap;
+  top: 0;
+  left: 0;
+  /* border: 1px solid; */
   resize: inherit;
   display: flex;
   align-items: center;
@@ -78,27 +93,38 @@
   justify-content: center;
   /* border: 1px solid; */
 }
+.bardcode_container-barcode-preview {
+  cursor: pointer;
+  position: absolute;
+  z-index: 100;
+  width: 130px;
+  height: 25px;
+  text-wrap: nowrap;
+  top: 0;
+  left: 0;
+  resize: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* border: 1px solid; */
+}
 .barlabel_title {
   font-size: 15px;
   display: block;
   margin-bottom: 15px;
   border-bottom: 1px solid #0000001f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 33px;
 }
-.barlabel_number {
-  width: 45px;
-  margin: 0 15px 0 3px;
-  border: none;
-  border-radius: 4px;
-  border-bottom: 1px solid var(--mast-blue);
-  background: var(--lg-main-blue);
-  color: var(--mast-blue);
-  text-align: right;
-}
+
 .bar_label {
   border: var(--grey_border);
   padding: 5px 4px;
   color: #8f8c8ce0;
   font-size: 13px;
+  position: relative;
 }
 .out_contaiber {
   position: fixed;
@@ -108,4 +134,29 @@
   right: 0;
   bottom: 0;
   z-index: 2;
+}
+.label_reference {
+  position: relative;
+}
+.cls_mm {
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(rgb(114 114 114 / 75%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(114 114 114 / 75%) 1px, transparent 1px),
+    linear-gradient(rgb(114 114 114) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(114 114 114) 1px, white 1px);
+  background-size: var(--mm) var(--mm), var(--mm) var(--mm), var(--cm) var(--cm),
+    var(--cm) var(--cm);
+  background-position: 0px 0px, 0px 0px, -1px -1px, -1px -1px;
+  animation: mm_anim 1s forwards ease-in-out;
+}
+
+@keyframes mm_anim {
+  100% {
+    opacity: 1;
+  }
 }

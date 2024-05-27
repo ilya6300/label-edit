@@ -59,3 +59,72 @@
   /* font-size: 13px; */
   text-align: start;
 }
+.startfonts_container {
+  max-width: 800px;
+  margin: 0 5px;
+}
+.startfonts_container-text {
+  margin: 5vh auto;
+  color: #8f8c8ce0;
+  font-size: 16px;
+}
+.startfonts_container-add_btn {
+  display: flex;
+  justify-content: space-between;
+  color: var(--mast-blue);
+}
+.startfonts_container_add_btn {
+  cursor: pointer;
+  border: 1px solid var(--mast-blue);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+.startfonts_container_add_btn::before {
+  content: "\271B";
+  font-size: 18px;
+  transition: color 0.3s ease-in-out;
+  font-weight: 400;
+  /* color: var(--mast-blue); */
+}
+.startfonts_container_add_btn:hover::before {
+  color: aliceblue;
+}
+.startfonts_container_add_btn:hover {
+  background: var(--mast-blue);
+}
+.startfonts_container_add_btn-text {
+  font-size: 18px;
+  font-weight: 300;
+}
+.startfonts_container_name_btn {
+}
+.startfonts_container_name_btn {
+  cursor: pointer;
+  transition: all 0.5s ease-in;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px double var(--mast-blue);
+  padding: 4px 0;
+  width: 85px;
+  text-align: center;
+  border-radius: 4px;
+  color: var(--mast-blue);
+}
+.startfonts_container_name_btn:hover {
+  color: white;
+  background-color: var(--mast-blue);
+  box-shadow: 0 1px 5px 1px var(--mast-blue);
+}
+.startfonts_container_btn {
+  display: flex;
+  justify-content: flex-end;
+  gap: 3.5vw;
+  margin: 35px 0;
+}
+.begin_container {
+  display: flex;
+}

@@ -16,6 +16,7 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
   const refContainer = useRef(null);
   const inpFile = useRef(null);
   const [valueImg, setValueImg] = useState(null);
+  const [idImg, setIdImg] = useState(null);
   // const [valueBase64, setValueBase64] = useState("");
   const [name, setName] = useState("");
 
@@ -56,7 +57,9 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
     reader.readAsDataURL(file);
   };
 
-  const actionImg = () => {
+  // выбор img и добавлениек в шаблон
+  const actionImg = (e) => {
+    console.log(e);
     if (preview) {
       if (name.length < 3) {
         return alert("Минимальная длина названия 3 символов");
@@ -66,7 +69,7 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
       setName("");
     }
     if (previewSelect) {
-      createImg(valueImg);
+      createImg(valueImg, idImg);
       setPreviewSelect(true);
       setName("");
     }
@@ -76,6 +79,7 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
     console.log(e.data);
     setValueImg(e.data);
     setName(e.name);
+    setIdImg(e.id);
     setPreviewSelect(true);
   };
 
@@ -107,7 +111,7 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
               ref={inpFile}
               onChange={selectedFile}
               type="file"
-              accept="image/.bmp"
+              accept=".bmp"
               className="hidden"
             />
           </span>

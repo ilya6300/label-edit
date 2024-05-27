@@ -4,7 +4,7 @@ import objVisible from "../img/icons/icon_visible.png";
 import objHidden from "../img/icons/icon_hidden.png";
 import { observer } from "mobx-react-lite";
 
-export const LayersObj = observer(({ setPropActive }) => {
+export const LayersObj = observer(() => {
   const getPropsObj = (e) => {
     console.log(e.target.id);
     Object.getObject(e);
@@ -32,12 +32,7 @@ export const LayersObj = observer(({ setPropActive }) => {
 
   return (
     <ul className="list_props">
-      <li className="add_obj-title">
-        <span className="btn_title_props" onClick={() => setPropActive(true)}>
-          Свойства
-        </span>{" "}
-        <span className="btn_title_props-active">Слои</span>
-      </li>
+      
       {Object.objects.map((obj) =>
         obj.id !== 9999 ? (
           <li

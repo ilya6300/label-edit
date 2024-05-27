@@ -11,7 +11,7 @@ textarea {
   outline: 0;
   resize: none;
 }
-textarea {
+textarea:hover {
   min-height: 60px;
 }
 * {
@@ -24,6 +24,7 @@ textarea {
   -moz-osx-font-smoothing: grayscale;
 }
 * {
+  user-select: none;
   webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -34,9 +35,16 @@ a {
 }
 
 @import url("./var.css");
+@import url("./ui.css");
 @import url("./label.css");
 @import url("./editor.css");
 @import url("./fontfamily.css");
 @import url("./img.css");
 @import url("./loader.css");
 @import url("./preview.css");
+@import url("./templates.css");
+@import url("./error.css");
+@import url("./messages.css");
+
+
+

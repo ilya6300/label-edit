@@ -1,0 +1,19 @@
+.error_container {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 60vh;
+    flex-direction: column;
+}
+.img_error {
+    display: block;
+    height: 25%;
+    opacity: 0.3;
+    min-height: 100px;
+    max-height: 140px;
+}
+.error_text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0000006b;
+}

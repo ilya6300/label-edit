@@ -7,7 +7,7 @@ import { observer } from "mobx-react-lite";
 export const ListFontFamily = observer(({selectFontFamily}) => {
   // Выбрать шрифт тектса
   const hoverFontFamily = (e) => {
-    Object.updateFontFamily(e.name);
+    Object.updateFontFamily(e);
   };
 
   return (
