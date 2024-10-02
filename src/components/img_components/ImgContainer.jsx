@@ -4,6 +4,7 @@ import { observer } from "mobx-react-lite";
 import { Loader } from "../Loader";
 import { Preview } from "../Preview";
 import { ListImg } from "./ListImg";
+import Memory from "../../store/Memory";
 
 export const ImgContainer = observer(({ setImgBD, createImg }) => {
   useEffect(() => {
@@ -17,7 +18,6 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
   const inpFile = useRef(null);
   const [valueImg, setValueImg] = useState(null);
   const [idImg, setIdImg] = useState(null);
-  // const [valueBase64, setValueBase64] = useState("");
   const [name, setName] = useState("");
 
   const addImg = () => {
@@ -50,16 +50,16 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
   const sendFile = async (file) => {
     const reader = new FileReader();
     reader.onload = () => {
-      service.postImg(name, reader.result);
-      console.log(reader.result);
-      // setValueBase64(reader.result);
+      console.log(Memory.regPost(name));
+      service.postImg(name, reader.result.replace(/data:image\/bmp;base64,/g, ""));
+      // console.log(reader.result);
     };
     reader.readAsDataURL(file);
   };
 
   // выбор img и добавлениек в шаблон
   const actionImg = (e) => {
-    console.log(e);
+    // console.log(e);
     if (preview) {
       if (name.length < 3) {
         return alert("Минимальная длина названия 3 символов");
@@ -95,7 +95,7 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
 
   return (
     <div ref={refContainer} className="add_obj_img">
-      <div className="container_list_img">
+      <ul className="container_list_img">
         <li className="add_obj-title">
           Из списка{" "}
           <span
@@ -103,7 +103,7 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
             onClick={() => setImgBD(false)}
           ></span>
         </li>
-        <li className="add_obj-title_new">
+        <li className="add_obj-title">
           Добавить
           <span className="container_add_btn" onClick={() => addImg()}>
             {" "}
@@ -117,7 +117,7 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
           </span>
         </li>
         {!service.imgLoading ? <ListImg getThisImg={getThisImg} /> : <Loader />}
-      </div>
+      </ul>
 
       {preview ? (
         <Preview

@@ -28,6 +28,7 @@
   width: 70%;
   display: flex;
   justify-content: center;
+  position: relative;
 }
 .item_template {
   color: #000000;

@@ -1,18 +1,16 @@
 .App {
-  /* background: var(--main-lg-bl); */
   width: 100vw;
   height: 100vh;
   display: flex;
-  /* align-items: center; */
   justify-content: center;
 }
 input,
-textarea {
+textarea, select {
   outline: 0;
   resize: none;
 }
 textarea:hover {
-  min-height: 60px;
+  /* min-height: 60px; */
 }
 * {
   list-style: none;

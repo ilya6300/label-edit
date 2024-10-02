@@ -8,6 +8,9 @@ import { PostCompanent } from "./PostCompanent";
 import Templates from "../store/Templates";
 import service from "../request/service";
 import { BarInfo } from "./BarInfo";
+import HistoryStore from "../store/HistoryStore";
+import { ImportCompanent } from "./import/ImportCompanent";
+import iconSettings from "../img/icons/icon-settings.png";
 
 export const BarLabel = observer(
   ({
@@ -17,6 +20,9 @@ export const BarLabel = observer(
     visibleTemplates,
     setClsMM,
     clsMM,
+    setImportC,
+    setPrinterSetting,
+    printerSetting,
   }) => {
     const [wValuse, setWValue] = useState(Memory.width_label);
     const [hValuse, setHValue] = useState(Memory.height_label);
@@ -26,6 +32,7 @@ export const BarLabel = observer(
     const [direction2, setDirection2] = useState(Memory.DIRECTION_2);
     const [refX, setRefX] = useState(Memory.ref_x);
     const [refY, setRefY] = useState(Memory.ref_y);
+
     // Имя шаблона
     const [valueName, setValueName] = useState(Memory.name_template);
 
@@ -39,7 +46,7 @@ export const BarLabel = observer(
             setWValue(15);
             Memory.widthLabelChange(15);
           }
-        }, 500);
+        }, 1000);
         setWValue(e.target.value);
         Memory.widthLabelChange(e.target.value);
       }
@@ -176,14 +183,14 @@ export const BarLabel = observer(
       setWValue(Templates.preview_templates.width_mm);
       setHValue(Templates.preview_templates.height_mm);
       setGValue(Templates.preview_templates.gap_mm);
+      Templates.saveID(Templates.preview_templates.id);
       Object.select();
-      Templates.downloadedTemplates();
+      Templates.downloadedTemplates(Object.objects_preview);
     };
 
     const deleteTemplate = () => {
       console.log(Templates.preview_templates.id);
-      service.deleteTemplate()
-      // Templates.resetTemplate();
+      service.deleteTemplate();
     };
 
     // Новый шаблон
@@ -194,7 +201,6 @@ export const BarLabel = observer(
     // Включить / отклюяить милимметровую сетку
     const [clsMMBtn, setClsMMBtn] = useState("cls_mm-btn");
     const onMM = () => {
-      console.log(clsMM);
       if (clsMM === "") {
         setClsMMBtn("cls_mm-btn-active");
         setClsMM("cls_mm");
@@ -204,11 +210,34 @@ export const BarLabel = observer(
       }
     };
 
+    const changeDpi = (e) => {
+      console.log(e);
+      Memory.dpiChange(e.target.value);
+    };
+
+    const backStepHistory = () => {
+      HistoryStore.incrementReturnHistory();
+    };
+
+    const visibleImportC = () => {
+      setImportC(true);
+    };
+
+    const trialPrint = async () => {
+      if (Templates.template_id === null) {
+        return alert("Сохраните шаблон или выберите из БД");
+      }
+      if (localStorage.getItem("printer") === null) {
+        return setPrinterSetting(true);
+      }
+      await service.trialPrint();
+    };
+
     return (
       <div className="bar_label">
         <span className="barlabel_title">
           <span style={{ width: "150px" }}>
-            {JSON.stringify(Templates.preview_templates) === '{}'
+            {JSON.stringify(Templates.preview_templates) === "{}"
               ? "Новый шаблон"
               : Memory.name_template}
           </span>
@@ -217,7 +246,7 @@ export const BarLabel = observer(
               <>
                 {/* Редактор */}
                 <BtnVer1 onClick={newTemplateFunc}>Создать новый</BtnVer1>
-
+                <BtnVer1 onClick={visibleImportC}>Импорт</BtnVer1>
                 <PostCompanent
                   valueName={valueName}
                   setValueName={setValueName}
@@ -241,27 +270,43 @@ export const BarLabel = observer(
             <button onClick={onMM} className={clsMMBtn}>
               #
             </button>
+            <span className="btn_back_history" onClick={backStepHistory}></span>
             <BarInfo />
           </div>
         </span>
 
         <div className="barlabel_container">
           <div className="barlabel_filter_container">
-            <LabelInpVer1 text="Ширина" value={wValuse} onChange={changeW} />
-            <LabelInpVer1 text="Высота" value={hValuse} onChange={changeH} />
+            <label onChange={changeDpi}>
+              dpi:{" "}
+              <select className="barlabel_container_dpi">
+                <option value="12">300</option>
+                <option value="8">200</option>
+              </select>
+            </label>
+            <LabelInpVer1
+              text="Ширина"
+              value={Memory.width_label}
+              onChange={changeW}
+            />
+            <LabelInpVer1
+              text="Высота"
+              value={Memory.height_label}
+              onChange={changeH}
+            />
             <LabelInpVer1
               text="Скругление"
-              value={rValuse}
+              value={Memory.radius_label}
               onChange={changeR}
             />
-            <LabelInpVer1 text="Зазор" value={gValuse} onChange={changeG} />
+            <LabelInpVer1 text="Зазор" value={Memory.gap} onChange={changeG} />
             <label>
               Направление:
               <input
                 className="barlabel_number"
                 type="number"
                 id="1"
-                value={direction1}
+                value={Memory.DIRECTION_1}
                 onChange={changeDirection}
                 style={{
                   width: "25px",
@@ -273,7 +318,7 @@ export const BarLabel = observer(
                 className="barlabel_number"
                 type="number"
                 id="2"
-                value={direction2}
+                value={Memory.DIRECTION_2}
                 onChange={changeDirection}
                 style={{
                   width: "25px",
@@ -287,7 +332,7 @@ export const BarLabel = observer(
                 className="barlabel_number"
                 type="number"
                 id="x"
-                value={refX}
+                value={Memory.ref_x}
                 onChange={changeRef}
                 style={{
                   width: "40px",
@@ -299,7 +344,7 @@ export const BarLabel = observer(
                 className="barlabel_number"
                 type="number"
                 id="y"
-                value={refY}
+                value={Memory.ref_y}
                 onChange={changeRef}
                 style={{
                   width: "40px",
@@ -307,6 +352,34 @@ export const BarLabel = observer(
                 }}
               />
             </label>
+          </div>
+        </div>
+        <div className="barlabel_container_suboptions">
+          <div className="barlabel_container_scale">
+            <span>Масштаб</span>
+            <input
+              type="range"
+              min="1"
+              max="4"
+              step="0.25"
+              value={Memory.scale}
+              onChange={(e) => Memory.setScaleLabel(e.target.value)}
+            />
+            <span>{Memory.scale * 100} %</span>
+          </div>
+          <div className="barlabel_container_printing">
+            <BtnVer1 onClick={trialPrint}>Пробная печать</BtnVer1>
+            <img
+              onClick={() => setPrinterSetting(!printerSetting)}
+              className="barlabel_setting_printer"
+              src={iconSettings}
+              alt="Настройки принтера"
+              style={{
+                animation: printerSetting
+                  ? "setting_printing_rotate 3s infinite linear"
+                  : "",
+              }}
+            />
           </div>
         </div>
       </div>

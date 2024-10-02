@@ -7,7 +7,7 @@ export const ItemImg = observer((props) => {
       className="img_item_container"
       onClick={() => props.getThisImg(props.img)}
     >
-      <img className="img_item" src={props.img.data} alt="" />
+      <img className="img_item" src={'data:image/bmp;base64,'+props.img.data} alt="" />
       <p
         className="img_item_text"
         style={{

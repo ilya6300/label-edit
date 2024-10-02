@@ -5,19 +5,17 @@ import Object from "../store/Object";
 import { observer } from "mobx-react-lite";
 import keyboard from "../store/keyboard";
 import HistoryStore from "../store/HistoryStore";
-import { wait } from "@testing-library/user-event/dist/utils";
 
 export const ThisLabel = observer(
   ({ objects, preview, add_canvas, setClsContainer, clsMM }) => {
-    //   const refOut = useRef(null);
     const documentMouseUp = () => {
-      onMouseUpFunc()
-    }
+      onMouseUpFunc();
+    };
     useEffect(() => {
       document.addEventListener("mouseup", documentMouseUp);
       return () => {
         document.removeEventListener("mouseup", documentMouseUp);
-      }
+      };
     }, []);
     // Переменные размера этикетки (холста)
     const [canvasX, setCanvasX] = useState(null);
@@ -85,7 +83,10 @@ export const ThisLabel = observer(
                 e,
                 "1px 1px 3px 0px var(--mast-blue-1)"
               );
-            } else if (e.target.offsetHeight - e.nativeEvent.offsetY < 7) {
+            } else if (
+              e.target.offsetHeight - e.nativeEvent.offsetY < 7 &&
+              e.target.innerText !== "lines"
+            ) {
               e.target.style.cursor = "s-resize";
               Object.hoverElementShadow(e, "0 2px 2px 0px var(--mast-blue-1)");
             } else if (e.target.offsetWidth - e.nativeEvent.offsetX < 7) {
@@ -134,14 +135,14 @@ export const ThisLabel = observer(
 
     // Открыть окно с свойствами
     const editBodyFunc = (e) => {
-      if (!preview) {
+      if (!preview && e.target.id !== "btn_size") {
+        console.log(e);
         Object.getObject(e);
         let reg = Object.obj.target.id.replace(/\D/gm, "");
-        Object.objects.find((el) => {
-          if (el.id === Number(reg)) {
-            Object.setPropObj(el);
-          }
-        });
+        const ID = Object.objects.find((el) => el.id === Number(reg));
+        if (ID) {
+          Object.setPropObj(ID);
+        }
         Memory.updateFlagPropsObj(true);
         Object.editBody();
         setClsContainer("editor_list_obj_container_prop");
@@ -149,17 +150,16 @@ export const ThisLabel = observer(
     };
 
     const onMouseDownFunc = (e) => {
-      if (!preview) {
-        // refOut.current.style.display = "block";
+      if (!preview && e.target.id !== "btn_size") {
         setCanvasX(lblRef.current.getBoundingClientRect().x);
         setCanvasY(lblRef.current.getBoundingClientRect().y);
         Object.getObject(e);
-        // pressShift(e);
         const reg = Object.obj.target.id.replace(/\D/gm, "");
         Object.objects.forEach((active) => {
           if (active.id === Number(reg)) {
             if (!active.active) {
               editBodyFunc(e);
+              // Object.getCoordXY()
               return;
             } else {
               editBodyFunc(e);
@@ -169,13 +169,15 @@ export const ThisLabel = observer(
                   7 &&
                 Object.obj.target.offsetWidth - Object.obj.nativeEvent.offsetX <
                   7 &&
-                !keyboard.shift_key
+                !keyboard.shift_key &&
+                e.target.innerText !== "lines"
               ) {
                 Object.getFlagEditSize(true, true, true);
               } else if (
                 Object.obj.target.offsetHeight -
                   Object.obj.nativeEvent.offsetY <
-                7
+                  7 &&
+                e.target.innerText !== "lines"
               ) {
                 Memory.calcCoefficientH();
                 Object.getFlagEditSize(true, false, true);
@@ -186,7 +188,6 @@ export const ThisLabel = observer(
                 Memory.calcCoefficientW();
                 Object.getFlagEditSize(true, true, false);
               }
-              // else {
               Object.objects.forEach((el) => {
                 let reg = Object.obj.target.id.replace(/\D/gm, "");
                 if (el.id === Number(reg)) {
@@ -202,12 +203,41 @@ export const ThisLabel = observer(
       }
     };
 
-    const onMouseUpFunc = () => {
+    const scaleBarcodeIncrement = () => {
+      if (
+        (Object.prop_obj.typeBarcode === "ean13" ||
+          Object.prop_obj.typeBarcode === "code128") &&
+        Object.prop_obj.w + 1 < 5
+      ) {
+        Object.manualW(Object.prop_obj.w + 1);
+      } else if (
+        Object.prop_obj.typeBarcode === "datamatrix" &&
+        Object.prop_obj.w + 1 < 23
+      ) {
+        Object.manualW(Object.prop_obj.w + 1);
+      }
+    };
+    const scaleBarcodeDecrement = () => {
+      if (
+        Object.prop_obj.typeBarcode === "ean13" ||
+        (Object.prop_obj.typeBarcode === "code128" && Object.prop_obj.w - 1 > 0)
+      ) {
+        Object.manualW(Object.prop_obj.w - 1);
+      } else if (
+        Object.prop_obj.typeBarcode === "datamatrix" &&
+        Object.prop_obj.w - 1 > 2
+      ) {
+        Object.manualW(Object.prop_obj.w - 1);
+      }
+    };
+
+    const onMouseUpFunc = (e) => {
       if (!preview) {
         if (Object.obj !== null) {
-          Object.getFlagEditSize(false);
           Object.getCoordXY();
+          Object.getFlagEditSize(false);
           Object.saveAttributeWH();
+
           Object.deleteClone();
           Object.boxShadowObj();
           HistoryStore.addHistory();
@@ -215,22 +245,13 @@ export const ThisLabel = observer(
       }
     };
 
-    // const onMouseUpHistory = () => {
-    //   if (!preview) {
-    //     if (Object.obj !== null) {
-    //       HistoryStore.addHistory();
-    //     }
-    //   }
-    // };
-
     return (
       <div
-        // onMouseUp={onMouseUpHistory}
         onMouseMove={onMouseMoveFunc}
         id="label"
         style={{
-          width: Memory.width_label * Memory.mm + "px",
-          height: Memory.height_label * Memory.mm + "px",
+          width: Memory.width_label * Memory.mm * Memory.scale + "px",
+          height: Memory.height_label * Memory.mm * Memory.scale + "px",
           borderRadius: Memory.radius_label + "px",
         }}
         className="label"
@@ -241,87 +262,159 @@ export const ThisLabel = observer(
               ref={lblRef}
               className="label_reference "
               style={{
-                width: Memory.width_label * Memory.mm + "px",
-                height: Memory.height_label * Memory.mm + "px",
+                width:
+                  (Memory.width_label * Memory.mm + 8) * Memory.scale + "px",
+                height:
+                  (Memory.height_label * Memory.mm + 8) * Memory.scale + "px",
                 borderRadius: Memory.radius_label + "px",
-                marginLeft: Memory.ref_x * Memory.mm + "px",
-                marginTop: Memory.ref_y * Memory.mm + "px",
+                marginLeft: Memory.ref_x * Memory.mm - 8 + "px",
+                marginTop: Memory.ref_y * Memory.mm - 8 + "px",
                 border: !preview ? "var(--grey_border)" : "none",
               }}
-            >
-              {Memory.visible_objects ? (
-                objects.map((obj) => (
-                  <div
-                    // onDragStart={(e) => e.preventDefault()}
-                    // onMouseUp={onMouseUpFunc}
-                    onMouseDown={onMouseDownFunc}
-                    onMouseOut={onMouseOutFunc}
-                    key={obj.id}
-                    id={obj.id}
-                    className={!preview ? obj.cls.join(" ") : obj.clsPreview}
-                    style={{
-                      width:
-                        obj.typeObj === "text"
-                          ? "fit-content"
-                          : obj.pxW * Memory.mm + "px",
-                      height: obj.pxH * Memory.mm + "px",
-                      zIndex: obj.zIndex,
-                      left: obj.pxX + "px",
-                      top: obj.pxY + "px",
-                      fontSize: obj.style.fontSize + "pt",
-                      fontFamily: obj.style.fontFamily,
-                      justifyContent: obj.style.position,
-                      rotate: obj.style.rotate + "deg",
+            ></div>
+            {Memory.visible_objects ? (
+              objects.map((obj) => (
+                <div
+                  on
+                  onMouseDown={onMouseDownFunc}
+                  onMouseOut={onMouseOutFunc}
+                  key={obj.id}
+                  id={obj.id}
+                  className={!preview ? obj.cls.join(" ") : obj.clsPreview}
+                  style={{
+                    // transform: `scale(${Memory.scale})`,
+                    width:
+                      obj.typeObj === "text" ||
+                      obj.typeBarcode === "ean13" ||
+                      obj.typeBarcode === "code128"
+                        ? "fit-content"
+                        : obj.typeBarcode === "datamatrix"
+                        ? obj.pxW * obj.min_size * Memory.mm * Memory.scale +
+                          "px"
+                        : obj.typeObj === "box"
+                        ? obj.pxW * Memory.scale + "px"
+                        : obj.pxW * Memory.mm * Memory.scale + "px",
+                    height:
+                      obj.typeBarcode === "datamatrix"
+                        ? obj.pxW * obj.min_size * Memory.mm * Memory.scale +
+                          "px"
+                        : obj.typeObj === "box"
+                        ? obj.pxH * Memory.scale + "px"
+                        : obj.pxH * Memory.mm * Memory.scale + "px",
+                    zIndex: obj.zIndex,
+                    left: obj.pxX * Memory.scale + "px",
+                    top: obj.pxY * Memory.scale + "px",
+                    fontSize: obj.style.fontSize * Memory.scale + "pt",
+                    fontFamily:
+                      String(obj.style.fontFamily) !== "0"
+                        ? obj.style.fontFamily
+                        : "monospace",
+                    justifyContent:
+                      obj.style.position === "2"
+                        ? "center"
+                        : obj.style.position === "3"
+                        ? "flex-end"
+                        : "flex-start",
+                    rotate:
+                      obj.typeObj !== "lines"
+                        ? obj.style.rotate + "deg"
+                        : obj.style.rotate,
 
-                      opacity:
-                        (obj.active && !preview) || (obj.active && preview)
-                          ? 1
-                          : !obj.active && !preview
-                          ? 0.2
-                          : 0,
-                      boxShadow: !preview ? obj.style.boxShadow : "none",
-                    }}
-                  >
-                    {obj.typeObj === "text" || obj.typeObj === "block" ? (
-                      obj.body
-                    ) : (
-                      <></>
-                    )}
-                    {obj.typeObj === "barcode" ? (
-                      <Barcode
-                        body={obj.body}
-                        typeBarcode={obj.typeBarcode}
-                        w={obj.pxW}
-                        h={obj.pxH}
-                        id={obj.id}
-                        active={obj.active}
-                        add_canvas={add_canvas}
-                      />
-                    ) : (
-                      <></>
-                    )}
-                    {obj.typeObj === "img" ? (
-                      <img
-                        id={obj.id}
-                        style={{
-                          width: obj.pxW * Memory.mm + "px",
-                          height: obj.pxH * Memory.mm + "px",
-                          border: "none",
-                          left: obj.pxX + "px",
-                          top: obj.pxY + "px",
-                        }}
-                        src={obj.body}
-                        alt=""
-                      />
-                    ) : (
-                      <></>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <></>
-              )}
-            </div>
+                    opacity:
+                      (obj.active && !preview) || (obj.active && preview)
+                        ? 1
+                        : !obj.active && !preview
+                        ? 0.2
+                        : 0,
+                    boxShadow: !preview ? obj.style.boxShadow : "none",
+                  }}
+                >
+                  {obj.typeBarcode !== "qrcode" &&
+                  obj.typeObj === "barcode" &&
+                  obj.id === Object.prop_obj.id &&
+                  !preview ? (
+                    <div className="barcode_panel_scale_container">
+                      <button
+                        id="btn_size"
+                        className="barcode_panel_scale_btn"
+                        onClick={scaleBarcodeIncrement}
+                      >
+                        +
+                      </button>
+                      <button
+                        id="btn_size"
+                        className="barcode_panel_scale_btn"
+                        onClick={scaleBarcodeDecrement}
+                      >
+                        -
+                      </button>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  {obj.typeObj === "text" || obj.typeObj === "block" ? (
+                    obj.body
+                  ) : (
+                    <></>
+                  )}
+                  {obj.typeObj === "barcode" ? (
+                    <Barcode obj={obj} add_canvas={add_canvas} />
+                  ) : (
+                    <></>
+                  )}
+                  {obj.typeObj === "img" ? (
+                    <img
+                      id={obj.id}
+                      style={{
+                        pointerEvents: "none",
+                        width: obj.pxW * Memory.mm * Memory.scale + "px",
+                        height: obj.pxH * Memory.mm * Memory.scale + "px",
+                        border: "none",
+                        left: obj.pxX * Memory.scale + "px",
+                        top: obj.pxY * Memory.scale + "px",
+                      }}
+                      src={"data:image/bmp;base64," + obj.body}
+                      alt="img"
+                    />
+                  ) : (
+                    <></>
+                  )}
+                  {obj.typeObj === "lines" ? (
+                    <div
+                      style={{
+                        width: obj.pxW * Memory.mm * Memory.scale + "px",
+                        height: obj.pxH * Memory.mm * Memory.scale + "px",
+                        background: "black",
+                        left: obj.pxX * Memory.scale + "px",
+                        top: obj.pxY * Memory.scale + "px",
+                      }}
+                      id={obj.id}
+                    >
+                      {obj.body}
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                  {obj.typeObj === "box" ? (
+                    <div
+                      style={{
+                        width: obj.pxW * Memory.scale + "px",
+                        height: obj.pxH * Memory.scale + "px",
+                        border: obj.line_thickness / 2 + "px solid",
+                        left: obj.pxX * Memory.scale + "px",
+                        top: obj.pxY * Memory.scale + "px",
+                        borderRadius: obj.borderRadius / 2 + "px",
+                      }}
+                      id={obj.id}
+                    ></div>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              ))
+            ) : (
+              <></>
+            )}
           </React.StrictMode>
         </div>
       </div>

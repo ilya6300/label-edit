@@ -1,19 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { ListFontFamily } from "./ListFontFamily";
 import service from "../../request/service";
 import { observer } from "mobx-react-lite";
-import { Loader } from "../Loader";
+import Object from "../../store/Object";
 
 export const FontsContainer = observer(({ setFlagFonts }) => {
   const [nameFont, setNameFont] = useState("");
   const [newFont, setNewFont] = useState(false);
   const [fileFont, setFileFont] = useState(null);
   const refInpFile = useRef(null);
-
-  // useEffect(() => {
-    // service.getFonts();
-    // setFlagFonts(true);
-  // }, []);
 
   const addFont = () => {
     refInpFile.current.click();
@@ -40,19 +35,32 @@ export const FontsContainer = observer(({ setFlagFonts }) => {
   const saveFont = async (file) => {
     const reader = new FileReader();
     reader.onload = () => {
-      service.postFont(nameFont, reader.result);
-      console.log(reader.result);
+      service.postFont(
+        nameFont,
+        reader.result.replace(/data:application\/.*;base64,/g, "")
+      );
     };
     reader.readAsDataURL(file);
     setNameFont("");
     setNewFont(false);
   };
 
+  const writeName = (e) => {
+    if (e.target.value.match(/[a-zA-Z\d_]/gm) || e.target.value.length === 0)
+      setNameFont(
+        e.target.value.replace(/[!@#№%^:$&?*()_\-=+<>\.,;:а-яёйА-ЯЁЙ\s]/g, "")
+      );
+  };
+
+  const closedFontsList = () => {
+    setFlagFonts(false);
+    Object.getFlagEditSize(false);
+  };
+
   return (
     <ul className="editor_list_obj_container_prop">
       <li className="add_obj-title">
-        {" "}
-        Шрифты{" "}
+        Шрифты
         <span
           className="container_closed_btn"
           onClick={() => setFlagFonts(false)}
@@ -63,11 +71,11 @@ export const FontsContainer = observer(({ setFlagFonts }) => {
         <>
           <li className="add_img_name_container-text">
             Загружен шрифт {nameFont}. Оставьте текущее название или введите
-            своё
+            своё на латинице. Максимум 8 символов
           </li>
           <input
             value={nameFont}
-            onChange={(e) => setNameFont(e.target.value.replace(/(\.)/g, ""))}
+            onChange={writeName}
             className="add_img_name_container-inp"
             type="text"
             placeholder="Введите название шрифта"
@@ -96,11 +104,7 @@ export const FontsContainer = observer(({ setFlagFonts }) => {
           </span>
         </li>
       )}
-      {/* {service.fontsLoading ? (
-        <Loader />
-      ) : ( */}
-        <ListFontFamily selectFontFamily={() => setFlagFonts(false)} />
-      {/* // )} */}
+      <ListFontFamily selectFontFamily={closedFontsList} />
     </ul>
   );
 });

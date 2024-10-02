@@ -1,48 +1,61 @@
 import { observer } from "mobx-react-lite";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 
-export const Preview = observer(({
-  valueImg,
-  actionImg,
-  name_btn,
-  preview,
-  name,
-  setName,
-  closedContainer,
-}) => {
-  const refPreview = useRef(null);
-  return (
-    <div className="add_obj_img_preview_container">
-      <p className="add_obj-title">Предпросмотр</p>
-      <div className="window_preview" ref={refPreview}>
-        <img
-          className="window_preview_img"
-          src={valueImg}
-          alt=""
-        />
-      </div>
-      {preview ? (
-        <ul className="add_img_name_container">
-          <li className="add_img_name_container-text">Введите название:</li>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="add_img_name_container-inp"
-            type="text"
-            placeholder="Введите название"
+export const Preview = observer(
+  ({
+    valueImg,
+    actionImg,
+    name_btn,
+    preview,
+    name,
+    setName,
+    closedContainer,
+  }) => {
+    const writeName = (e) => {
+      if (
+        e.target.value.match(/[a-zA-Z\d_]/gm) ||
+        e.target.value.length === 0
+      ) {
+        setName(e.target.value.replace(/[!@#№%^$:&?*()_\-=+<>\.,;:а-яёйА-ЯЁЙ\s]/g, ""));
+      }
+    };
+
+    const refPreview = useRef(null);
+    return (
+      <div className="add_obj_img_preview_container">
+        <p className="add_obj-title">Предпросмотр</p>
+        <div className="window_preview" ref={refPreview}>
+          <img
+            className="window_preview_img"
+            src={preview ? valueImg : "data:image/bmp;base64," + valueImg}
+            alt=""
           />
-        </ul>
-      ) : (
-        <li className="add_img_prev_select_text">{name}</li>
-      )}
-      <div className="preview_container_btn">
-        <span className="btn_prev" onClick={actionImg}>
-          {name_btn}
-        </span>
-        <span onClick={closedContainer} className="btn_prev">
-          Закрыть
-        </span>
+        </div>
+        {preview ? (
+          <ul className="add_img_name_container">
+            <li className="add_img_name_container-text">
+              Введите название на латинице. Максимум 8 символов:
+            </li>
+            <input
+              value={name}
+              onChange={writeName}
+              className="add_img_name_container-inp"
+              type="text"
+              placeholder="Введите название (ENG)"
+            />
+          </ul>
+        ) : (
+          <li className="add_img_prev_select_text">{name}</li>
+        )}
+        <div className="preview_container_btn">
+          <span className="btn_prev" onClick={actionImg}>
+            {name_btn}
+          </span>
+          <span onClick={closedContainer} className="btn_prev">
+            Закрыть
+          </span>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);

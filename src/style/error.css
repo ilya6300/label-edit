@@ -7,10 +7,8 @@
 }
 .img_error {
     display: block;
-    height: 25%;
+    height: 110px;
     opacity: 0.3;
-    min-height: 100px;
-    max-height: 140px;
 }
 .error_text {
     font-size: 20px;

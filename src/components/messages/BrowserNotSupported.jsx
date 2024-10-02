@@ -5,7 +5,7 @@ export const BrowserNotSupported = () => {
   return (
     <div className="error_container">
       <p className="error_text">
-        Браузер Firefox не поддерживается, пожалуйста, используйте: GoogleChrom,
+        Браузер Firefox не поддерживается, пожалуйста, используйте: GoogleChrome,
         YandexBrowser, Opera, Edge
       </p>
       <img

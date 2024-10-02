@@ -19,8 +19,6 @@
 }
 .preview_label_container_reletive {
   position: relative;
-  /* background: #f6e3bd;
-  display: flex; */
 }
 .bardcode_container-block-preview {
   cursor: pointer;
@@ -33,6 +31,9 @@
   left: 0;
   /* border: 1px solid; */
   resize: inherit;
+  font-weight: 700;
+  font-family: monospace;
+  /* display: inline-block; */
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -50,6 +51,7 @@
   display: flex;
   justify-content: space-between;
   padding: 0 8px 0 5px;
+  border-radius: 8px 8px 0 0;
 }
 .preview_label_scale_container {
   background: white;

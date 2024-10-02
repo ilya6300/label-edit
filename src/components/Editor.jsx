@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "./Label";
 import { toJS } from "mobx";
 import Object from "../store/Object";
@@ -16,6 +16,9 @@ import { ServerError } from "./ServerError";
 import { BrowserNotSupported } from "./messages/BrowserNotSupported";
 import { ExchangeWithServer } from "./messages/ExchangeWithServer";
 import Memory from "../store/Memory";
+import { ImportCompanent } from "./import/ImportCompanent";
+import { MessagesContainer } from "./messages/MessagesContainer";
+import { PrinterSettings } from "./PrinterSettings";
 
 export const Editor = observer(() => {
   const [browserNotSupportedFlag, setBrowserNotSupportedFlag] = useState(false);
@@ -24,46 +27,31 @@ export const Editor = observer(() => {
     service.getFonts();
   }, []);
 
-  const inputPropRef = useRef(null);
-
   useEffect(() => {
     if (window.navigator.userAgent.toLowerCase().match(/firefox/g)) {
       return setBrowserNotSupportedFlag(true);
-      // return alert("Браузер Firefox не поддерживается, пожалуйста, используйте: GoogleChrom, YandexBrowser, Opera, Edge");
     }
-    if (Fonts.fonts.length !== 0) {
-      Fonts.fonts.forEach((f) => {
-        const myFont = new FontFace(f.name, `url(${f.data})`);
-        myFont.load();
-        document.fonts.add(myFont);
-      });
-      setNoFonts(false);
-      Fonts.defaultFont(Fonts.fonts[0]);
-    } else {
-      setNoFonts(true);
-    }
+    setNoFonts(false);
+    Fonts.defaultFont(Fonts.fonts[0]);
   }, [!service.fontsLoading]);
 
   // Класс мм сетки
   const [clsMM, setClsMM] = useState("");
-
+  const [printerSetting, setPrinterSetting] = useState(false);
   const [noFonts, setNoFonts] = useState(false);
-
+  const [importC, setImportC] = useState(false);
   const [visibleTemplates, setVisibleTemplates] = useState(false);
   const [flagPreview, setFlagPrevier] = useState(false);
   if (!browserNotSupportedFlag) {
     return (
       <div className="editor_container">
+        <MessagesContainer />
         {Memory.exchange ? <ExchangeWithServer /> : <></>}
-
-        <BtnControl inputPropRef={inputPropRef}/>
-        <h1 className="title_editor">Редактор этикеток</h1>
-
+        <BtnControl />
         {!service.fontsLoading && !service.errorNetwork ? (
           <>
             {!noFonts ? (
               <>
-                {" "}
                 <BarLabel
                   setVisibleTemplates={setVisibleTemplates}
                   visibleTemplates={visibleTemplates}
@@ -71,18 +59,31 @@ export const Editor = observer(() => {
                   flagPreview={flagPreview}
                   clsMM={clsMM}
                   setClsMM={setClsMM}
+                  setImportC={setImportC}
+                  setPrinterSetting={setPrinterSetting}
+                  printerSetting={printerSetting}
                 />
                 {visibleTemplates ? (
                   <GetTemplate />
                 ) : (
                   <div className="editor_list_viewer">
-                    <AddContainer />
-                    <Label
-                    inputPropRef={inputPropRef}
-                      flagPreview={flagPreview}
-                      setFlagPrevier={setFlagPrevier}
-                      clsMM={clsMM}
-                    />
+                    {!printerSetting ? (
+                      <>
+                        {importC ? (
+                          <ImportCompanent setImportC={setImportC} />
+                        ) : (
+                          <></>
+                        )}
+                        <AddContainer />
+                        <Label
+                          flagPreview={flagPreview}
+                          setFlagPrevier={setFlagPrevier}
+                          clsMM={clsMM}
+                        />
+                      </>
+                    ) : (
+                      <PrinterSettings setPrinterSetting={setPrinterSetting}/>
+                    )}
                   </div>
                 )}
                 <button

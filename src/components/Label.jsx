@@ -7,7 +7,7 @@ import { PropertiesPanel } from "./PropertiesPanel";
 import { PreviewLabel } from "./PreviewLabel";
 import { ThisLabel } from "./ThisLabel";
 
-export const Label = observer(({ flagPreview, setFlagPrevier, clsMM, inputPropRef }) => {
+export const Label = observer(({ flagPreview, setFlagPrevier, clsMM }) => {
   // Класс для контейнера свойств
   const [clsContainer, setClsContainer] = useState(
     "editor_list_obj_container_prop-start"
@@ -42,15 +42,20 @@ export const Label = observer(({ flagPreview, setFlagPrevier, clsMM, inputPropRe
         <div
           className="label"
           style={{
-            marginTop: -Memory.height_label * Memory.mm + 20 + "px",
-            height: Memory.height_label * Memory.mm + "px",
-            width: Memory.width_label * Memory.mm + "px",
+            marginTop:
+              (-Memory.height_label * Memory.mm + 20) * Memory.scale + "px",
+            height: Memory.height_label * Memory.mm * Memory.scale + "px",
+            width: Memory.width_label * Memory.mm * Memory.scale + "px",
             borderRadius: Memory.radius_label + "px",
             marginBottom: Memory.gap * Memory.mm + "px",
           }}
         ></div>
 
-        <ThisLabel clsMM={clsMM} objects={Object.objects} setClsContainer={setClsContainer} />
+        <ThisLabel
+          clsMM={clsMM}
+          objects={Object.objects}
+          setClsContainer={setClsContainer}
+        />
 
         {Memory.height_label > 75 ? (
           <div
@@ -72,11 +77,15 @@ export const Label = observer(({ flagPreview, setFlagPrevier, clsMM, inputPropRe
         )}
       </div>
       {Object.obj !== null ? (
-        <PropertiesPanel clsContainer={clsContainer} inputPropRef={inputPropRef}/>
+        <PropertiesPanel clsContainer={clsContainer} />
       ) : (
         <NoneProps />
       )}
-      {flagPreview ? <PreviewLabel clsMM={clsMM} setFlagPrevier={setFlagPrevier} /> : <></>}
+      {flagPreview ? (
+        <PreviewLabel clsMM={clsMM} setFlagPrevier={setFlagPrevier} />
+      ) : (
+        <></>
+      )}
     </div>
   );
 });

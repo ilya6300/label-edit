@@ -5,19 +5,20 @@ class Templates {
   constructor() {
     makeAutoObservable(this);
   }
+
+  template_id = null;
   preview_templates = {};
   downloaded_template = [];
 
-  // resetTemplate = () => {
-  //   this.preview_templates = {};
-  // };
-
-
-  downloadedTemplates = () => {
-    console.log(Object.objects_preview)
-    this.downloaded_template = JSON.parse(JSON.stringify(Object.objects_preview));
+  downloadedTemplates = (collection) => {
+    console.log(Object.objects_preview);
+    this.downloaded_template = JSON.parse(
+      JSON.stringify(collection)
+    );
   };
 
-  // Получить шаблон по id
+  saveID = (id) => {
+    this.template_id = id;
+  };
 }
 export default new Templates();

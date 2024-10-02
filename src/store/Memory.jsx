@@ -1,10 +1,31 @@
 import { makeAutoObservable } from "mobx";
 import Object from "./Object";
-import Fonts from "./Fonts";
 import Templates from "./Templates";
+import Msg from "./Msg";
 
 class Memory {
   mm = 3.709575175750246;
+  mm_qr = 3.999575175750246;
+  dpi = 12;
+
+  button_left_press = false;
+  left_press_timer = false;
+  pressLeftDown = () => {
+    this.left_press_timer = true;
+    setTimeout(() => {
+      if (this.left_press_timer) {
+        this.button_left_press = true;
+      } else {
+        this.button_left_press = false;
+      }
+    }, 400);
+  };
+  pressLeftUp = () => {
+    setTimeout(() => {
+      this.left_press_timer = false;
+      this.button_left_press = false;
+    }, 100);
+  };
   // Флаг отображение файлов на этикетке
   visible_objects = true;
   visible_modal_post = false; // Флаг модального окна сохранения или изменения шаблона
@@ -13,16 +34,14 @@ class Memory {
     this.exchange = boolean;
   };
   visiblePost = (boolean) => {
-    console.log(boolean);
     this.visible_modal_post = boolean;
   };
-  // move
   //  Переменные этикетки
   width_label = 58;
   height_label = 40;
   radius_label = 5;
   gap = 2;
-  DIRECTION_1 = 0;
+  DIRECTION_1 = 1;
   DIRECTION_2 = 0;
   ref_x = 0;
   ref_y = 0;
@@ -30,6 +49,12 @@ class Memory {
   // Временные переменные
   all_img = [];
 
+  //  Масштаб этикетки редактора
+  scale = 1;
+  setScaleLabel = (value) => {
+    this.scale = value;
+    // Object.recalculationScaleCoord(value);
+  };
   // Переменные окно предпросмотра
   scale_preview_index = 2;
   scales = [
@@ -91,6 +116,10 @@ class Memory {
     },
   ];
 
+  dpiChange = (value) => {
+    this.dpi = value;
+  };
+
   // При своение имени шаблона
   writeNameTemplate = () => {
     this.name_template = Templates.preview_templates.name;
@@ -107,6 +136,8 @@ class Memory {
   coefficient_w = 1;
   // коэффициэнт высоты
   coefficient_h = 1;
+  // Переменные текста
+  var_date = [];
 
   // Шаблоны
   templates = [];
@@ -114,6 +145,10 @@ class Memory {
   constructor() {
     makeAutoObservable(this);
   }
+
+  varDateWrite = (data) => {
+    this.var_date = data;
+  };
   // Сброс масштаба этикетки в 100%
   resetScale = () => {
     this.scale_preview_index = 2;
@@ -188,6 +223,21 @@ class Memory {
   };
   calcCoefficientH = () => {
     this.coefficient_h = Object.prop_obj.w / Object.prop_obj.h;
+  };
+
+  regPost = (name) => {
+    let name_slice = name.toUpperCase();
+    if (name.length > 6) {
+      name_slice = name.slice(0, 6);
+    }
+    let key = "";
+    const abc = "QWERTYUIOPLKJHGFDSAZXCVBNM0123456789";
+    let randomKey = abc[Math.floor(Math.random() * abc.length)];
+    while (key.length < 2) {
+      key += randomKey;
+      randomKey = abc[Math.floor(Math.random() * abc.length)];
+    }
+    return name_slice + key;
   };
 }
 

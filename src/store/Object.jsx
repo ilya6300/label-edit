@@ -19,8 +19,18 @@ class Object {
   xObj = null;
   wObj = null;
   hObj = null;
-  //   img
-  //   img = null
+
+  // Функция поиска ID
+  findID = (clone) => {
+    if (!clone) {
+      const reg = this.obj.target.id.replace(/\D/gm, "");
+      const ID = this.objects.find((i) => i.id === Number(reg));
+      return ID;
+    } else {
+      const ID = this.objects.find((i) => i.id === 9999);
+      return ID;
+    }
+  };
   // выбрать шаблон
   select = () => {
     this.reset();
@@ -30,115 +40,149 @@ class Object {
     this.obj = e;
   };
   getCoordClone = (x, canvasX, y, canvasY, lblRef) => {
-    this.objects.forEach((el) => {
-      if (el.id === 9999) {
-        if (el.editSize !== true) {
-          // x
-          if (
-            x - canvasX - this.obj.nativeEvent.layerX > 0 &&
-            lblRef.current.getBoundingClientRect().width - 3 >
-              x - canvasX - this.obj.nativeEvent.layerX + this.obj.nativeEvent.target.clientWidth
-          ) {
-            el.pxX = x - canvasX - this.obj.nativeEvent.layerX;
-            el.x = el.pxX / Memory.mm;
-          }
-          // y
-          if (
-            y - canvasY - this.obj.nativeEvent.layerY > 0 &&
-            lblRef.current.getBoundingClientRect().height - 3 >
-              y - canvasY - this.obj.nativeEvent.layerY + this.obj.nativeEvent.target.clientHeight
-          ) {
-            el.pxY = y - canvasY - this.obj.nativeEvent.layerY;
-            el.y = el.pxY / Memory.mm;
-          }
+    const ID = this.findID(true);
+    // console.log(Memory.button_left_press);
+
+    if (ID) {
+      if (ID.editSize || ID.editSizeW || ID.editSizeH) return;
+      if (!ID.editSize) {
+        if (!Memory.button_left_press) return;
+        // x
+        if (
+          x - canvasX - this.obj.nativeEvent.layerX > 0 &&
+          lblRef.current.getBoundingClientRect().width - 3 >
+            x -
+              canvasX -
+              this.obj.nativeEvent.layerX +
+              this.obj.nativeEvent.target.clientWidth
+        ) {
+          ID.pxX =
+            (x -
+              (canvasX - Memory.ref_x * Memory.mm) -
+              this.obj.nativeEvent.layerX) /
+            Memory.scale;
+          ID.x = ID.pxX - Memory.ref_x * Memory.mm;
+        }
+        // y
+        if (
+          y - canvasY - this.obj.nativeEvent.layerY > 0 &&
+          lblRef.current.getBoundingClientRect().height - 3 >
+            y -
+              canvasY -
+              this.obj.nativeEvent.layerY +
+              this.obj.nativeEvent.target.clientHeight
+        ) {
+          ID.pxY =
+            (y -
+              (canvasY - Memory.ref_y * Memory.mm) -
+              this.obj.nativeEvent.layerY) /
+            Memory.scale;
+          ID.y = ID.pxY - Memory.ref_y * Memory.mm;
         }
       }
-    });
+    }
   };
   //   Вычисление X и Y при перимещение
   getCoordXY = (collision) => {
-    this.objects.forEach((el) => {
-      const reg = this.obj.target.id.replace(/\D/gm, "");
-      if (el.id === Number(reg)) {
-        const clone = this.objects.find((f) => f.id === 9999);
-        if (clone) {
-          if (!collision) {
-            el.pxX = clone.pxX;
-            el.pxY = clone.pxY;
-          } else {
-            el.pxX = (Memory.mm * clone.pxX - 1) / Memory.mm;
-            el.pxY = (Memory.mm * clone.pxY - 1) / Memory.mm;
-          }
-          el.x = clone.x;
-          el.y = clone.y;
+    const ID = this.findID();
+    if (ID) {
+      if (!Memory.button_left_press) return;
+      // if (ID.editSize || ID.editSizeW || ID.editSizeH) return;
+      const clone = this.objects.find((f) => f.id === 9999);
+      if (clone) {
+        console.log(clone);
+        if (!collision) {
+          ID.pxX = clone.pxX;
+          ID.pxY = clone.pxY;
+        } else {
+          ID.pxX = (Memory.mm * clone.pxX - 1) / Memory.mm;
+          ID.pxY = (Memory.mm * clone.pxY - 1) / Memory.mm;
         }
+        this.fakeCoord()
+        ID.x = clone.x / Memory.mm;
+        ID.y = clone.y / Memory.mm;
       }
-    });
+    }
   };
+  // пересчитать координаты относительно масштаба
+  // recalculationScaleCoord = (value) => {
+  //   this.objects.forEach((obj) => {
+  //     // if (value === "1") {
+  //     // obj.pxX = obj.x * value * Memory.mm;
+  //     // obj.pxY = obj.y * Memory.mm * value;
+  //     // } else {
+  //     // obj.pxX = obj.x * Memory.mm * value + (obj.w * value) / 2;
+  //     // obj.pxY = obj.y * Memory.mm * value + (obj.h * value) / 2;
+  //     // }
+  //   });
+  // };
   // Ручная смена X координат
   manualX = (coord) => {
-    this.objects.forEach((el) => {
-      const reg = this.obj.target.id.replace(/\D/gm, "");
-      if (el.id === Number(reg)) {
-        el.pxX = coord;
-        el.x = coord / Memory.mm;
-      }
-    });
+    const ID = this.findID();
+    if (ID) {
+      ID.pxX = coord;
+      this.fakeCoord()
+      ID.x = coord / Memory.mm;
+    }
   };
   // Ручная смена Y координат
   manualY = (coord) => {
-    this.objects.forEach((el) => {
-      const reg = this.obj.target.id.replace(/\D/gm, "");
-      if (el.id === Number(reg)) {
-        el.pxY = coord;
-        el.y = coord / Memory.mm;
-      }
-    });
+    const ID = this.findID();
+    if (ID) {
+      ID.pxY = coord;
+      this.fakeCoord()
+      ID.y = coord / Memory.mm;
+    }
   };
   //Ручная смена ширины
   manualW = (coord) => {
-    this.objects.forEach((el) => {
-      const reg = this.obj.target.id.replace(/\D/gm, "");
-      if (el.id === Number(reg)) {
-        el.pxW = coord;
-        el.w = coord;
-        if (el.typeBarcode === "datamatrix" || el.typeBarcode === "qrcode") {
-          el.pxH = coord;
-          el.h = coord;
-        }
+    const reg = this.obj.target.id.replace(/\D/gm, "");
+    const ID = this.objects.find((el) => el.id === Number(reg));
+    console.log(this.obj);
+    if (ID) {
+      console.log(coord);
+      ID.pxW = coord;
+      ID.w = coord;
+      if (ID.typeBarcode === "datamatrix" || ID.typeBarcode === "qrcode") {
+        ID.pxH = coord;
+        ID.h = coord;
       }
-    });
+    }
   };
   //Ручная смена высоты
   manualH = (coord) => {
-    this.objects.forEach((el) => {
-      const reg = this.obj.target.id.replace(/\D/gm, "");
-      if (el.id === Number(reg)) {
-        el.pxH = coord;
-        el.h = coord;
-        if (el.typeBarcode === "datamatrix" || el.typeBarcode === "qrcode") {
-          el.pxW = coord;
-          el.w = coord;
-        }
+    const ID = this.findID();
+    if (ID) {
+      ID.pxH = coord;
+      ID.h = coord;
+      if (ID.typeBarcode === "datamatrix" || ID.typeBarcode === "qrcode") {
+        ID.pxW = coord;
+        ID.w = coord;
       }
-    });
+    }
   };
   // Получение клоном ширины и высоты
   getAttributeClone = (x, y, lblRef) => {
-    this.objects.forEach((el) => {
-      if (el.id === 9999) {
-        if (
-          el.style.rotate === "90" ||
-          el.style.rotate === "180" ||
-          el.style.rotate === "270"
-        ) {
-          return;
-        }
-        if (el.editSizeW) {
+    const cloneID = this.findID(true);
+    if (cloneID) {
+      if (
+        cloneID.style.rotate === "90" ||
+        cloneID.style.rotate === "180" ||
+        cloneID.style.rotate === "270" ||
+        cloneID.typeBarcode === "datamatrix" ||
+        cloneID.typeBarcode === "ean13" ||
+        cloneID.typeBarcode === "code128"
+      ) {
+        return;
+      } else if (cloneID.editSizeW) {
+        if (cloneID.typeObj !== "box") {
           if ((x - this.obj.target.getBoundingClientRect().x) / Memory.mm < 3) {
             return;
           }
-          el.pxW = (x - this.obj.target.getBoundingClientRect().x) / Memory.mm;
+          cloneID.pxW =
+            (x - this.obj.target.getBoundingClientRect().x) /
+            Memory.mm /
+            Memory.scale;
 
           if (
             lblRef.current.getBoundingClientRect().x +
@@ -146,30 +190,51 @@ class Object {
               x <
             5
           ) {
-            el.pxW = (el.pxW * Memory.mm - 1) / Memory.mm;
+            cloneID.pxW =
+              (cloneID.pxW * Memory.mm - 1) / Memory.mm / Memory.scale;
           }
-          el.w = el.pxW;
+        } else {
+          if (x - this.obj.target.getBoundingClientRect().x < 3) {
+            return;
+          }
+          cloneID.pxW =
+            (x - this.obj.target.getBoundingClientRect().x) / Memory.scale;
+
           if (
-            (el.typeBarcode !== "datamatrix" || el.typeBarcode !== "qrcode") &&
-            keyboard.shift_key
+            lblRef.current.getBoundingClientRect().x +
+              lblRef.current.getBoundingClientRect().width -
+              x <
+            5
           ) {
-            el.pxH = el.pxW * Memory.coefficient_w;
-            el.h = el.w * Memory.coefficient_w;
-          } else if (
-            el.typeBarcode === "datamatrix" ||
-            el.typeBarcode === "qrcode"
-          ) {
-            el.h = el.w;
-            el.pxH = el.pxW;
+            cloneID.pxW = (cloneID.pxW * Memory.mm - 1) / Memory.scale;
           }
         }
 
-        if (el.editSizeH) {
+        cloneID.w = cloneID.pxW;
+        if (
+          (cloneID.typeBarcode !== "datamatrix" ||
+            cloneID.typeBarcode !== "qrcode") &&
+          keyboard.shift_key
+        ) {
+          cloneID.pxH = (cloneID.pxW * Memory.coefficient_w) / Memory.scale;
+          cloneID.h = cloneID.w * Memory.coefficient_w;
+        } else if (
+          cloneID.typeBarcode === "datamatrix" ||
+          cloneID.typeBarcode === "qrcode"
+        ) {
+          cloneID.h = cloneID.w;
+          cloneID.pxH = cloneID.pxW;
+        }
+      }
+      if (cloneID.editSizeH && cloneID.typeObj !== "lines") {
+        if (cloneID.typeObj !== "box") {
           if ((y - this.obj.target.getBoundingClientRect().y) / Memory.mm < 3) {
             return;
           } else
-            el.pxH =
-              (y - this.obj.target.getBoundingClientRect().y) / Memory.mm;
+            cloneID.pxH =
+              (y - this.obj.target.getBoundingClientRect().y) /
+              Memory.mm /
+              Memory.scale;
 
           if (
             lblRef.current.getBoundingClientRect().y +
@@ -177,72 +242,93 @@ class Object {
               y <
             5
           ) {
-            el.pxH = (el.pxH * Memory.mm - 1) / Memory.mm;
+            cloneID.pxH =
+              (cloneID.pxH * Memory.mm - 1) / Memory.mm / Memory.scale;
           }
-          el.h = el.pxH;
+        } else {
+          if (y - this.obj.target.getBoundingClientRect().y < 3) {
+            return;
+          } else
+            cloneID.pxH =
+              (y - this.obj.target.getBoundingClientRect().y) / Memory.scale;
+
           if (
-            (el.typeBarcode !== "datamatrix" || el.typeBarcode !== "qrcode") &&
-            keyboard.shift_key
+            lblRef.current.getBoundingClientRect().y +
+              lblRef.current.getBoundingClientRect().height -
+              y <
+            5
           ) {
-            el.pxW = el.pxH * Memory.coefficient_h;
-            el.w = el.h * Memory.coefficient_h;
-          } else if (
-            el.typeBarcode === "datamatrix" ||
-            el.typeBarcode === "qrcode"
-          ) {
-            el.w = el.h;
-            el.pxW = el.pxH;
+            cloneID.pxH = (cloneID.pxH * Memory.mm - 1) / Memory.scale;
           }
         }
+
+        cloneID.h = cloneID.pxH;
+        if (
+          (cloneID.typeBarcode !== "datamatrix" ||
+            cloneID.typeBarcode !== "qrcode") &&
+          keyboard.shift_key
+        ) {
+          cloneID.pxW = cloneID.pxH * Memory.coefficient_h;
+          cloneID.w = cloneID.h * Memory.coefficient_h;
+        } else if (
+          cloneID.typeBarcode === "datamatrix" ||
+          cloneID.typeBarcode === "qrcode"
+        ) {
+          cloneID.w = cloneID.h;
+          cloneID.pxW = cloneID.pxH;
+        }
       }
-    });
+    }
   };
   //
   saveAttributeWH = () => {
-    this.objects.forEach((el) => {
-      const reg = this.obj.target.id.replace(/\D/gm, "");
-      if (el.id === Number(reg)) {
-        const clone = this.objects.find((f) => f.id === 9999);
-        if (clone) {
-          el.pxW = clone.pxW;
-          el.pxH = clone.pxH;
-          el.w = clone.w;
-          el.h = clone.h;
-        }
+    const ID = this.findID();
+    if (ID) {
+      const clone = this.findID(true);
+      if (clone) {
+        ID.pxW = clone.pxW;
+        ID.pxH = clone.pxH;
+        ID.w = clone.w;
+        ID.h = clone.h;
       }
-    });
+    }
   };
   //   Изменение переменной масштабирования
   getFlagEditSize = (boolean, booleanW, booleanH) => {
-    const reg = this.obj.target.id.replace(/\D/gm, "");
-    this.objects.forEach((el) => {
-      if (el.id === Number(reg)) {
-        el.editSize = boolean;
-        el.editSizeW = booleanW;
-        el.editSizeH = booleanH;
-      }
-    });
+    const ID = this.findID();
+    if (ID) {
+      ID.editSize = boolean;
+      ID.editSizeW = booleanW;
+      ID.editSizeH = booleanH;
+    }
   };
   //   Редактирвоание body
   editBody = (body) => {
-    this.objects.forEach((el) => {
-      if (el.id === Number(this.obj.target.id)) {
-        if (body !== undefined) {
-          el.body = body;
-        }
-      }
-    });
+    const ID = this.findID();
+    if (ID && body !== undefined) {
+      ID.body = body;
+    }
+  };
+  // Изменить ID img
+  upDateImgID = (id) => {
+    const ID = this.findID();
+    if (ID && id !== undefined) {
+      ID.image_id = id;
+    }
   };
   //   Изменить размер текста в боди
   updateFontSize = (size) => {
-    this.objects.forEach((el) => {
-      if (el.id === Number(this.prop_obj.id)) {
-        if (size !== undefined) {
-          console.log(el.id);
-          el.style.fontSize = size;
-        }
-      }
-    });
+    const ID = this.findID();
+    if (ID && size !== undefined) {
+      ID.style.fontSize = size;
+    }
+  };
+  //   Изменить толщину линии box
+  updateLine = (size) => {
+    const ID = this.findID();
+    if (ID && size !== undefined) {
+      ID.line_thickness = size;
+    }
   };
   //   Добавить объект в массив
   addObj = (obj) => {
@@ -251,6 +337,7 @@ class Object {
   // Добавить объект в массив превью
   addObjPreiew = (obj) => {
     this.objects_preview = [...this.objects_preview, obj];
+    console.log(toJS(this.objects_preview));
   };
   // Сбросить массив превью
   resetPreiew = () => {
@@ -258,7 +345,15 @@ class Object {
   };
   //   Записать объект в prop_obj
   setPropObj = (obj) => {
-    this.prop_obj = obj;
+    if (obj !== null) {
+      this.prop_obj = obj;
+      if (
+        this.prop_obj.typeBarcode === "ean13" ||
+        this.prop_obj.typeBarcode === "code128"
+      ) {
+        obj.pxW = this.obj.target.offsetWidth / Memory.mm;
+      }
+    }
   };
   //   Очистка массива
   reset = () => {
@@ -269,12 +364,11 @@ class Object {
   newTemplate = () => {
     this.obj = null;
     this.objects = [];
-    Templates.preview_templates = [];
+    Templates.preview_templates = {};
     this.resetPreiew();
   };
   //   Удалить объект из массива
   deleteObject = () => {
-    // console.log(this.prop_obj);
     Memory.updateFlagVisibleObj(false);
     this.objects = this.objects.filter((o) => o.id !== this.prop_obj.id);
     this.obj = null;
@@ -285,67 +379,70 @@ class Object {
   };
   //   Изменить стиль шрифта
   updateFontFamily = (family) => {
-    this.objects.forEach((el) => {
-      if (el.id === Number(this.obj.target.id)) {
-        el.style.fontFamily = family.name;
-        el.font_family_id = family.id;
-      }
-    });
+    const ID = this.findID();
+    if (ID) {
+      ID.style.fontFamily = family.name;
+      ID.font_family_id = family.id;
+    }
   };
   //   Изменение позиции
   textAlign = (position) => {
-    this.objects.forEach((el) => {
-      if (el.id === Number(this.obj.target.id)) {
-        el.style.position = position;
-      }
-    });
+    const ID = this.findID();
+    if (ID) {
+      console.log(position);
+      ID.style.position = position;
+    }
   };
   //   Изменение позиции
   updateRotate = (deg) => {
-    this.objects.forEach((el) => {
-      let reg = this.obj.target.id.replace(/\D/gm, "");
-      if (el.id === Number(reg)) {
-        // const this_obj = { ...el };
-        // if (
-        //   (deg === "90" || deg === "270") &&
-        //   el.style.rotate !== "90" &&
-        //   el.style.rotate !== "180"
-        // ) {
-        //   el.w = this_obj.h;
-        //   el.h = this_obj.w;
-        // }
-        // if (
-        //   (deg === "0" || deg === "180") &&
-        //   (el.style.rotate === "90" || el.style.rotate === "180")
-        // ) {
-        //   el.w = this_obj.h;
-        //   el.h = this_obj.w;
-        // }
-        el.style.rotate = deg;
+    const ID = this.findID();
+    if (ID) {
+      if (ID.typeObj === "lines") {
+        console.log(ID.style.rotate, deg);
+        if (
+          ((deg === "90" || deg === "270") &&
+            (String(ID.style.rotate) === "180" ||
+              String(ID.style.rotate) === "0")) ||
+          ((deg === "0" || deg === "180") &&
+            (String(ID.style.rotate) === "90" ||
+              String(ID.style.rotate) === "270"))
+        ) {
+          const w = ID.w;
+          const h = ID.h;
+          this.manualW(h);
+          this.manualH(w);
+          console.log(this.obj);
+        }
       }
-    });
+      ID.style.rotate = deg;
+    }
+  };
+  // Запись фековых координат
+  fakeCoord = () => {
+    const ID = this.findID();
+    if (ID) {
+      if (String(ID.style.rotate) === "0") {
+        ID.pxFakeX = ID.pxX;
+        ID.pxFakeY = ID.pxY;
+      }
+    }
   };
   // Записать имя
   saveName = (name) => {
-    let reg = this.obj.target.id.replace(/\D/gm, "");
-    this.objects.forEach((el) => {
-      if (el.id === Number(reg)) {
-        el.name = name;
-      }
-    });
+    const ID = this.findID();
+    if (ID) {
+      ID.name = name;
+    }
   };
   // Активировать или деактивировать объект
   activeObj = (boolean) => {
-    const reg = this.obj.target.id.replace(/\D/gm, "");
-    this.objects.forEach((el) => {
-      if (el.id === Number(reg)) {
-        el.active = boolean;
-      }
-    });
+    const ID = this.findID();
+    if (ID) {
+      ID.active = boolean;
+    }
   };
   // boxshadow
   boxShadowObj = () => {
-    // console.log("boxShadowObj");
     const reg = this.obj.target.id.replace(/\D/gm, "");
     this.objects.forEach((el) => {
       if (el.id === Number(reg)) {
@@ -365,10 +462,10 @@ class Object {
         }
         if (el.typeObj !== "block") {
           if (!el.cls.includes("border_activ-3"))
-          el.cls = [...el.cls, "border_activ-3"];
+            el.cls = [...el.cls, "border_activ-3"];
         } else {
           if (!el.cls.includes("border_activ-0"))
-          el.cls = [...el.cls, "border_activ-0"];
+            el.cls = [...el.cls, "border_activ-0"];
         }
       } else {
         if (el.style.boxShadow === "0 0 1px 1px var(--error)") {
@@ -382,15 +479,29 @@ class Object {
   };
   // Z index
   zIndexObj = () => {
-    const reg = this.obj.target.id.replace(/\D/gm, "");
-    this.objects.forEach((el) => {
-      if (el.id === Number(reg)) {
-        el.zIndex = 5;
-      } else {
-        el.zIndex = 2;
-      }
-    });
+    const ID = this.findID();
+    if (ID) {
+      ID.zIndex = 5;
+    } else {
+      ID.zIndex = 2;
+    }
   };
+
+  humanReadable = (int) => {
+    const ID = this.findID();
+    if (ID) {
+      console.log(int);
+      ID.human_readable = int;
+    }
+  };
+
+  humanReadableFlag = (boleean) => {
+    const ID = this.findID();
+    if (ID) {
+      ID.human_readable_visible = boleean;
+    }
+  };
+
   // изменение стайла тени при наведение
   hoverElementShadow = (element, shadow) => {
     const reg = element.target.id.replace(/\D/gm, "");
@@ -402,10 +513,14 @@ class Object {
       }
     });
   };
-  // selectHistory = (h) => {
-  //   console.log(toJS(h), toJS(h.objects));
-  //   this.objects = h.objects;
-  // };
+
+  boxRadius = (int) => {
+    const ID = this.findID();
+    if (ID) {
+      console.log(int);
+      ID.borderRadius = int;
+    }
+  };
 }
 
 export default new Object();

@@ -1,4 +1,4 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable } from "mobx";
 import Object from "./Object";
 class history {
   constructor() {
@@ -45,14 +45,11 @@ class history {
     if (this.objects_history.length === 0) {
       this.writeHistory();
     }
-
-    // }
   };
 
   selectHistory = (h) => {
     Object.objects = h.objects;
     this.current_object = h.objects;
-    // this.writeHistory();
   };
 }
 export default new history();

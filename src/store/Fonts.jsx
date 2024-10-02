@@ -2,7 +2,7 @@ import { makeAutoObservable } from "mobx";
 
 class Fonts {
   default_font = {};
-  fonts = [];
+  fonts = [{ id: 9999, name: "0" }];
 
   constructor() {
     makeAutoObservable(this);
@@ -10,7 +10,6 @@ class Fonts {
 
   defaultFont = (font) => {
     this.default_font = font;
-    console.log(this.default_font);
   };
 }
 

@@ -4,7 +4,12 @@ import Object from "../../store/Object";
 
 export const ItemFontFamily = observer((props) => {
   useEffect(() => {
-    const myFont = new FontFace(props.font.name, `url(${props.font.data})`);
+    if (props.font.data === undefined) return;
+    const myFont = new FontFace(
+      props.font.name,
+      `url(data:application/octet-stream;base64,${props.font.data})`
+    );
+    // console.log("data:application/octet-stream;base64," + props.font.data);
     myFont.load();
     document.fonts.add(myFont);
   }, []);

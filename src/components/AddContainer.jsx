@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Object from "../store/Object";
 import { observer } from "mobx-react-lite";
 import { ImgContainer } from "./img_components/ImgContainer";
 import Fonts from "../store/Fonts";
 import { Loader } from "./Loader";
+import { DMContainer } from "./obj/DMContainer";
+import Memory from "../store/Memory";
 
 export const AddContainer = observer(() => {
   const [imgBD, setImgBD] = useState(false);
+  const [dmFlag, setDmFlag] = useState(false);
 
   let num = 1;
   while (num <= Object.objects.length) {
@@ -27,18 +30,18 @@ export const AddContainer = observer(() => {
       id: num,
       name: "text",
       typeObj: "text",
-      typeBarcode: "",
+      // typeBarcode: "",
       pxX: 0,
       pxY: 0,
-      pxW: "fit-content",
-      pxH: "fit-content",
+      pxW: 12 * Memory.mm,
+      pxH: 6,
       x: 0,
       y: 0,
       body: "Текст",
-      file: null,
+      // file: null,
       zIndex: 2,
-      w: "fit-content",
-      h: "fit-content",
+      w: 12 * Memory.mm,
+      h: 6,
       active: true,
       cls: ["bardcode_container-text "],
       clsPreview: "bardcode_container-text-preview",
@@ -46,7 +49,7 @@ export const AddContainer = observer(() => {
       style: {
         fontSize: 12,
         fontFamily: Fonts.default_font.name,
-        position: "left",
+        position: "1",
         rotate: 0,
         boxShadow: "none",
       },
@@ -63,7 +66,7 @@ export const AddContainer = observer(() => {
       id: num,
       name: "block",
       typeObj: "block",
-      typeBarcode: "",
+      // typeBarcode: "",
       pxX: 0,
       pxY: 0,
       pxW: 50,
@@ -83,29 +86,28 @@ export const AddContainer = observer(() => {
       style: {
         fontSize: 12,
         fontFamily: Fonts.default_font.name,
-        position: "left",
+        position: "1",
         rotate: 0,
         boxShadow: "none",
       },
     };
     Object.addObj(obj);
   };
-
   const addBarcode = (e) => {
     let barcode;
     let width;
     console.log(e.target.id);
-    if (e.target.id === "datamatrix") {
-      barcode = "0104603721020607215>(egukLfdK5r93zoJf";
-      width = 10;
-    }
+    // if (e.target.id === "datamatrix") {
+    //   barcode = `0104603721020607215>(egukLfdK5r93zoJf`;
+    //   width = 10;
+    // }
     if (e.target.id === "ean13") {
-      barcode = "046037210206";
-      width = 30;
+      barcode = "978020137962";
+      width = 2;
     }
     if (e.target.id === "code128") {
       barcode = "barcode046037210206";
-      width = 30;
+      width = 2;
     }
     if (e.target.id === "qrcode") {
       barcode = "barcode046037210206";
@@ -114,19 +116,20 @@ export const AddContainer = observer(() => {
 
     const obj = {
       id: num,
+      human_readable: 0,
+      human_readable_visible: false,
       name: "barcode",
       typeObj: "barcode",
-      fontSize: 12,
-      // fontFamily: "none",
       typeBarcode: e.target.id,
       pxX: 0,
       pxY: 0,
+      pxFakeX: 0,
+      pxFakeY: 0,
       pxW: width,
       pxH: 10,
       x: 0,
       y: 0,
       body: barcode,
-      file: null,
       zIndex: 2,
       w: width,
       h: 10,
@@ -137,13 +140,16 @@ export const AddContainer = observer(() => {
       clsPreview: "bardcode_container-barcode-preview",
       style: {
         fontSize: 12,
-        // fontFamily: "Times New Roman",
-        position: "left",
+        position: "1",
         rotate: 0,
         boxShadow: "none",
       },
     };
-    Object.addObj(obj);
+    if (e.target.id !== "datamatrix") {
+      Object.addObj(obj);
+    } else {
+      setDmFlag(true);
+    }
   };
 
   const createImg = (data, id) => {
@@ -151,9 +157,7 @@ export const AddContainer = observer(() => {
       id: num,
       name: "img",
       typeObj: "img",
-      fontSize: 12,
-      // fontFamily: "none",
-      typeBarcode: "",
+      // typeBarcode: "",
       pxX: 0,
       pxY: 0,
       pxW: 10,
@@ -161,7 +165,6 @@ export const AddContainer = observer(() => {
       x: 0,
       y: 0,
       body: data,
-      // file: e.target.files[0],
       zIndex: 2,
       w: 10,
       h: 10,
@@ -173,7 +176,67 @@ export const AddContainer = observer(() => {
       clsPreview: "bardcode_container-block-preview",
       style: {
         fontSize: 12,
-        // fontFamily: "Times New Roman",
+        position: "left",
+        rotate: 0,
+        boxShadow: "none",
+      },
+    };
+    Object.addObj(obj);
+  };
+
+  const addLine = () => {
+    const obj = {
+      id: num,
+      name: "Линия",
+      typeObj: "lines",
+      pxX: 0,
+      pxY: 0,
+      pxW: 15,
+      pxH: 1,
+      x: 0,
+      y: 0,
+      body: "lines",
+      zIndex: 2,
+      w: 15,
+      h: 1,
+      editSizeW: false,
+      editSizeH: false,
+      active: true,
+      cls: ["bardcode_container-barcode"],
+      clsPreview: "bardcode_container-barcode-preview",
+      style: {
+        fontSize: 0,
+        position: "left",
+        rotate: 0,
+        boxShadow: "none",
+      },
+    };
+    Object.addObj(obj);
+  };
+
+  const addBox = () => {
+    const obj = {
+      id: num,
+      name: "Бокс",
+      typeObj: "box",
+      pxX: 0,
+      pxY: 0,
+      pxW: 15,
+      pxH: 15,
+      x: 0,
+      y: 0,
+      borderRadius: 0,
+      line_thickness: 0.5,
+      zIndex: 2,
+      w: 15,
+      h: 15,
+      editSizeW: false,
+      editSizeH: false,
+      active: true,
+      cls: ["bardcode_container-barcode"],
+      clsPreview: "bardcode_container-barcode-preview",
+      style: {
+        fontSize: 0,
         position: "left",
         rotate: 0,
         boxShadow: "none",
@@ -206,24 +269,21 @@ export const AddContainer = observer(() => {
           <li className="add_obj" onClick={addBarcode} id="qrcode">
             QR code
           </li>
-          {/* <li className="add_obj" onClick={addImg} id="qrcode">
-          Изображение input
-          <input
-            ref={inpFile}
-            onChange={selectedFile}
-            type="file"
-            accept="image/.bmp"
-            className="hidden"
-          />
-        </li> */}
           <li className="add_obj" onClick={() => setImgBD(true)} id="qrcode">
             Изображение из бд
+          </li>
+          <li className="add_obj" onClick={addLine}>
+            Линия
+          </li>
+          <li className="add_obj" onClick={addBox}>
+            Бокс
           </li>
           {imgBD ? (
             <ImgContainer setImgBD={setImgBD} createImg={createImg} />
           ) : (
             <></>
           )}
+          {dmFlag ? <DMContainer setDmFlag={setDmFlag} /> : <></>}
         </>
       ) : (
         <Loader />

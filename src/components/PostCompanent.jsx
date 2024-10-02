@@ -1,16 +1,13 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { BtnVer1 } from "../UI/btn/BtnVer1";
 import Memory from "../store/Memory";
 import Object from "../store/Object";
 import service from "../request/service";
 import Templates from "../store/Templates";
 import { observer } from "mobx-react-lite";
+import Msg from "../store/Msg";
 
 export const PostCompanent = observer(({ valueName, setValueName }) => {
-  // const [visibleName, setVisibleName] = useState(Memory.visible_modal_post);
-
-  // Сохранить текущий шаблон
-
   // Извлечение новых элементов
   const extractionObj = (array) => {
     const post_objects = [];
@@ -25,25 +22,25 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
       if (el.typeObj !== "img") {
         obj.data = el.body;
       }
-      if (el.typeObj === "text") {
-        obj.type = "text";
-      } else {
+      if (el.typeBarcode !== "datamatrix" && el.typeObj === "lines") {
         obj.width = Math.round(el.w * 100) / 100;
         obj.height = Math.round(el.h * 100) / 100;
       }
       if (el.typeObj === "text" || el.typeObj === "block") {
-        obj.font_size = el.style.fontSize;
         obj.font_id = el.font_family_id;
+        obj.font_size = el.style.fontSize;
       }
       if (el.typeObj === "block") {
-        obj.type = "block";
-        obj.text_align = el.style.position;
+        obj.text_align = Number(el.style.position);
       }
       // barcode
       if (el.typeObj === "barcode") {
-        obj.type = "barcode";
+        obj.human_readable = el.human_readable;
         if (el.typeBarcode === "datamatrix") {
           obj.code_type = "datamatrix";
+          obj.width = el.w;
+          obj.height = el.size;
+          obj.radius = el.min_size;
         }
         if (el.typeBarcode === "ean13") {
           obj.code_type = "ean13";
@@ -57,8 +54,31 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
       }
       if (el.typeObj === "img") {
         obj.image_id = el.image_id;
-        obj.type = "img";
       }
+      if (el.typeObj === "box") {
+        obj.line_thickness = el.line_thickness;
+        obj.radius = el.borderRadius;
+      }
+      if (el.typeObj === "lines") {
+        console.log(3);
+        if (
+          String(el.style.rotate) === "0" ||
+          String(el.style.rotate) === "180"
+        ) {
+          obj.width = Math.round((Number(el.x) + Number(el.w)) * 100) / 100;
+          obj.height = Math.round(Number(el.y) * 100) / 100;
+          obj.font_size = Math.round(Number(el.h) * 100) / 100;
+        } else {
+          console.log(2);
+          obj.width = Math.round(Number(el.x) * 100) / 100;
+          obj.height = Math.round((Number(el.y) + Number(el.h)) * 100) / 100;
+          obj.font_size = Math.round(Number(el.w) * 100) / 100;
+        }
+      } else {
+        obj.width = Math.round(Number(el.w) * 100) / 100;
+        obj.height = Math.round(Number(el.h) * 100) / 100;
+      }
+      obj.type = el.typeObj;
       post_objects.push(obj);
     });
     return post_objects;
@@ -82,14 +102,15 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     };
     template.objects = [...extractionObj(Object.objects)];
     service.postTemplate(template);
+    Memory.visiblePost(false);
+    Object.resetPreiew();
   };
   // Изменить шаблон
   // Обновление объектов
   const updateObj = () => {
+    // Object.resetPreiew();
     // Временный массив который хранит в себе элементы которые были обновлены
     const update_object = [];
-    // console.log(toJS(Templates.downloaded_template));
-    // console.log(toJS(Object.objects));
     // Перебираем ранее загруженный массив, с тем что на этикетке
     Templates.downloaded_template.forEach((old) => {
       Object.objects.filter((newT) => {
@@ -118,8 +139,30 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
               }
               // Ширина / высота
               if (key === "w" || key === "h") {
-                temp.width = newT.w;
-                temp.height = newT.h;
+                if (old.typeObj !== "lines") {
+                  temp.width = newT.w;
+                  temp.height = newT.h;
+                } else {
+                  console.log(
+                    "cтрока 145",
+                    String(newT.style.rotate),
+                    String(newT.style.rotate) === "0"
+                  );
+                  if (
+                    String(newT.style.rotate) === "0" ||
+                    String(newT.style.rotate) === "180"
+                  ) {
+                    temp.width =
+                      Math.round((Number(newT.x) + Number(newT.w)) * 100) / 100;
+                    temp.height = Math.round(Number(newT.y) * 100) / 100;
+                    temp.font_size = Math.round(Number(newT.h) * 100) / 100;
+                  } else {
+                    temp.width = Math.round(Number(newT.x) * 100) / 100;
+                    temp.height =
+                      Math.round((Number(newT.y) + Number(newT.h)) * 100) / 100;
+                    temp.font_size = Math.round(Number(newT.w) * 100) / 100;
+                  }
+                }
               }
               // Изменение тела
               if (key === "body") {
@@ -129,13 +172,21 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
               if (key === "font_family_id") {
                 temp.font_id = newT.font_family_id;
               }
+              // видимость текста шк
+              if (key === "human_readable") {
+                temp.human_readable = newT.human_readable;
+              }
             }
           }
           for (let key in old.style) {
             if (old.style[key] !== newT.style[key]) {
               // изменение стиля - поворот, шрифты, позиция текста
               if (key === "rotate") {
-                temp.rotation = newT.style.rotate;
+                if (newT.typeBarcode === "datamatrix") {
+                  temp.rotation = newT.min_size;
+                } else {
+                  temp.rotation = newT.style.rotate;
+                }
               }
               if (key === "fontSize") {
                 temp.rotation = newT.style.fontSize;
@@ -146,6 +197,7 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
             }
           }
           update_object.push(temp);
+          console.log("======", temp);
         }
       });
     });
@@ -153,6 +205,7 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
       console.log(update_object);
       service.pathUpdateObj(update_object);
     }
+    console.log(update_object);
   };
   // Изменить параметры этикетки
   const updateLabel = () => {
@@ -169,9 +222,6 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     checkParameter("reference_y", Memory.ref_y);
     checkParameter("direction_x", Memory.DIRECTION_1);
     checkParameter("direction_y", Memory.DIRECTION_2);
-    // if (Templates.preview_templates.name !== valueName) {
-    //   update_label["name"] = valueName;
-    // }
 
     if (JSON.stringify(update_label) !== "{}") {
       console.log(update_label);
@@ -181,32 +231,45 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
   // удалить объект с этикетки, который был загружен ранее
   const deleteObject = () => {
     const delete_objects = [];
+    const id_old_id = [];
+    const id_obj = [];
+    Object.objects.forEach((o) => {
+      id_obj.push(o.id);
+    });
     Templates.downloaded_template.forEach((d) => {
-      if (!JSON.stringify(Object.objects).includes(JSON.stringify(d))) {
-        delete_objects.push(d.id);
+      id_old_id.push(d.id);
+      // if (!JSON.stringify(Object.objects).includes(JSON.stringify(d))) {
+      //   delete_objects.push(d.id);
+      // }
+    });
+    id_old_id.forEach((id) => {
+      if (!id_obj.includes(id)) {
+        delete_objects.push(id);
       }
     });
+    if (Object.objects.length === 0) {
+      return Msg.writeMessages("Нельзя сохранить пустой шаблон!");
+    }
     if (delete_objects.length !== 0) {
       service.deleteObj(delete_objects);
     }
-    // console.log(delete_objects)
   };
   // Добавить новый элемент на существующею этикетку
   const newObjPost = () => {
     const new_objects = [];
+    const id_old_object = [];
+    Templates.downloaded_template.forEach((o) => {
+      id_old_object.push(o.id);
+    });
     Object.objects.forEach((newObj) => {
-      if (
-        !JSON.stringify(Templates.downloaded_template).includes(
-          JSON.stringify(newObj)
-        )
-      ) {
+      if (!id_old_object.includes(newObj.id)) {
         new_objects.push(newObj);
       }
     });
     if (new_objects.length > 0) {
-      console.log(extractionObj(new_objects));
       service.addNewObj(extractionObj(new_objects));
     }
+    console.log("new_objects", new_objects);
   };
   // Изменить существующею этикетку
   const pathTemplates = () => {
@@ -214,13 +277,26 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     updateLabel();
     deleteObject();
     newObjPost();
+    Memory.visiblePost(false);
+  };
+
+  const modalPostRef = useRef();
+  useEffect(() => {
+    document.addEventListener("mousedown", closedPostModal);
+  }, []);
+  const closedPostModal = (e) => {
+    if (modalPostRef.current && !modalPostRef.current.contains(e.target)) {
+      Memory.visiblePost(false);
+    }
   };
 
   return (
     <>
       <BtnVer1
         onClick={() =>
-          Memory.visible_modal_post ? Memory.visiblePost(false) : Memory.visiblePost(true)
+          Memory.visible_modal_post
+            ? Memory.visiblePost(false)
+            : Memory.visiblePost(true)
         }
       >
         {JSON.stringify(Templates.preview_templates) === "{}"
@@ -228,20 +304,26 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
           : "Сохранить " + valueName}
       </BtnVer1>{" "}
       {Memory.visible_modal_post ? (
-        <div className="post_template_container_modal">
+        <div ref={modalPostRef} className="post_template_container_modal">
           {JSON.stringify(Templates.preview_templates) === "{}" ? (
             <>
               {" "}
               <p className="post_template_modal_text">
                 Введите название шаблона
               </p>
-              <input
-                type="text"
-                value={valueName}
-                onChange={(e) => setValueName(e.target.value)}
-              />
-              <BtnVer1 onClick={postTemplates}>Сохранить</BtnVer1>
-              <BtnVer1 onClick={() => Memory.visiblePost(false)}>Закрыть</BtnVer1>
+              <div className="post_template_container_modal_ui_container">
+                <input
+                  className="post_template_container_modal_inpt_name"
+                  type="text"
+                  value={valueName}
+                  onChange={(e) => setValueName(e.target.value)}
+                  placeholder="Введите имя шаблона"
+                />
+                <BtnVer1 onClick={postTemplates}>Сохранить</BtnVer1>
+                <BtnVer1 onClick={() => Memory.visiblePost(false)}>
+                  Закрыть
+                </BtnVer1>
+              </div>
             </>
           ) : (
             <>
@@ -250,7 +332,9 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
                 Шаблон: {Memory.name_template}
               </p>
               <BtnVer1 onClick={pathTemplates}>Изменить</BtnVer1>
-              <BtnVer1 onClick={() => Memory.visiblePost(false)}>Закрыть</BtnVer1>
+              <BtnVer1 onClick={() => Memory.visiblePost(false)}>
+                Закрыть
+              </BtnVer1>
             </>
           )}
         </div>

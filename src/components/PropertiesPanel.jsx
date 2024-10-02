@@ -4,8 +4,9 @@ import { LayersObj } from "./LayersObj";
 import { observer } from "mobx-react-lite";
 import { FontsContainer } from "./obj/FontsContainer";
 import { HistoryObj } from "./history/HistoryObj";
+import { VarText } from "./obj/vartext/VarText";
 
-export const PropertiesPanel = observer(({ clsContainer, inputPropRef }) => {
+export const PropertiesPanel = observer(({ clsContainer }) => {
   const [propActive, setPropActive] = useState(true);
   const [layersActive, setLayersActive] = useState(false);
   const [historyActive, setHistorysActive] = useState(false);
@@ -15,6 +16,7 @@ export const PropertiesPanel = observer(({ clsContainer, inputPropRef }) => {
   const [clsHistoryActive, setClsHistorysActive] = useState("btn_title_props");
   //
   const [flagFonts, setFlagFonts] = useState(false);
+  const [varText, setVarText] = useState(false);
 
   const propsSelect = () => {
     setPropActive(true);
@@ -41,7 +43,7 @@ export const PropertiesPanel = observer(({ clsContainer, inputPropRef }) => {
     setClsHistorysActive("btn_title_props-active");
   };
 
-  if (!flagFonts) {
+  if (!varText && !flagFonts) {
     return (
       <div className={clsContainer}>
         <ul>
@@ -57,12 +59,20 @@ export const PropertiesPanel = observer(({ clsContainer, inputPropRef }) => {
             </span>
           </li>
         </ul>
-        {propActive ? <PropertiesObj inputPropRef={inputPropRef} setFlagFonts={setFlagFonts} /> : <></>}
+        {propActive ? (
+          <PropertiesObj setVarText={setVarText} setFlagFonts={setFlagFonts} />
+        ) : (
+          <></>
+        )}
         {layersActive ? <LayersObj /> : <></>}
         {historyActive ? <HistoryObj /> : <></>}
       </div>
     );
-  } else {
+  }
+  if (flagFonts) {
     return <FontsContainer setFlagFonts={setFlagFonts} />;
+  }
+  if (varText) {
+    return <VarText setVarText={setVarText} />;
   }
 });

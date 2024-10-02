@@ -1,16 +1,20 @@
-import axios from "axios";
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, toJS } from "mobx";
 import Fonts from "../store/Fonts";
 import Memory from "../store/Memory";
 import Templates from "../store/Templates";
 import { request } from "./service.config";
+import { request_dm } from "./service.sizedm";
+import Msg from "../store/Msg";
+import Object from "../store/Object";
+import config from "../config.json";
+import axios from "axios";
 
 class service {
   constructor() {
     makeAutoObservable(this);
   }
   // Переменные
-  server_url = "http://10.76.10.37:8033/api/v1/";
+  server_url = config.url_api;
   // server_url = "http://10.76.10.37:3000/api/v1/";
   images = [];
   imgLoading = true;
@@ -19,22 +23,35 @@ class service {
   tempImgLoading = true;
   templatesListLoading = true;
   errorNetwork = false;
+  dm_table = [];
+
+  // Получить все переменные
+  getVar = async () => {
+    try {
+      const res = await request.get("template_list/print_variables/");
+      Memory.varDateWrite(res.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   // Получить все изображения
   getImages = async () => {
     this.imgLoading = true;
     try {
       const res = await request.get(`images/`);
-      console.log(res.data);
+      console.log(toJS(res.data["data"]["response"]));
       if (res.data["data"].length !== 0) {
         this.images = res.data["data"]["response"];
+        this.images.forEach((el) => {
+          el.data = atob(el.data);
+        });
+        console.log(toJS(this.images));
       }
     } catch (e) {
       console.log(e);
     } finally {
-      //   setTimeout(() => {
       this.imgLoading = false;
-      //   }, 1000);
     }
   };
   //   Загрузить изображение на сервер
@@ -42,6 +59,7 @@ class service {
     try {
       const res = await request.post(`images/`, {
         name: name,
+        tag_images: Memory.regPost(name) + ".BMP",
         data: file,
       });
 
@@ -59,6 +77,7 @@ class service {
     try {
       const res = await request.post(`fonts/`, {
         name: String(name),
+        tag_fonts: Memory.regPost(String(name)) + ".TTF",
         data: file,
       });
       console.log(res);
@@ -74,17 +93,15 @@ class service {
     try {
       const res = await request.get(`fonts/`);
       if (res.data.success) {
-        console.log(res.data);
-        Fonts.fonts = res.data["data"]["response"];
+        Fonts.fonts = [...res.data["data"]["response"]];
       }
-
-      // Fonts.defaultFont(res.data["data"]["response"][0]);
     } catch (e) {
       console.log(e);
       if (e.code === "ERR_NETWORK") {
         return (this.errorNetwork = true);
       }
     } finally {
+      this.getVar();
       this.fontsLoading = false;
     }
   };
@@ -95,8 +112,13 @@ class service {
     try {
       const res = await request.post(`form_labels/`, obj);
       console.log(res);
+      if (!res.data.success) {
+        Memory.visiblePost(true);
+      }
     } catch (e) {
       console.log(e);
+    } finally {
+      Msg.writeMessages("Шаблон успешно сохранён");
     }
   };
   // Получить все шаблоны
@@ -104,9 +126,11 @@ class service {
     this.templatesListLoading = true;
     try {
       const res = await request.get(`template_list/`);
-      console.log(res.data["data"].length !== 0);
+      console.log(res.data["data"]);
       if (res.data["data"].length !== 0) {
         Memory.templates = res.data["data"]["response"];
+      } else {
+        Memory.templates = [];
       }
     } catch (e) {
       console.log(e);
@@ -132,7 +156,10 @@ class service {
   pathUpdateObj = async (obj) => {
     try {
       const res = await request.patch(`form_labels/field`, obj);
-      console.log(res);
+      if (!res.data.success) {
+        Memory.visiblePost(true);
+      }
+      console.log(res.data);
     } catch (e) {
       console.log(e);
     }
@@ -141,7 +168,7 @@ class service {
   pathUpdateLabel = async (label) => {
     try {
       const res = await request.patch(
-       `form_labels/label/` + Templates.preview_templates.id,
+        `form_labels/label/` + Templates.preview_templates.id,
         label
       );
       console.log(res);
@@ -199,6 +226,42 @@ class service {
       const res = await request(deleteTemplate);
       console.log(res);
     } catch (e) {
+      console.log(e);
+    } finally {
+      this.getTemplates();
+      Object.resetPreiew();
+      Templates.preview_templates = [];
+      Templates.downloaded_template = [];
+    }
+  };
+
+  // Получить таблицу размеров DM
+  getSizeDM = async () => {
+    try {
+      const res = await request("template_list/dm");
+      console.log(res.data["data"]);
+      this.dm_table = res.data["data"];
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  trialPrint = async () => {
+    try {
+      const res = await request.post(`trial_printing`, {
+        template: {
+          id_template: Templates.template_id,
+          is_update: true,
+        },
+        setting_printer: JSON.parse(localStorage.getItem("printer")),
+      });
+      console.log(res);
+    } catch (e) {
+      if (e.code === "ERR_NETWORK") {
+        Msg.writeMessages(
+          "Шаблон не распечатан. Возможные ошибки: 1. Неверные параметры настройки принтера, в редакторе этикеток. 2. Принтер выключен."
+        );
+      }
       console.log(e);
     }
   };

@@ -1,5 +1,5 @@
 .label_container {
-  min-width: 785px;
+  width: calc(100% - 225px);
   display: flex;
   justify-content: space-between;
 }
@@ -31,9 +31,11 @@
   left: 0;
   border: 1px solid;
   resize: inherit;
-  display: flex;
+  /* display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
+  font-weight: 700;
+  font-family: monospace;
 }
 .bardcode_container-text-preview {
   cursor: pointer;
@@ -61,6 +63,9 @@
   left: 0;
   border: 1px solid;
   resize: inherit;
+  font-weight: 700;
+  font-family: monospace;
+  /* display: inline-block; */
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -137,6 +142,7 @@
 }
 .label_reference {
   position: relative;
+  font-family: monospace;
 }
 .cls_mm {
   position: absolute;
@@ -153,6 +159,12 @@
     var(--cm) var(--cm);
   background-position: 0px 0px, 0px 0px, -1px -1px, -1px -1px;
   animation: mm_anim 1s forwards ease-in-out;
+}
+.barcode_body {
+  position: absolute;
+  bottom: -10px;
+  font-size: 9px;
+  width: 100%;
 }
 
 @keyframes mm_anim {

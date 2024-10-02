@@ -23,8 +23,8 @@ export const PreviewLabel = observer(({ setFlagPrevier, clsMM }) => {
     Memory.incrementScale();
   };
   const resetScaleFunc = () => {
-    Memory.resetScale()
-  }
+    Memory.resetScale();
+  };
 
   return (
     <div
@@ -73,7 +73,9 @@ export const PreviewLabel = observer(({ setFlagPrevier, clsMM }) => {
             >
               +
             </span>
-            <span className="preview_label_title" onClick={resetScaleFunc}>сброс</span>
+            <span className="preview_label_title" onClick={resetScaleFunc}>
+              сброс
+            </span>
           </div>
           <div
             className="preview_label_window"
@@ -87,16 +89,19 @@ export const PreviewLabel = observer(({ setFlagPrevier, clsMM }) => {
             <div
               className="absolute"
               style={{
+                rotate: '180deg',
                 top:
                   Memory.DIRECTION_1 === 1
-                    ? -(
-                        Memory.height_label *
-                          Memory.mm 
-                      ) + "px"
+                    ? -(Memory.height_label * Memory.mm) + "px"
                     : 0,
               }}
             >
-              <ThisLabel clsMM={clsMM} objects={Object.objects} preview={true} add_canvas="a" />
+              <ThisLabel
+                clsMM={clsMM}
+                objects={Object.objects}
+                preview={true}
+                add_canvas="a"
+              />
             </div>
           </div>
         </div>

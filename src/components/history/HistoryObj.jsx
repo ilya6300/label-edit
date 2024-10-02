@@ -4,7 +4,6 @@ import { observer } from "mobx-react-lite";
 
 export const HistoryObj = observer(() => {
   const historyElement = (h) => {
-
     HistoryStore.selectHistory(h)
   };
   return (
