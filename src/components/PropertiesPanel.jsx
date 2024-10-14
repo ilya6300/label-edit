@@ -47,7 +47,7 @@ export const PropertiesPanel = observer(({ clsContainer }) => {
     return (
       <div className={clsContainer}>
         <ul>
-          <li className="add_obj-title">
+          <li className="prop_obj-title">
             <span className={clsPropActive} onClick={propsSelect}>
               Свойства
             </span>

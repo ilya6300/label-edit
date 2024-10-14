@@ -151,59 +151,68 @@ export const PropertiesObj = observer(
     };
 
     const rewriteManualW = (e) => {
-      if (e.target.value.match(/[\d,]/gm) && e.target.value >= 0) {
-        if (
-          e.target.value > 5.1 &&
-          (Object.prop_obj.typeBarcode !== "ean13" ||
-            Object.prop_obj.typeBarcode !== "code128") &&
-          Object.prop_obj.typeObj !== "lines" &&
-          Object.prop_obj.typeBarcode !== "datamatrix"
-        ) {
+      // if (
+      //   e.target.value.match(/[\d,]/gm)
+      //   //  && e.target.value >= 0
+      // ) {
+      if (
+        // e.target.value > 5.1 &&
+        (Object.prop_obj.typeBarcode !== "ean13" ||
+          Object.prop_obj.typeBarcode !== "code128") &&
+        Object.prop_obj.typeObj !== "lines" &&
+        Object.prop_obj.typeBarcode !== "datamatrix"
+      ) {
+        setValueW(e.target.value);
+        Object.manualW(e.target.value);
+      } else if (
+        Object.prop_obj.typeBarcode === "ean13" ||
+        Object.prop_obj.typeBarcode === "code128"
+      ) {
+        if (Number(e.target.value) < 1) return;
+        if (Number(e.target.value) > 4) return;
+        if (Number(e.target.value) >= 1 || Number(e.target.value) <= 4) {
           setValueW(e.target.value);
           Object.manualW(e.target.value);
-        } else if (
-          Object.prop_obj.typeBarcode === "ean13" ||
-          Object.prop_obj.typeBarcode === "code128"
-        ) {
-          if (Number(e.target.value) < 1) return;
-          if (Number(e.target.value) > 4) return;
-          if (Number(e.target.value) >= 1 || Number(e.target.value) <= 4) {
-            setValueW(e.target.value);
-            Object.manualW(e.target.value);
-          }
-          setTimeout(() => {
-            Object.prop_obj.pxW =
-              Object.obj.nativeEvent.target.clientWidth / Memory.mm;
-          }, 650);
-        } else if (Object.prop_obj.typeObj === "lines") {
-          setValueW(e.target.value);
-          Object.manualW(e.target.value);
-        } else if (Object.prop_obj.typeBarcode === "datamatrix") {
-          if (e.target.value.match(/[\d,]/gm) && e.target.value >= 1) {
-            Object.manualW(e.target.value);
-          }
         }
+        setTimeout(() => {
+          Object.prop_obj.pxW =
+            Object.obj.nativeEvent.target.clientWidth / Memory.mm;
+        }, 650);
+      } else if (Object.prop_obj.typeObj === "lines") {
+        setValueW(e.target.value);
+        Object.manualW(e.target.value);
+      } else if (Object.prop_obj.typeBarcode === "datamatrix") {
+        if (e.target.value.match(/[\d,]/gm) && e.target.value >= 1) {
+          Object.manualW(e.target.value);
+        }
+        // }
       }
     };
 
     const rewriteManualH = (e) => {
-      if (e.target.value.match(/[\d,]/gm) && e.target.value >= 0) {
-        if (
-          e.target.value > 5.1 &&
-          Object.prop_obj.typeObj !== "lines" &&
-          Object.prop_obj.typeBarcode !== "datamatrix"
-        ) {
-          setValueH(e.target.value);
-          Object.manualH(e.target.value);
-        } else if (Object.prop_obj.typeObj === "lines" && e.target.value >= 0) {
-          setValueH(Math.round(e.target.value * 100) / 100);
-          Object.manualH(Math.round(e.target.value * 100) / 100);
-        } else if (Object.prop_obj.typeBarcode === "datamatrix") {
-          if (e.target.value.match(/[\d,]/gm) && e.target.value >= 1) {
-            Object.manualW(e.target.value);
-          }
+      // if (
+      //   e.target.value.match(/[\d,]/gm)
+      //   //  && e.target.value >= 0
+      // ) {
+      if (
+        // e.target.value > 5.1 &&
+        Object.prop_obj.typeObj !== "lines" &&
+        Object.prop_obj.typeBarcode !== "datamatrix"
+      ) {
+        setValueH(e.target.value);
+        Object.manualH(e.target.value);
+      } else if (
+        Object.prop_obj.typeObj === "lines"
+        //  && e.target.value >= 0
+      ) {
+        setValueH(e.target.value);
+        Object.manualH(e.target.value);
+      } else if (Object.prop_obj.typeBarcode === "datamatrix") {
+        if (e.target.value.match(/[\d,]/gm) && e.target.value >= 1) {
+          Object.manualW(e.target.value);
         }
       }
+      // }
     };
 
     const visibleTextBarcodeFunc = () => {
@@ -321,7 +330,11 @@ export const PropertiesObj = observer(
               <input
                 className="input_coord_prop_obj"
                 type="number"
-                value={Math.round(Object.prop_obj.w * 100) / 100}
+                value={
+                  Object.prop_obj.w !== ""
+                    ? Math.round(Object.prop_obj.w * 100) / 100
+                    : ""
+                }
                 onChange={rewriteManualW}
               />{" "}
               мм
@@ -334,11 +347,14 @@ export const PropertiesObj = observer(
           <span className="prop_obj_info">Высота:</span>{" "}
           {Object.prop_obj.w !== "fit-content" ? (
             <>
-              {" "}
               <input
                 className="input_coord_prop_obj"
                 type="number"
-                value={Math.round(Object.prop_obj.h * 100) / 100}
+                value={
+                  Object.prop_obj.h !== ""
+                    ? Math.round(Object.prop_obj.h * 100) / 100
+                    : ""
+                }
                 onChange={rewriteManualH}
               />{" "}
               мм
@@ -352,7 +368,11 @@ export const PropertiesObj = observer(
           <input
             className="input_coord_prop_obj"
             type="number"
-            value={Math.round(Object.prop_obj.x * 100) / 100}
+            value={
+              Object.prop_obj.x > 0
+                ? Math.round(Object.prop_obj.x * 100) / 100
+                : ""
+            }
             onChange={rewriteManualX}
           />
           мм
@@ -362,12 +382,17 @@ export const PropertiesObj = observer(
           <input
             className="input_coord_prop_obj"
             type="number"
-            value={Math.round(Object.prop_obj.y * 100) / 100}
+            value={
+              Object.prop_obj.y > 0
+                ? Math.round(Object.prop_obj.y * 100) / 100
+                : ""
+            }
             onChange={rewriteManualY}
-          />{" "}
+          />
           мм
         </li>
-        {Object.prop_obj.typeObj !== "box" ? (
+        {Object.prop_obj.typeObj !== "box" &&
+        Object.prop_obj.typeObj !== "img" ? (
           <li className="prop_obj">
             {rotate ? (
               <span ref={rotateRef} className="prop_obj_position">

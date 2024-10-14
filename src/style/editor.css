@@ -19,6 +19,7 @@
 }
 .editor_list_viewer {
   width: 100%;
+  height: 550px;
   display: flex;
   justify-content: space-between;
   gap: 1%;
@@ -59,6 +60,7 @@
   padding: 80% 5px;
   color: #b2b2b2d1;
   font-size: 20px;
+  min-width: 206px;
 }
 .editor_list_obj_container_prop {
   position: relative;
@@ -68,10 +70,10 @@
   border: var(--grey_border);
   align-items: stretch;
   justify-content: flex-start;
-  /* gap: 2.5%; */
   animation: open_properties 1.4s ease forwards;
   border-radius: 0 15px 15px 0;
   max-height: 460px;
+  min-width: 206px;
 }
 .list_props {
   overflow-y: auto;
@@ -80,7 +82,7 @@
   margin: 9px 0;
 }
 .add_obj-title {
-  padding: 10px;
+  padding: 5px 30px 5px 15px;
   display: flex;
   border-bottom: var(--grey_border);
   justify-content: space-between;
@@ -100,6 +102,18 @@
   position: sticky;
   top: 40px;
   background: aliceblue;
+}
+.prop_obj-title {
+  padding: 5px;
+  display: flex;
+  border-bottom: var(--grey_border);
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: aliceblue;
+  font-size: 14px;
+  border-radius: 15px;
 }
 .add_obj {
   border: var(--mast-blue-1);
@@ -318,6 +332,7 @@
   justify-content: flex-end;
   align-items: center;
   gap: 25px;
+  position: relative;
 }
 .barlabel_container_scale {
   display: flex;
@@ -343,7 +358,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 320px;
+  min-width: 320px;
+  /* max-width: 450px; */
   height: 26px;
 }
 .printer_setting_radio_label {
@@ -368,21 +384,48 @@
   margin-bottom: 35px;
 }
 .printer_setting_container {
+  position: absolute;
+  z-index: 10;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   color: #8f8c8ce0;
   width: 100%;
+  height: 100%;
   gap: 12px;
-  padding: 5%;
+  padding: 1%;
   border: var(--grey_border);
+  background: white;
 }
-.printer_setting_closed {
+.printer_setting_column_container {
   display: flex;
-  width: 320px;
-  margin-top: 30px;
   justify-content: flex-end;
+  width: 80%;
+  flex-direction: row;
+  align-items: center;
+  gap: 5vw;
+}
+.printer_setting_column {
+  width: 100%;
+  max-width: 450px;
+  height: 355px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.printer_setting_btn_container {
+  display: flex;
+  width: 160px;
+  height: 100%;
+  /* margin-top: 30px; */
+  flex-direction: column;
+  justify-content: space-between;
+}
+.printer_setting_btn_action {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 .printer_setting_row_value {
   color: var(--mast-blue-1);
@@ -695,6 +738,24 @@
   border: 1px solid #979697;
   border-radius: 4px;
   padding-left: 3px;
+}
+
+.post_template_modal_rename_container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.post_template_modal_btn_container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.label_container_label {
+  display: flex;
+  width: 100%;
+  justify-content: center;
 }
 
 @keyframes open_properties {

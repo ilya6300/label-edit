@@ -28,11 +28,11 @@ export const Editor = observer(() => {
   }, []);
 
   useEffect(() => {
-    if (window.navigator.userAgent.toLowerCase().match(/firefox/g)) {
-      return setBrowserNotSupportedFlag(true);
-    }
+    // if (window.navigator.userAgent.toLowerCase().match(/firefox/g)) {
+    //   return setBrowserNotSupportedFlag(true);
+    // }
     setNoFonts(false);
-    Fonts.defaultFont(Fonts.fonts[0]);
+    // Fonts.defaultFont(Fonts.fonts[0]);
   }, [!service.fontsLoading]);
 
   // Класс мм сетки
@@ -64,25 +64,26 @@ export const Editor = observer(() => {
                   printerSetting={printerSetting}
                 />
                 {visibleTemplates ? (
-                  <GetTemplate />
+                  <GetTemplate setVisibleTemplates={setVisibleTemplates} />
                 ) : (
                   <div className="editor_list_viewer">
-                    {!printerSetting ? (
-                      <>
-                        {importC ? (
-                          <ImportCompanent setImportC={setImportC} />
-                        ) : (
-                          <></>
-                        )}
-                        <AddContainer />
-                        <Label
-                          flagPreview={flagPreview}
-                          setFlagPrevier={setFlagPrevier}
-                          clsMM={clsMM}
-                        />
-                      </>
+                    {importC ? (
+                      <ImportCompanent setImportC={setImportC} />
                     ) : (
-                      <PrinterSettings setPrinterSetting={setPrinterSetting}/>
+                      <></>
+                    )}
+                    {!service.fontsLoading ? <AddContainer /> : <></>}
+
+                    <Label
+                      flagPreview={flagPreview}
+                      setFlagPrevier={setFlagPrevier}
+                      clsMM={clsMM}
+                    />
+
+                    {printerSetting ? (
+                      <PrinterSettings setPrinterSetting={setPrinterSetting} />
+                    ) : (
+                      <></>
                     )}
                   </div>
                 )}
@@ -95,7 +96,21 @@ export const Editor = observer(() => {
                       "obj",
                       toJS(Object.obj),
                       "downloaded_template",
-                      toJS(Templates.downloaded_template)
+                      toJS(Templates.downloaded_template),
+                      "width_label",
+                      Memory.width_label,
+                      "height_label",
+                      Memory.height_label,
+                      "gap",
+                      Memory.gap,
+                      "DIRECTION_1",
+                      Memory.DIRECTION_1,
+                      "DIRECTION_2",
+                      Memory.DIRECTION_2,
+                      "ref_x",
+                      Memory.ref_x,
+                      "ref_y",
+                      Memory.ref_y
                     )
                   }
                 >

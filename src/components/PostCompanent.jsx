@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BtnVer1 } from "../UI/btn/BtnVer1";
 import Memory from "../store/Memory";
 import Object from "../store/Object";
@@ -6,6 +6,7 @@ import service from "../request/service";
 import Templates from "../store/Templates";
 import { observer } from "mobx-react-lite";
 import Msg from "../store/Msg";
+import { toJS } from "mobx";
 
 export const PostCompanent = observer(({ valueName, setValueName }) => {
   // Извлечение новых элементов
@@ -44,9 +45,15 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
         }
         if (el.typeBarcode === "ean13") {
           obj.code_type = "ean13";
+          // radius на бэке - pxW, font_size - pxH
+          obj.radius = el.pxW;
+          obj.font_size = el.pxH;
         }
         if (el.typeBarcode === "code128") {
           obj.code_type = "code128";
+          // radius на бэке - pxW, font_size - pxH
+          obj.radius = el.pxW;
+          obj.font_size = el.pxH;
         }
         if (el.typeBarcode === "qrcode") {
           obj.code_type = "qrcode";
@@ -60,19 +67,17 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
         obj.radius = el.borderRadius;
       }
       if (el.typeObj === "lines") {
-        console.log(3);
         if (
           String(el.style.rotate) === "0" ||
           String(el.style.rotate) === "180"
         ) {
           obj.width = Math.round((Number(el.x) + Number(el.w)) * 100) / 100;
           obj.height = Math.round(Number(el.y) * 100) / 100;
-          obj.font_size = Math.round(Number(el.h) * 100) / 100;
+          obj.line_thickness = Math.round(Number(el.h) * 100) / 100;
         } else {
-          console.log(2);
           obj.width = Math.round(Number(el.x) * 100) / 100;
           obj.height = Math.round((Number(el.y) + Number(el.h)) * 100) / 100;
-          obj.font_size = Math.round(Number(el.w) * 100) / 100;
+          obj.line_thickness = Math.round(Number(el.w) * 100) / 100;
         }
       } else {
         obj.width = Math.round(Number(el.w) * 100) / 100;
@@ -84,128 +89,176 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     return post_objects;
   };
 
+  const calculationAutoHeight = () => {
+    const block = document.querySelectorAll(".bardcode_container-block");
+    block.forEach((obj) => {
+      const ID = Object.objects.find((i) => i.id === Number(obj.id));
+      obj.style.height = "auto";
+      obj.style.width = "auto";
+      if (ID) {
+        setTimeout(() => {
+          ID.pxH = obj.offsetHeight / Memory.mm;
+          ID.h = obj.offsetHeight / Memory.mm;
+          ID.pxW = obj.offsetWidth / Memory.mm;
+          ID.w = obj.offsetWidth / Memory.mm;
+        }, 50);
+      }
+    });
+  };
+
   // Добавление объектов при создании нового шаблона
   const postTemplates = () => {
+    try {
+      calculationAutoHeight();
+    } catch (e) {
+      console.error(e);
+    }
     if (valueName.length < 3) {
       return alert("Имя шаблона должно содержать минимум 3 символа");
     }
-    const template = {
-      name: valueName,
-      width_mm: Number(Memory.width_label),
-      height_mm: Number(Memory.height_label),
-      gap_mm: Number(Memory.gap),
-      reference_x: Number(Memory.ref_x),
-      reference_y: Number(Memory.ref_y),
-      direction_x: Number(Memory.DIRECTION_1),
-      direction_y: Number(Memory.DIRECTION_2),
-      objects: [],
-    };
-    template.objects = [...extractionObj(Object.objects)];
-    service.postTemplate(template);
-    Memory.visiblePost(false);
-    Object.resetPreiew();
+    try {
+      const template = {
+        name: valueName,
+        width_mm: Number(Memory.width_label),
+        height_mm: Number(Memory.height_label),
+        gap_mm: Number(Memory.gap),
+        reference_x: Number(Memory.ref_x),
+        reference_y: Number(Memory.ref_y),
+        direction_x: Number(Memory.DIRECTION_1),
+        direction_y: Number(Memory.DIRECTION_2),
+        objects: [],
+      };
+      template.objects = [...extractionObj(Object.objects)];
+      service.postTemplate(template);
+      Memory.visiblePost(false);
+      Object.resetPreiew();
+      Templates.setNewTemplate(false);
+    } catch (e) {
+      console.error(e);
+    }
   };
   // Изменить шаблон
   // Обновление объектов
   const updateObj = () => {
-    // Object.resetPreiew();
-    // Временный массив который хранит в себе элементы которые были обновлены
-    const update_object = [];
-    // Перебираем ранее загруженный массив, с тем что на этикетке
-    Templates.downloaded_template.forEach((old) => {
-      Object.objects.filter((newT) => {
-        // Ищем объекты, и проверяем что они не равны
-        if (
-          old.id === newT.id &&
-          JSON.stringify(old) !== JSON.stringify(newT)
-        ) {
-          // перебираем все элементы у объекта, в котором были произведены изменения
-          const temp = { field_id: old.id };
-          for (let key in old) {
-            // Сравниваем изменённые поля
-            if (old[key] !== newT[key]) {
-              // изменение координа
-              if (key === "x" || key === "y") {
-                temp.pos_x = newT.x;
-                temp.pos_y = newT.y;
-              }
-              // изменение имени объекта
-              if (key === "name") {
-                temp.name = newT.name;
-              }
-              // Отключение / включение active
-              if (key === "active") {
-                temp.enabled = newT.active;
-              }
-              // Ширина / высота
-              if (key === "w" || key === "h") {
-                if (old.typeObj !== "lines") {
-                  temp.width = newT.w;
-                  temp.height = newT.h;
-                } else {
-                  console.log(
-                    "cтрока 145",
-                    String(newT.style.rotate),
-                    String(newT.style.rotate) === "0"
-                  );
+    try {
+      calculationAutoHeight();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      // Временный массив который хранит в себе элементы которые были обновлены
+      const update_object = [];
+      setTimeout(() => {
+        Templates.downloaded_template.forEach((old) => {
+          Object.objects.filter((newT) => {
+            // Ищем объекты, и проверяем что они не равны
+            if (
+              old.id === newT.id &&
+              JSON.stringify(old) !== JSON.stringify(newT)
+            ) {
+              // перебираем все элементы у объекта, в котором были произведены изменения
+              const temp = { field_id: Number(old.id) };
+              for (let key in old) {
+                // Сравниваем изменённые поля
+                if (old[key] !== newT[key]) {
+                  // изменение координа
+                  if (key === "x" || key === "y") {
+                    temp.pos_x = newT.x;
+                    temp.pos_y = newT.y;
+                  }
+                  // изменение имени объекта
+                  if (key === "name") {
+                    temp.name = newT.name;
+                  }
+                  // Отключение / включение active
+                  if (key === "active") {
+                    temp.enabled = newT.active;
+                  }
+                  // Ширина / высота
+                  if (key === "w" || key === "h") {
+                    if (old.typeObj !== "lines") {
+                      console.log(newT, newT.w);
+                      temp.width = Math.round(newT.w * 100) / 100;
+                      temp.height = Math.round(newT.h * 100) / 100;
+                    } else {
+                      if (
+                        String(newT.style.rotate) === "0" ||
+                        String(newT.style.rotate) === "180"
+                      ) {
+                        temp.width =
+                          Math.round((Number(newT.x) + Number(newT.w)) * 100) /
+                          100;
+                        temp.height = Math.round(Number(newT.y) * 100) / 100;
+                        temp.line_thickness =
+                          Math.round(Number(newT.h) * 100) / 100;
+                      } else {
+                        temp.width = Math.round(Number(newT.x) * 100) / 100;
+                        temp.height =
+                          Math.round((Number(newT.y) + Number(newT.h)) * 100) /
+                          100;
+                        temp.line_thickness =
+                          Math.round(Number(newT.w) * 100) / 100;
+                      }
+                    }
+                  }
+                  // Изменение тела
+                  if (key === "body") {
+                    temp.data = newT.body;
+                  }
+                  // ИВ шрифта
+                  if (key === "font_family_id") {
+                    temp.font_id = newT.font_family_id;
+                  }
+                  // видимость текста шк
+                  if (key === "human_readable") {
+                    temp.human_readable = newT.human_readable;
+                  }
+                  // Ширина в пикселях для линейного шк. radius на бэке - pxW, font_size - pxH
                   if (
-                    String(newT.style.rotate) === "0" ||
-                    String(newT.style.rotate) === "180"
+                    key === "pxW" &&
+                    (old.typeBarcode === "ean13" ||
+                      old.typeBarcode === "code128")
                   ) {
-                    temp.width =
-                      Math.round((Number(newT.x) + Number(newT.w)) * 100) / 100;
-                    temp.height = Math.round(Number(newT.y) * 100) / 100;
-                    temp.font_size = Math.round(Number(newT.h) * 100) / 100;
-                  } else {
-                    temp.width = Math.round(Number(newT.x) * 100) / 100;
-                    temp.height =
-                      Math.round((Number(newT.y) + Number(newT.h)) * 100) / 100;
-                    temp.font_size = Math.round(Number(newT.w) * 100) / 100;
+                    temp.radius = newT.pxW;
+                    temp.font_size = newT.pxH;
                   }
                 }
               }
-              // Изменение тела
-              if (key === "body") {
-                temp.data = newT.body;
-              }
-              // ИВ шрифта
-              if (key === "font_family_id") {
-                temp.font_id = newT.font_family_id;
-              }
-              // видимость текста шк
-              if (key === "human_readable") {
-                temp.human_readable = newT.human_readable;
-              }
-            }
-          }
-          for (let key in old.style) {
-            if (old.style[key] !== newT.style[key]) {
-              // изменение стиля - поворот, шрифты, позиция текста
-              if (key === "rotate") {
-                if (newT.typeBarcode === "datamatrix") {
-                  temp.rotation = newT.min_size;
-                } else {
-                  temp.rotation = newT.style.rotate;
+              for (let key in old.style) {
+                if (old.style[key] !== newT.style[key]) {
+                  // изменение стиля - поворот, шрифты, позиция текста
+                  if (key === "rotate") {
+                    if (newT.typeBarcode === "datamatrix") {
+                      temp.rotation = newT.min_size;
+                    } else {
+                      temp.rotation = newT.style.rotate;
+                    }
+                  }
+                  if (key === "fontSize") {
+                    temp.font_size = newT.style.fontSize;
+                  }
+                  if (key === "position") {
+                    temp.text_align = newT.style.position;
+                  }
                 }
               }
-              if (key === "fontSize") {
-                temp.rotation = newT.style.fontSize;
-              }
-              if (key === "position") {
-                temp.text_align = newT.style.position;
-              }
+              update_object.push(temp);
             }
-          }
-          update_object.push(temp);
-          console.log("======", temp);
+          });
+        });
+        if (update_object.length !== 0) {
+          service.pathUpdateObj(update_object);
         }
-      });
-    });
-    if (update_object.length !== 0) {
-      console.log(update_object);
-      service.pathUpdateObj(update_object);
+      }, 50);
+      // Перебираем ранее загруженный массив, с тем что на этикетке
     }
-    console.log(update_object);
+  };
+  // Переименовать шаблон
+  const renameTemplate = async () => {
+    if (Memory.name_template !== rename) {
+      Templates.preview_templates.name = rename;
+      Memory.writeNameTemplate();
+      service.pathUpdateLabel({ name: rename });
+    }
   };
   // Изменить параметры этикетки
   const updateLabel = () => {
@@ -224,7 +277,6 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     checkParameter("direction_y", Memory.DIRECTION_2);
 
     if (JSON.stringify(update_label) !== "{}") {
-      console.log(update_label);
       service.pathUpdateLabel(update_label);
     }
   };
@@ -238,11 +290,9 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     });
     Templates.downloaded_template.forEach((d) => {
       id_old_id.push(d.id);
-      // if (!JSON.stringify(Object.objects).includes(JSON.stringify(d))) {
-      //   delete_objects.push(d.id);
-      // }
     });
     id_old_id.forEach((id) => {
+      // console.log(id_obj, id_old_id);
       if (!id_obj.includes(id)) {
         delete_objects.push(id);
       }
@@ -259,9 +309,11 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     const new_objects = [];
     const id_old_object = [];
     Templates.downloaded_template.forEach((o) => {
+      console.log(toJS(o));
       id_old_object.push(o.id);
     });
     Object.objects.forEach((newObj) => {
+      console.log(toJS(newObj));
       if (!id_old_object.includes(newObj.id)) {
         new_objects.push(newObj);
       }
@@ -269,14 +321,22 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     if (new_objects.length > 0) {
       service.addNewObj(extractionObj(new_objects));
     }
-    console.log("new_objects", new_objects);
   };
-  // Изменить существующею этикетку
-  const pathTemplates = () => {
+  // Изменить существующею этикеткуТог
+  const pathTemplates = async () => {
+    renameTemplate();
     updateObj();
     updateLabel();
-    deleteObject();
     newObjPost();
+    setTimeout(() => {
+      deleteObject();
+    }, 1000);
+    setTimeout(async () => {
+      setTimeout(async () => {
+        await service.getTemplatesID(Templates.preview_templates.id);
+        await Object.select();
+      }, 500);
+    }, 1000);
     Memory.visiblePost(false);
   };
 
@@ -289,6 +349,11 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
       Memory.visiblePost(false);
     }
   };
+  const [renameFlag, setRenameFlag] = useState(false);
+  const [rename, setRename] = useState(Memory.name_template);
+  const handlerRename = async (e) => {
+    setRename(e.target.value);
+  };
 
   return (
     <>
@@ -299,13 +364,11 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
             : Memory.visiblePost(true)
         }
       >
-        {JSON.stringify(Templates.preview_templates) === "{}"
-          ? "Сохранить новый"
-          : "Сохранить " + valueName}
+        {Templates.new_template ? "Сохранить новый" : "Сохранить " + valueName}
       </BtnVer1>{" "}
       {Memory.visible_modal_post ? (
         <div ref={modalPostRef} className="post_template_container_modal">
-          {JSON.stringify(Templates.preview_templates) === "{}" ? (
+          {Templates.new_template ? (
             <>
               {" "}
               <p className="post_template_modal_text">
@@ -327,14 +390,34 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
             </>
           ) : (
             <>
-              {" "}
-              <p className="post_template_modal_text">
-                Шаблон: {Memory.name_template}
-              </p>
-              <BtnVer1 onClick={pathTemplates}>Изменить</BtnVer1>
-              <BtnVer1 onClick={() => Memory.visiblePost(false)}>
-                Закрыть
-              </BtnVer1>
+              {!renameFlag ? (
+                <p className="post_template_modal_text">
+                  Шаблон: {Memory.name_template}
+                </p>
+              ) : (
+                <div className="post_template_modal_rename_container">
+                  <p>Новое название шаблона - {Memory.name_template}</p>
+                  <input
+                    placeholder="Введите новое название шаблона"
+                    className="barlabel_text"
+                    value={rename}
+                    onChange={handlerRename}
+                  />
+                </div>
+              )}
+              <div className="post_template_modal_btn_container">
+                <BtnVer1 onClick={pathTemplates}>Изменить</BtnVer1>
+                <BtnVer1
+                  onClick={() =>
+                    renameFlag ? setRenameFlag(false) : setRenameFlag(true)
+                  }
+                >
+                  Переименовать
+                </BtnVer1>
+                <BtnVer1 onClick={() => Memory.visiblePost(false)}>
+                  Закрыть
+                </BtnVer1>
+              </div>
             </>
           )}
         </div>

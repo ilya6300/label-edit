@@ -10,6 +10,13 @@ class Memory {
 
   button_left_press = false;
   left_press_timer = false;
+
+  visible_printer_settings = true;
+
+  setVisiblePrinterSettings = async () => {
+    this.visible_printer_settings = true;
+  };
+
   pressLeftDown = () => {
     this.left_press_timer = true;
     setTimeout(() => {
@@ -123,7 +130,7 @@ class Memory {
   // При своение имени шаблона
   writeNameTemplate = () => {
     this.name_template = Templates.preview_templates.name;
-    console.log(this.name_template);
+    // console.log(this.name_template);
   };
 
   // Флаг отображения свойств объектов

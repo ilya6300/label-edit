@@ -275,40 +275,52 @@ export const ThisLabel = observer(
             {Memory.visible_objects ? (
               objects.map((obj) => (
                 <div
-                  on
                   onMouseDown={onMouseDownFunc}
                   onMouseOut={onMouseOutFunc}
                   key={obj.id}
                   id={obj.id}
                   className={!preview ? obj.cls.join(" ") : obj.clsPreview}
                   style={{
-                    // transform: `scale(${Memory.scale})`,
                     width:
-                      obj.typeObj === "text" ||
-                      obj.typeBarcode === "ean13" ||
-                      obj.typeBarcode === "code128"
-                        ? "fit-content"
-                        : obj.typeBarcode === "datamatrix"
+                      // obj.typeObj === "text" ||
+                      // obj.typeBarcode === "ean13" ||
+                      // obj.typeBarcode === "code128"
+                      //   ? "fit-content"
+                      //   :
+                      obj.typeBarcode === "datamatrix"
                         ? obj.pxW * obj.min_size * Memory.mm * Memory.scale +
                           "px"
                         : obj.typeObj === "box"
-                        ? obj.pxW * Memory.scale + "px"
+                        ? obj.pxW * Memory.mm * Memory.scale + "px"
                         : obj.pxW * Memory.mm * Memory.scale + "px",
                     height:
                       obj.typeBarcode === "datamatrix"
                         ? obj.pxW * obj.min_size * Memory.mm * Memory.scale +
                           "px"
                         : obj.typeObj === "box"
-                        ? obj.pxH * Memory.scale + "px"
+                        ? obj.pxH * Memory.mm * Memory.scale + "px"
                         : obj.pxH * Memory.mm * Memory.scale + "px",
                     zIndex: obj.zIndex,
-                    left: obj.pxX * Memory.scale + "px",
-                    top: obj.pxY * Memory.scale + "px",
+                    left:
+                      obj.typeObj === "lines" ||
+                      obj.typeObj === "box" ||
+                      // obj.typeObj === "block" ||
+                      obj.typeObj === "img" ||
+                      obj.typeBarcode === "datamatrix" ||
+                      obj.typeBarcode === "qr"
+                        ? obj.pxX * Memory.scale + "px"
+                        : obj.pxFakeX * Memory.scale + "px",
+                    top:
+                      obj.typeObj === "lines" ||
+                      obj.typeObj === "box" ||
+                      // obj.typeObj === "block" ||
+                      obj.typeObj === "img" ||
+                      obj.typeBarcode === "datamatrix" ||
+                      obj.typeBarcode === "qr"
+                        ? obj.pxY * Memory.scale + "px"
+                        : obj.pxFakeY * Memory.scale + "px",
                     fontSize: obj.style.fontSize * Memory.scale + "pt",
-                    fontFamily:
-                      String(obj.style.fontFamily) !== "0"
-                        ? obj.style.fontFamily
-                        : "monospace",
+                    fontFamily: obj.style.fontFamily,
                     justifyContent:
                       obj.style.position === "2"
                         ? "center"
@@ -385,8 +397,8 @@ export const ThisLabel = observer(
                         width: obj.pxW * Memory.mm * Memory.scale + "px",
                         height: obj.pxH * Memory.mm * Memory.scale + "px",
                         background: "black",
-                        left: obj.pxX * Memory.scale + "px",
-                        top: obj.pxY * Memory.scale + "px",
+                        // left: obj.pxX * Memory.scale + "px",
+                        // top: obj.pxY * Memory.scale + "px",
                       }}
                       id={obj.id}
                     >
@@ -398,8 +410,8 @@ export const ThisLabel = observer(
                   {obj.typeObj === "box" ? (
                     <div
                       style={{
-                        width: obj.pxW * Memory.scale + "px",
-                        height: obj.pxH * Memory.scale + "px",
+                        width: obj.pxW * Memory.mm * Memory.scale + "px",
+                        height: obj.pxH * Memory.mm * Memory.scale + "px",
                         border: obj.line_thickness / 2 + "px solid",
                         left: obj.pxX * Memory.scale + "px",
                         top: obj.pxY * Memory.scale + "px",

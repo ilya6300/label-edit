@@ -208,7 +208,6 @@ export const DMContainer = ({ setDmFlag }) => {
       x: 0,
       y: 0,
       body: dm.dm,
-      file: null,
       zIndex: 2,
       w: 6,
       h: 6,

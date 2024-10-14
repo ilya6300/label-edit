@@ -33,14 +33,16 @@ export const AddContainer = observer(() => {
       // typeBarcode: "",
       pxX: 0,
       pxY: 0,
-      pxW: 12 * Memory.mm,
+      pxW: 12,
       pxH: 6,
+      pxFakeX: 0,
+      pxFakeY: 0,
       x: 0,
       y: 0,
       body: "Текст",
       // file: null,
       zIndex: 2,
-      w: 12 * Memory.mm,
+      w: 12,
       h: 6,
       active: true,
       cls: ["bardcode_container-text "],
@@ -54,8 +56,8 @@ export const AddContainer = observer(() => {
         boxShadow: "none",
       },
     };
-
     Object.addObj(obj);
+    // Object.startSetFontFamily(obj.id);
   };
 
   const addTextBlock = () => {
@@ -71,6 +73,8 @@ export const AddContainer = observer(() => {
       pxY: 0,
       pxW: 50,
       pxH: 20,
+      pxFakeX: 0,
+      pxFakeY: 0,
       x: 0,
       y: 0,
       body: "Текст",
@@ -91,6 +95,7 @@ export const AddContainer = observer(() => {
         boxShadow: "none",
       },
     };
+
     Object.addObj(obj);
   };
   const addBarcode = (e) => {
@@ -247,9 +252,8 @@ export const AddContainer = observer(() => {
 
   return (
     <ul className="editor_list_obj_container">
-      {Fonts.default_font.name !== undefined ? (
+      {Fonts.default_font !== undefined ? (
         <>
-          {" "}
           <li className="add_obj-title">Добавить элемент</li>
           <li className="add_obj" onClick={addText}>
             Текст (строка)

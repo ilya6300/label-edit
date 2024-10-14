@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Memory from "../store/Memory";
 import { observer } from "mobx-react-lite";
 import Object from "../store/Object";
@@ -11,6 +11,8 @@ import { BarInfo } from "./BarInfo";
 import HistoryStore from "../store/HistoryStore";
 import { ImportCompanent } from "./import/ImportCompanent";
 import iconSettings from "../img/icons/icon-settings.png";
+import Msg from "../store/Msg";
+import { CodeTemplayModal } from "./templates/CodeTemplayModal";
 
 export const BarLabel = observer(
   ({
@@ -35,6 +37,10 @@ export const BarLabel = observer(
 
     // Имя шаблона
     const [valueName, setValueName] = useState(Memory.name_template);
+    const refCodeImport = useRef();
+
+    const [visibleCodeTemplateFlag, setVisibleCodeTemplateFlag] =
+      useState(false);
 
     const changeW = (e) => {
       if (e.target.value > 150) {
@@ -94,7 +100,14 @@ export const BarLabel = observer(
     };
 
     const preview = () => {
-      flagPreview ? setFlagPrevier(false) : setFlagPrevier(true);
+      if (flagPreview) {
+        setFlagPrevier(false);
+      } else {
+        setFlagPrevier(true);
+        setTimeout(() => {
+          Object.editBodyPreview();
+        }, 100);
+      }
     };
 
     const changeDirection = (e) => {
@@ -174,28 +187,32 @@ export const BarLabel = observer(
     };
 
     // Выбрать шаблон
-    const selectTemplate = () => {
-      setVisibleTemplates(false);
-      setRefX(Templates.preview_templates.reference_x);
-      setRefY(Templates.preview_templates.reference_y);
-      setDirection1(Templates.preview_templates.direction_x);
-      setDirection2(Templates.preview_templates.direction_y);
-      setWValue(Templates.preview_templates.width_mm);
-      setHValue(Templates.preview_templates.height_mm);
-      setGValue(Templates.preview_templates.gap_mm);
-      Templates.saveID(Templates.preview_templates.id);
-      Object.select();
-      Templates.downloadedTemplates(Object.objects_preview);
-    };
+    // const selectTemplate = () => {
+    //   setVisibleTemplates(false);
+    //   setRefX(Templates.preview_templates.reference_x);
+    //   setRefY(Templates.preview_templates.reference_y);
+    //   setDirection1(Templates.preview_templates.direction_x);
+    //   setDirection2(Templates.preview_templates.direction_y);
+    //   setWValue(Templates.preview_templates.width_mm);
+    //   setHValue(Templates.preview_templates.height_mm);
+    //   setGValue(Templates.preview_templates.gap_mm);
+    //   Templates.saveID(Templates.preview_templates.id);
+    //   Object.select();
+    //   Templates.downloadedTemplates(Object.objects_preview);
+    //   setTimeout(() => {
+    //     Object.editBodyPreview();
+    //   }, 1000);
+    // };
 
-    const deleteTemplate = () => {
-      console.log(Templates.preview_templates.id);
-      service.deleteTemplate();
-    };
+    // const deleteTemplate = () => {
+    //   console.log(Templates.preview_templates.id);
+    //   service.deleteTemplate();
+    // };
 
     // Новый шаблон
     const newTemplateFunc = () => {
       Object.newTemplate();
+      Templates.setNewTemplate(true);
     };
 
     // Включить / отклюяить милимметровую сетку
@@ -220,38 +237,73 @@ export const BarLabel = observer(
     };
 
     const visibleImportC = () => {
+      setVisibleTemplates(false);
       setImportC(true);
     };
 
-    const trialPrint = async () => {
+    const trialPrintFunc = async () => {
       if (Templates.template_id === null) {
         return alert("Сохраните шаблон или выберите из БД");
       }
       if (localStorage.getItem("printer") === null) {
         return setPrinterSetting(true);
       }
-      await service.trialPrint();
+      const res = await service.trialPrint();
+      if (res.success) {
+        setVisibleCodeTemplateFlag(true);
+      }
+    };
+
+    const importTemplates = async (e) => {
+      // reader.readAsText(e.target.files[0]);
+      if (!e.target.files[0].name.match(/\.tdmc$/gm)) {
+        return Msg.writeMessages(
+          "Необходимо загрузить файл типа .tdmc (Template DMC). Экспортированный ранее из редактора этикеток DMC или DMC"
+        );
+      }
+      try {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const resID = await service.importCodeTemplate(reader.result);
+          // console.log("resID", resID.data.id);
+          if (resID.success !== undefined) {
+            await service.getTemplatesID(resID.data.id);
+          }
+        };
+        reader.readAsText(e.target.files[0]);
+        console.log(e.target.files[0].name);
+      } catch (e) {
+        return Msg.writeMessages(e);
+      }
+      // return Msg.writeMessages("Файл импортирован успешно!");
+      e.target.value = null;
+      // console.log(e.target.files);
+    };
+
+    const getPingPrint = async () => {
+      if (localStorage.getItem("printer") === null) {
+        return setPrinterSetting(true);
+      }
+      await service.pingPrinter();
     };
 
     return (
       <div className="bar_label">
         <span className="barlabel_title">
           <span style={{ width: "150px" }}>
-            {JSON.stringify(Templates.preview_templates) === "{}"
-              ? "Новый шаблон"
-              : Memory.name_template}
+            {Templates.new_template ? "Новый шаблон" : Memory.name_template}
           </span>
           <div className="barlabel_btn_container">
             {!visibleTemplates ? (
               <>
                 {/* Редактор */}
                 <BtnVer1 onClick={newTemplateFunc}>Создать новый</BtnVer1>
-                <BtnVer1 onClick={visibleImportC}>Импорт</BtnVer1>
+                <BtnVer1 onClick={openTemplates}>Шаблоны</BtnVer1>
                 <PostCompanent
                   valueName={valueName}
                   setValueName={setValueName}
                 />
-                <BtnVer1 onClick={openTemplates}>Получить из БД</BtnVer1>
+
                 <BtnVer1 onClick={reset}>Очистить текущий</BtnVer1>
                 <BtnVer1 flagPreview={flagPreview} onClick={preview}>
                   Предпросмотр
@@ -260,9 +312,23 @@ export const BarLabel = observer(
             ) : (
               <>
                 {/* Окно просмотра шаблона */}
+
+                <input
+                  ref={refCodeImport}
+                  type="file"
+                  accept=".tdmc"
+                  style={{ display: "none" }}
+                  onChange={importTemplates}
+                />
+                <BtnVer1 onClick={() => refCodeImport.current.click()}>
+                  Импорт из файла
+                </BtnVer1>
+                <BtnVer1 onClick={visibleImportC}>
+                  Импорт кода (строками)
+                </BtnVer1>
                 <BtnVer1 onClick={closedTemplates}>Закрыть</BtnVer1>
-                <BtnVer1 onClick={selectTemplate}>Выбрать шаблон</BtnVer1>
-                <BtnVer1 onClick={deleteTemplate}>Удалить шаблон</BtnVer1>
+                {/* <BtnVer1 onClick={selectTemplate}>Выбрать шаблон</BtnVer1> */}
+                {/* <BtnVer1 onClick={deleteTemplate}>Удалить шаблон</BtnVer1> */}
 
                 {/*  */}
               </>
@@ -368,7 +434,16 @@ export const BarLabel = observer(
             <span>{Memory.scale * 100} %</span>
           </div>
           <div className="barlabel_container_printing">
-            <BtnVer1 onClick={trialPrint}>Пробная печать</BtnVer1>
+            {visibleCodeTemplateFlag ? (
+              <CodeTemplayModal
+                setVisibleCodeTemplateFlag={setVisibleCodeTemplateFlag}
+              />
+            ) : (
+              <></>
+            )}
+            <span>Действия с принтером</span>
+            <BtnVer1 onClick={getPingPrint}>Проверка связи</BtnVer1>
+            <BtnVer1 onClick={trialPrintFunc}>Пробная печать</BtnVer1>
             <img
               onClick={() => setPrinterSetting(!printerSetting)}
               className="barlabel_setting_printer"

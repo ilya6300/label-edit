@@ -5,6 +5,7 @@ import { observer } from "mobx-react-lite";
 import Object from "../../store/Object";
 import Fonts from "../../store/Fonts";
 import Msg from "../../store/Msg";
+import service from "../../request/service";
 
 export const ImportCompanent = observer(({ setImportC }) => {
   const refTextImport = useRef();
@@ -31,6 +32,7 @@ export const ImportCompanent = observer(({ setImportC }) => {
       const regEquation = String(
         removeSpace(refTextImport.current.value).match(regString)
       );
+      console.log(regEquation);
       if (
         String(
           removeSpace(refTextImport.current.value).match(regCheckDirection)
@@ -88,14 +90,15 @@ export const ImportCompanent = observer(({ setImportC }) => {
       );
       return String(regBody.replace(/"$|"$\s|^"|\s^"/g, ""));
     } else {
-      const regEquation = String(removeSpace(el).match(regStringEl));
+      const regEquation = String(removeSpace(el).match(reg));
 
-      const regBody = String(regEquation.match(/".*"/g));
+      const regBody = String(regEquation.match(/".*"$/g));
+      console.log(string, el, regBody);
       return String(regBody.replace(/"$|"$\s|^"|\s^"/g, ""));
     }
   };
 
-  const datamatrixElement = (obj, el) => {
+  const datamatrixElement = async (obj, el) => {
     obj.x =
       (regAttributeElement("DMATRIX", `\\d*`, el) * Memory.mm) / Memory.dpi;
     obj.pxX = obj.x;
@@ -103,11 +106,7 @@ export const ImportCompanent = observer(({ setImportC }) => {
       (regAttributeElement("DMATRIX", `\\d*,\\d*`, el) * Memory.mm) /
       Memory.dpi;
     obj.pxY = obj.y;
-    obj.w = regAttributeElement(
-      "DMATRIX",
-      `\\d*,\\d*,\\d*,\\d*,[Cc]126,x\\d*`,
-      el
-    );
+    obj.w = regAttributeElement("DMATRIX", `\\d*,\\d*,\\d*`, el);
     if (
       regAttributeElement(
         "DMATRIX",
@@ -118,6 +117,8 @@ export const ImportCompanent = observer(({ setImportC }) => {
       obj.w = 6;
     }
     obj.h = obj.w;
+    obj.size = obj.w;
+    obj.min_size = obj.w / Memory.dpi;
     obj.pxW = obj.w;
     obj.pxH = obj.w;
     obj.style.rotate = String(
@@ -127,22 +128,34 @@ export const ImportCompanent = observer(({ setImportC }) => {
         el
       )
     );
-    obj.size = regDMRchange(el);
-    obj.body = regBodyElement(
-      "DMATRIX",
-      `\\d*,\\d*,\\d*,\\d*,[Cc]126,x\\d*(,r\\d{1,3})?,\\d{1,3},\\d{1,3},".*"`,
-      el
-    );
-    obj.min_size = obj.size / Memory.dpi;
+    // obj.size = regDMRchange(el);
+    obj.body = regBodyElement("DMATRIX", `".*"`, el);
+    console.log("obj.body", obj.body.length);
+    if (service.dm_table.length === 0) {
+      await service.getSizeDM();
+    }
+    let i = 0;
+    let flag = false;
+    while (!flag) {
+      if (service.dm_table[i].max_data_alpha_num < obj.body.length) {
+        i++;
+      } else {
+        // console.log(service.dm_table[i]);
+        obj.min_size = service.dm_table[i].row_sym_size / Memory.dpi;
+        flag = true;
+      }
+    }
+    // obj.min_size = obj.body.length / Memory.dpi;
   };
 
   const textElement = (obj, el) => {
-    obj.x = (regAttributeElement("TEXT", `\\d*`, el) * Memory.mm) / Memory.dpi;
-    obj.pxX = obj.x;
-    obj.y =
-      (regAttributeElement("TEXT", `\\d*,\\d*`, el) * Memory.mm) / Memory.dpi;
-    obj.pxY = obj.y;
-    obj.font_family_id = 0;
+    obj.x = regAttributeElement("TEXT", `\\d*`, el) / Memory.dpi;
+    obj.pxFakeX = obj.x * Memory.mm;
+    obj.pxX = obj.x * Memory.mm;
+    obj.y = regAttributeElement("TEXT", `\\d*,\\d*`, el) / Memory.dpi;
+    obj.pxFakeY = obj.y * Memory.mm;
+    obj.pxY = obj.y * Memory.mm;
+    obj.font_family_id = Fonts.default_font.id;
     if (Number(regAttributeElement("TEXT", `\\d*,\\d*,"\\d*`, el)) === 2) {
       obj.style.fontSize = 7;
     } else if (
@@ -162,6 +175,10 @@ export const ImportCompanent = observer(({ setImportC }) => {
     ) {
       obj.style.fontSize = 12;
     }
+    obj.w = 12;
+    obj.pxW = 12;
+    obj.h = 6;
+    obj.pxH = 6;
     obj.fontFamily = "0";
     Msg.writeMessages(
       "В шаблоне будет использоваться шрифт принетра по умолчанию. Если хотите изменить шрифт в текстовом элементе, выберите нужный шрифт вручную, в свойствах элемента."
@@ -180,26 +197,55 @@ export const ImportCompanent = observer(({ setImportC }) => {
   };
 
   const blockElement = (obj, el) => {
-    obj.x = (regAttributeElement("BLOCK", `\\d*`, el) * Memory.mm) / Memory.dpi;
+    obj.x = regAttributeElement("BLOCK", `\\d*`, el) / Memory.mm;
+    obj.pxFakeX = obj.x;
     obj.pxX = obj.x;
-    obj.y =
-      (regAttributeElement("BLOCK", `\\d*,\\d*`, el) * Memory.mm) / Memory.dpi;
-    obj.pxY = obj.y;
+    obj.y = regAttributeElement("BLOCK", `\\d*,\\d*`, el) / Memory.dpi;
+    obj.pxFakeY = obj.y * Memory.mm;
+    obj.pxY = obj.y * Memory.mm;
     obj.w = regAttributeElement("BLOCK", `\\d*,\\d*,\\d*`, el) / Memory.dpi;
     obj.h =
       regAttributeElement("BLOCK", `\\d*,\\d*,\\d*,\\d*`, el) / Memory.dpi;
     obj.pxW = obj.w;
     obj.pxH = obj.h;
-    obj.font_family_id = 0;
+    obj.font_family_id = Fonts.default_font.id;
     obj.fontFamily = "0";
     Msg.writeMessages(
       "В шаблоне будет использоваться шрифт принетра по умолчанию. Если хотите изменить шрифт в текстовом элементе, выберите нужный шрифт вручную, в свойствах элемента."
     );
-    obj.style.rotate = regAttributeElement(
-      "BLOCK",
-      `\\d*,\\d*,\\d*,\\d*,"[\\dA-Za-z]",\\d*`,
-      el
-    );
+    if (
+      regAttributeElement(
+        "BLOCK",
+        `\\d*,\\d*,\\d*,\\d*,"[\\dA-Za-z]",\\d*`,
+        el
+      ) === 0
+    ) {
+      obj.style.rotate = 0;
+    } else if (
+      regAttributeElement(
+        "BLOCK",
+        `\\d*,\\d*,\\d*,\\d*,"[\\dA-Za-z]",\\d*`,
+        el
+      ) === 1
+    ) {
+      obj.style.rotate = "90";
+    } else if (
+      regAttributeElement(
+        "BLOCK",
+        `\\d*,\\d*,\\d*,\\d*,"[\\dA-Za-z]",\\d*`,
+        el
+      ) === 2
+    ) {
+      obj.style.rotate = "180";
+    } else if (
+      regAttributeElement(
+        "BLOCK",
+        `\\d*,\\d*,\\d*,\\d*,"[\\dA-Za-z]",\\d*`,
+        el
+      ) === 3
+    ) {
+      obj.style.rotate = "270";
+    }
     obj.style.position = String(
       regAttributeElement(
         "BLOCK",
@@ -254,17 +300,16 @@ export const ImportCompanent = observer(({ setImportC }) => {
   };
 
   const barcodeElement = (obj, el, barcode) => {
-    obj.x =
-      (regAttributeElement("BARCODE", `\\d*`, el) * Memory.mm) / Memory.dpi;
-    obj.pxX = obj.x;
-    obj.y =
-      (regAttributeElement("BARCODE", `\\d*,\\d*`, el) * Memory.mm) /
-      Memory.dpi;
-    obj.pxY = obj.y;
+    obj.x = regAttributeElement("BARCODE", `\\d*`, el) / Memory.dpi;
+    obj.pxFakeX = obj.x * Memory.mm;
+    obj.pxX = obj.x * Memory.mm;
+    obj.y = regAttributeElement("BARCODE", `\\d*,\\d*`, el) / Memory.dpi;
+    obj.pxFakeY = obj.y * Memory.mm;
+    obj.pxY = obj.y * Memory.mm;
     obj.h =
       regAttributeElement("BARCODE", `\\d*,\\d*,"${barcode}",\\d*`, el) /
       Memory.dpi;
-    obj.pxH = obj.h;
+    obj.pxH = Math.round(obj.h);
     obj.human_readable = regAttributeElement(
       "BARCODE",
       `\\d*,\\d*,"${barcode}",\\d*,\\d`,
@@ -283,7 +328,7 @@ export const ImportCompanent = observer(({ setImportC }) => {
       `\\d*,\\d*,"${barcode}",\\d*,\\d,\\d*,\\d`,
       el
     );
-    obj.pxW = obj.w;
+    // obj.pxW = obj.w;
     obj.body = regBodyElement(
       "BARCODE",
       `\\d*,\\d*,"${barcode}",\\d*,\\d,\\d*,\\d,"\\d*"`,
@@ -295,10 +340,10 @@ export const ImportCompanent = observer(({ setImportC }) => {
 
   const barElement = (obj, el) => {
     obj.x = (regAttributeElement("BAR", `\\d*`, el) * Memory.mm) / Memory.dpi;
-    obj.pxX = obj.x;
+    obj.pxFakeX = obj.x;
     obj.y =
       (regAttributeElement("BAR", `\\d*,\\d*`, el) * Memory.mm) / Memory.dpi;
-    obj.pxY = obj.y;
+    obj.pxFakeY = obj.y;
     obj.w = regAttributeElement("BAR", `\\d*,\\d*,\\d*`, el) / Memory.dpi;
     obj.pxW = obj.w;
     obj.h = regAttributeElement("BAR", `\\d*,\\d*,\\d*,\\d*`, el) / Memory.dpi;
@@ -306,18 +351,18 @@ export const ImportCompanent = observer(({ setImportC }) => {
   };
 
   const qrcodeElement = (obj, el) => {
-    obj.x =
-      (regAttributeElement("QRCODE", `\\d*`, el) * Memory.mm) / Memory.dpi;
-    obj.pxX = obj.x;
-    obj.y =
-      (regAttributeElement("QRCODE", `\\d*,\\d*`, el) * Memory.mm) / Memory.dpi;
+    obj.x = regAttributeElement("QRCODE", `\\d*`, el) / Memory.dpi;
+    obj.pxFakeX = obj.x * Memory.mm;
+    obj.pxX = obj.x * Memory.mm;
+    obj.y = regAttributeElement("QRCODE", `\\d*,\\d*`, el) / Memory.dpi;
 
     obj.style.rotate = regAttributeElement(
       "QRCODE",
       `\\d*,\\d*,[L|M|Q|H],\\d,[A|M]\\d*`,
       el
     );
-    obj.pxY = obj.y;
+    obj.pxFakeY = obj.y * Memory.mm;
+    obj.pxY = obj.y * Memory.mm;
     obj.body = regBodyElement(
       "QRCODE",
       `\\d*,\\d*,[L?|M?|Q?|H?],\\d*,[A?|M?],\\d*,\\w{2}?,\\w{2}?,".*"`,
@@ -354,6 +399,7 @@ export const ImportCompanent = observer(({ setImportC }) => {
         id: createID(),
         zIndex: 2,
         active: true,
+        editSize: false,
         editSizeW: false,
         editSizeH: false,
         style: {
@@ -388,7 +434,7 @@ export const ImportCompanent = observer(({ setImportC }) => {
         blockElement(obj, string);
         // Barcode
       } else if (el === "BARCODE") {
-        obj.style.fontSize = 12;
+        // obj.style.fontSize = 12;
         // Ean13
         if (string.match(/EAN13/)) {
           obj.name = "barcode";
@@ -453,11 +499,10 @@ export const ImportCompanent = observer(({ setImportC }) => {
     }
   };
 
-  const importText = () => {
+  const importStringTemplate = () => {
     if (refTextImport.current.value < 10) {
       return;
     }
-    // Object.reset();
     try {
       if (refTextImport.current.value.match("SIZE")) {
         // Атрибуты этикетки
@@ -482,9 +527,10 @@ export const ImportCompanent = observer(({ setImportC }) => {
               "DIRECTION"
             )} в шаблон`
           );
-        } else {
-          Memory.labelDirection2(regAttributeLabel("DIRECTION", true));
         }
+        // else {
+        //   Memory.labelDirection2(regAttributeLabel("DIRECTION", true));
+        // }
         if (regAttributeLabel("SIZE") < 15 || regAttributeLabel("SIZE") > 150) {
           return Msg.writeMessages(
             `Неверное значение ширины. Нижний порог ширины 15мм, верхний 150мм. Вы пытаетесь записать значение ${regAttributeLabel(
@@ -513,7 +559,7 @@ export const ImportCompanent = observer(({ setImportC }) => {
           Memory.gapLabelChange(regAttributeLabel("GAP"));
         }
         Memory.labelRefX(regAttributeLabel("REFERENCE"));
-        Memory.labelRefY(regAttributeLabel("REFERENCE", true));
+        // Memory.labelRefY(regAttributeLabel("REFERENCE", true));
       }
 
       // Объекты
@@ -554,7 +600,7 @@ export const ImportCompanent = observer(({ setImportC }) => {
         className="import_container_body"
       ></textarea>
       <div className="import_container_btn_container">
-        <BtnVer1 onClick={importText}>Импортировать</BtnVer1>
+        <BtnVer1 onClick={importStringTemplate}>Импортировать</BtnVer1>
         <BtnVer1 onClick={() => setImportC(false)}>Закрыть </BtnVer1>
         <BtnVer1 onClick={() => txtRef.current.click()}>Из файла .txt </BtnVer1>
       </div>

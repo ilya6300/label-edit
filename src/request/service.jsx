@@ -94,6 +94,15 @@ class service {
       const res = await request.get(`fonts/`);
       if (res.data.success) {
         Fonts.fonts = [...res.data["data"]["response"]];
+        Fonts.fonts.forEach((f) => {
+          const myFont = new FontFace(
+            f.name,
+            `url(data:application/octet-stream;base64,${f.data})`
+          );
+          // console.log("data:application/octet-stream;base64," + props.font.data);
+          myFont.load();
+          document.fonts.add(myFont);
+        });
       }
     } catch (e) {
       console.log(e);
@@ -102,6 +111,7 @@ class service {
       }
     } finally {
       this.getVar();
+      Fonts.defaultFont(Fonts.fonts[0]);
       this.fontsLoading = false;
     }
   };
@@ -114,11 +124,11 @@ class service {
       console.log(res);
       if (!res.data.success) {
         Memory.visiblePost(true);
+      } else {
+        Msg.writeMessages("Шаблон успешно сохранён");
       }
     } catch (e) {
       console.log(e);
-    } finally {
-      Msg.writeMessages("Шаблон успешно сохранён");
     }
   };
   // Получить все шаблоны
@@ -143,8 +153,8 @@ class service {
     this.templatesLoading = true;
     try {
       const res = await request.get(`form_labels/${id}`);
-      console.log(res.data["data"]);
-      return (Templates.preview_templates = res.data["data"]);
+      Templates.preview_templates = res.data["data"];
+      return Templates.convertTemplatesForLabel();
     } catch (e) {
       console.log(e);
     } finally {
@@ -159,8 +169,10 @@ class service {
       if (!res.data.success) {
         Memory.visiblePost(true);
       }
+      Msg.writeMessages("Шаблон успешно изменён");
       console.log(res.data);
     } catch (e) {
+      Msg.writeMessages("Не удалось изменить шаблон.");
       console.log(e);
     }
   };
@@ -192,7 +204,8 @@ class service {
       const res = await request(deleteData);
       console.log(res);
     } catch (e) {
-      console.log(e);
+      // Msg.writeMessages("Не удалось удалить объекты");
+      console.error(e);
     }
   };
   // Добавить объект в существующий шаблон
@@ -247,22 +260,120 @@ class service {
   };
 
   trialPrint = async () => {
+    const ping = await this.pingPrinter(true);
+    console.log(ping);
+    if (ping !== "Готов к работе") return;
     try {
       const res = await request.post(`trial_printing`, {
         template: {
           id_template: Templates.template_id,
           is_update: true,
         },
-        setting_printer: JSON.parse(localStorage.getItem("printer")),
+        setting_printer: {
+          host: JSON.parse(localStorage.getItem("printer")).host,
+          port: Number(JSON.parse(localStorage.getItem("printer")).port),
+          type_printer: JSON.parse(localStorage.getItem("printer"))
+            .type_printer,
+          number_labels: Number(JSON.parse(localStorage.getItem("printer")))
+            .number_labels,
+          printer_resolution: Number(
+            JSON.parse(localStorage.getItem("printer")).printer_resolution
+          ),
+        },
       });
-      console.log(res);
+      Templates.setCodeTypeTemplate(res.data);
+      return res.data;
     } catch (e) {
       if (e.code === "ERR_NETWORK") {
         Msg.writeMessages(
-          "Шаблон не распечатан. Возможные ошибки: 1. Неверные параметры настройки принтера, в редакторе этикеток. 2. Принтер выключен."
+          "Шаблон не распечатан. Возможные ошибки: 1. Неверные параметры настройки принтера, в редакторе этикеток. 2. Принтер выключен. 3. На принтере отсутствует соединение с локальной сетью"
         );
       }
       console.log(e);
+    }
+  };
+
+  pingPrinter = async (trial) => {
+    try {
+      const res = await request.post("trial_printing/ping", {
+        host: JSON.parse(localStorage.getItem("printer")).host,
+        port: JSON.parse(localStorage.getItem("printer")).port,
+        type_printer: JSON.parse(localStorage.getItem("printer")).type_printer,
+      });
+      console.log(res.data);
+      if (res.data.success) {
+        if (!trial || res.data.data !== "Готов к работе") {
+          Msg.writeMessages(`Ответ от принетра. ${res.data.data}`);
+        }
+      } else {
+        Msg.writeMessages(`Ошибка принтера. ${res.data.data}`);
+      }
+      return res.data.data;
+    } catch (e) {
+      console.log(e);
+      return Msg.writeMessages(
+        "Ответ от принтера не получен. Возможные ошибки: 1. Неверные параметры настройки принтера, в редакторе этикеток. 2. Принтер выключен. 3. На принтере отсутствует подключение к локальной сети"
+      );
+    }
+  };
+
+  getSettingsPrinter = async () => {
+    try {
+      const res = await request(
+        `trial_printing/setting?host=${
+          JSON.parse(localStorage.getItem("printer")).host
+        }&port=${JSON.parse(localStorage.getItem("printer")).port}`
+      );
+      return res.data["data"];
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  setSettingsPrinter = async (option) => {
+    console.log(option);
+    try {
+      const res = await request.post(`trial_printing/setting`, option);
+      console.log(res);
+      return res.data.success;
+    } catch (e) {
+      console.error(e);
+      return Msg.writeMessages(
+        "Не удалось применить новые настройки. Ответ от принтера не получен. Возможные ошибки: 1. Неверные параметры настройки принтера, в редакторе этикеток. 2. Принтер выключен. 3. На принтере отсутствует подключение к локальной сети"
+      );
+    }
+  };
+
+  // Получить юникодшаблона
+  exportCodeTemplate = async (id) => {
+    try {
+      const res = await request(`trial_printing/get_template/${id}`);
+      return res.data;
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  importCodeTemplate = async (data) => {
+    try {
+      const res = await request.post(`trial_printing/save_template`, {
+        data: data,
+      });
+      if (res.data.success) {
+        Msg.writeMessages(
+          `Файл импортирован успешно! Добавлен в список под именем - ${res.data["data"].name}`
+        );
+      } else {
+        Msg.writeMessages(
+          "Не удалось импортировать файл! Содержимое файла имеет некорректный шаблон. Выгрузите, пожалуйста, файл ещё раз из редактора этикеток DMC или DMC. Не открывайте его и не меняйте содержимое, это может привести к повторному сбою при импорте."
+        );
+      }
+      console.log(res);
+      return res.data;
+    } catch (e) {
+      console.log(e);
+    } finally {
+      this.getTemplates();
     }
   };
 }
