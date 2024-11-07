@@ -14,7 +14,7 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
         port: 9100,
         number_labels: 1,
         type_printer: "tspl",
-        printer_resolution: 0,
+        printer_resolution: 300,
         VERSION: "",
         CODEPAGE: "",
         DENSITY: "",
@@ -48,10 +48,6 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
   const [speed, setSpeed] = useState("");
 
   const setPrinterSettings = () => {
-    // const printer = JSON.parse(localStorage.getItem("printer"));
-    // console.log(printer[`${name}`]);
-    // printer[`${name}`] = value;
-    // localStorage.setItem("printer", JSON.stringify(printer));
     setshiftXFlag(false);
     setshiftYFlag(false);
     setHostFlag(false);
@@ -61,22 +57,17 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
   };
   const selectTypePrinter = (e) => {
     setTypePrinter(e.target.value);
-    console.log(e.target.value);
   };
   const selectDpiPrinter = (e) => {
     setPrinterResolution(e.target.value);
-    console.log(e.target.value);
   };
   const setValue = (e, func) => {
-    // if (e.target.value >= 0) {
     func(e.target.value);
-    // }
   };
 
   const checkSettingsPrinter = async () => {
     try {
       const res = await service.getSettingsPrinter();
-      console.log(res);
       const printer = JSON.parse(localStorage.getItem("printer"));
       printer.printer_resolution = res.DPI;
       printer.VERSION = res.VERSION;
@@ -88,7 +79,7 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
       localStorage.setItem("printer", JSON.stringify(printer));
       writeOptionsSettingsPrinter();
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -108,9 +99,18 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
   };
 
   const settingsPrinter = {
-    host: JSON.parse(localStorage.getItem("printer")).host,
-    port: JSON.parse(localStorage.getItem("printer")).port,
-    type_printer: JSON.parse(localStorage.getItem("printer")).type_printer,
+    host:
+      JSON.parse(localStorage.getItem("printer")) !== null
+        ? JSON.parse(localStorage.getItem("printer")).host
+        : "",
+    port:
+      JSON.parse(localStorage.getItem("printer")) !== null
+        ? JSON.parse(localStorage.getItem("printer")).port
+        : "",
+    type_printer:
+      JSON.parse(localStorage.getItem("printer")) !== null
+        ? JSON.parse(localStorage.getItem("printer")).type_printer
+        : "",
   };
 
   const rewritPrinting = () => {

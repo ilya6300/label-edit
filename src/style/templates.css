@@ -60,7 +60,7 @@
 .modal_template_container {
   position: absolute;
   z-index: 3;
-  top: 36px;
+  top: 60px;
   min-width: 400px;
   border: 1px solid var(--mast-blue-1);
   border-radius: 8px;

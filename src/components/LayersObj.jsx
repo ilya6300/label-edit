@@ -6,7 +6,6 @@ import { observer } from "mobx-react-lite";
 
 export const LayersObj = observer(() => {
   const getPropsObj = (e) => {
-    console.log(e.target.id);
     Object.getObject(e);
     let reg = Object.obj.target.id.replace(/\D/gm, "");
     Object.objects.find((el) => {

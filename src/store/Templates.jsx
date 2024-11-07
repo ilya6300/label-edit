@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, toJS } from "mobx";
 import Object from "./Object";
 import Msg from "./Msg";
 import Memory from "./Memory";
@@ -14,15 +14,14 @@ class Templates {
   preview_templates = {};
   downloaded_template = [];
   new_template = true;
-  code_type_template = ''
+  code_type_template = "";
 
   setCodeTypeTemplate = async (template) => {
-    this.code_type_template = template.data
-  }
+    this.code_type_template = template.data;
+  };
 
   downloadedTemplates = (collection) => {
-    console.log(Object.objects_preview);
-    this.downloaded_template = JSON.parse(JSON.stringify(collection));
+    this.downloaded_template = structuredClone(toJS(collection));
   };
 
   setNewTemplate = (boolean) => {
@@ -35,7 +34,6 @@ class Templates {
 
   convertTemplatesForLabel = async () => {
     Object.resetPreiew();
-    console.log(this.preview_templates);
     if (this.preview_templates.length === 0) {
       return Msg.writeMessages(
         "Этот шаблон не имеет объектов. Его выбрать невозможно. Выберите другой шаблон или создайте новый."
@@ -52,7 +50,6 @@ class Templates {
     Memory.labelDirection1(this.preview_templates.direction_x);
     Memory.labelDirection2(this.preview_templates.direction_y);
     Memory.gapLabelChange(this.preview_templates.gap_mm);
-    console.log("this.preview_templates", this.preview_templates);
     this.preview_templates.objects.forEach((el) => {
       if (el.type === "text") {
         const obj = {
@@ -89,7 +86,6 @@ class Templates {
           style: {
             fontSize: el.font_size,
             fontFamily:
-              // el.font_rel !== null ? el.font_rel.name : Fonts.default_font.name,
               el.font_rel.name,
             rotate: el.rotation,
             boxShadow: "none",
@@ -255,7 +251,6 @@ class Templates {
         };
 
         Object.addObjPreiew(obj);
-        // }
       } else if (el.type === "box") {
         const obj = {
           id: el.id,
@@ -283,7 +278,6 @@ class Templates {
           },
         };
         Object.addObjPreiew(obj);
-        // }
       } else if (el.type === "lines") {
         const obj = {
           id: el.id,
@@ -324,6 +318,7 @@ class Templates {
         Object.addObjPreiew(obj);
       }
     });
+    Object.downloadObjects();
     setTimeout(() => {
       if (this.preview_templates.objects === undefined) {
         return;

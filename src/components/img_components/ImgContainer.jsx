@@ -59,7 +59,6 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
 
   // выбор img и добавлениек в шаблон
   const actionImg = (e) => {
-    // console.log(e);
     if (preview) {
       if (name.length < 3) {
         return alert("Минимальная длина названия 3 символов");

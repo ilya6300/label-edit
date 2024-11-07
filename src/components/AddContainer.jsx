@@ -5,7 +5,6 @@ import { ImgContainer } from "./img_components/ImgContainer";
 import Fonts from "../store/Fonts";
 import { Loader } from "./Loader";
 import { DMContainer } from "./obj/DMContainer";
-import Memory from "../store/Memory";
 
 export const AddContainer = observer(() => {
   const [imgBD, setImgBD] = useState(false);
@@ -30,7 +29,6 @@ export const AddContainer = observer(() => {
       id: num,
       name: "text",
       typeObj: "text",
-      // typeBarcode: "",
       pxX: 0,
       pxY: 0,
       pxW: 12,
@@ -40,7 +38,6 @@ export const AddContainer = observer(() => {
       x: 0,
       y: 0,
       body: "Текст",
-      // file: null,
       zIndex: 2,
       w: 12,
       h: 6,
@@ -57,7 +54,6 @@ export const AddContainer = observer(() => {
       },
     };
     Object.addObj(obj);
-    // Object.startSetFontFamily(obj.id);
   };
 
   const addTextBlock = () => {
@@ -68,7 +64,6 @@ export const AddContainer = observer(() => {
       id: num,
       name: "block",
       typeObj: "block",
-      // typeBarcode: "",
       pxX: 0,
       pxY: 0,
       pxW: 50,
@@ -101,11 +96,6 @@ export const AddContainer = observer(() => {
   const addBarcode = (e) => {
     let barcode;
     let width;
-    console.log(e.target.id);
-    // if (e.target.id === "datamatrix") {
-    //   barcode = `0104603721020607215>(egukLfdK5r93zoJf`;
-    //   width = 10;
-    // }
     if (e.target.id === "ean13") {
       barcode = "978020137962";
       width = 2;
@@ -162,7 +152,6 @@ export const AddContainer = observer(() => {
       id: num,
       name: "img",
       typeObj: "img",
-      // typeBarcode: "",
       pxX: 0,
       pxY: 0,
       pxW: 10,

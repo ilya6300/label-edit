@@ -3,6 +3,23 @@
   display: flex;
   justify-content: space-between;
 }
+.label_container-post_downloader {
+  background: #8b8b8b30;
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 12px;
+  padding: 5% ;
+}
+.post_downloader_body {
+  font-size: 22px;
+}
 .label_line {
   position: relative;
   z-index: 2;

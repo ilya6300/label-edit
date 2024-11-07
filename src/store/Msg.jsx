@@ -21,7 +21,6 @@ class Message {
           .replace(/[:]/gm, ": ")
           .replace(/,/gm, ", ")
     );
-    console.log(dublicate)
     if (!dublicate) {
     this.id_message = this.id_message + 1;
     this.messages = [

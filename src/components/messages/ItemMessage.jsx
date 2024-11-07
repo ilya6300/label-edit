@@ -4,7 +4,6 @@ import { observer } from "mobx-react-lite";
 
 export const ItemMessage = observer((props) => {
   const deleteMsg = () => {
-    console.log(props.msg)
     Msg.deleteMessage(props.msg);
   };
   return (

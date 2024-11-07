@@ -54,6 +54,7 @@ export const ThisLabel = observer(
         y = e.clientY;
         if (Object.obj !== null) {
           //
+          Memory.flagMoveCoord(true);
           const reg = Object.obj.target.id.replace(/\D/gm, "");
 
           Object.objects.find((el) => {
@@ -136,7 +137,6 @@ export const ThisLabel = observer(
     // Открыть окно с свойствами
     const editBodyFunc = (e) => {
       if (!preview && e.target.id !== "btn_size") {
-        console.log(e);
         Object.getObject(e);
         let reg = Object.obj.target.id.replace(/\D/gm, "");
         const ID = Object.objects.find((el) => el.id === Number(reg));
@@ -159,7 +159,6 @@ export const ThisLabel = observer(
           if (active.id === Number(reg)) {
             if (!active.active) {
               editBodyFunc(e);
-              // Object.getCoordXY()
               return;
             } else {
               editBodyFunc(e);
@@ -282,12 +281,7 @@ export const ThisLabel = observer(
                   className={!preview ? obj.cls.join(" ") : obj.clsPreview}
                   style={{
                     width:
-                      // obj.typeObj === "text" ||
-                      // obj.typeBarcode === "ean13" ||
-                      // obj.typeBarcode === "code128"
-                      //   ? "fit-content"
-                      //   :
-                      obj.typeBarcode === "datamatrix"
+                        obj.typeBarcode === "datamatrix"
                         ? obj.pxW * obj.min_size * Memory.mm * Memory.scale +
                           "px"
                         : obj.typeObj === "box"
@@ -304,8 +298,7 @@ export const ThisLabel = observer(
                     left:
                       obj.typeObj === "lines" ||
                       obj.typeObj === "box" ||
-                      // obj.typeObj === "block" ||
-                      obj.typeObj === "img" ||
+                       obj.typeObj === "img" ||
                       obj.typeBarcode === "datamatrix" ||
                       obj.typeBarcode === "qr"
                         ? obj.pxX * Memory.scale + "px"
@@ -313,7 +306,6 @@ export const ThisLabel = observer(
                     top:
                       obj.typeObj === "lines" ||
                       obj.typeObj === "box" ||
-                      // obj.typeObj === "block" ||
                       obj.typeObj === "img" ||
                       obj.typeBarcode === "datamatrix" ||
                       obj.typeBarcode === "qr"
@@ -397,8 +389,6 @@ export const ThisLabel = observer(
                         width: obj.pxW * Memory.mm * Memory.scale + "px",
                         height: obj.pxH * Memory.mm * Memory.scale + "px",
                         background: "black",
-                        // left: obj.pxX * Memory.scale + "px",
-                        // top: obj.pxY * Memory.scale + "px",
                       }}
                       id={obj.id}
                     >

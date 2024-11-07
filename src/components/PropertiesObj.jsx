@@ -56,7 +56,6 @@ export const PropertiesObj = observer(
       Object.editBody(e.target.value);
       if (Object.prop_obj.typeObj === "text") {
         Object.manualW(Object.obj.target.offsetWidth / Memory.mm);
-        console.log(Object.obj.target.offsetWidth / Memory.mm);
       }
     };
 
@@ -151,12 +150,7 @@ export const PropertiesObj = observer(
     };
 
     const rewriteManualW = (e) => {
-      // if (
-      //   e.target.value.match(/[\d,]/gm)
-      //   //  && e.target.value >= 0
-      // ) {
       if (
-        // e.target.value > 5.1 &&
         (Object.prop_obj.typeBarcode !== "ean13" ||
           Object.prop_obj.typeBarcode !== "code128") &&
         Object.prop_obj.typeObj !== "lines" &&
@@ -190,12 +184,7 @@ export const PropertiesObj = observer(
     };
 
     const rewriteManualH = (e) => {
-      // if (
-      //   e.target.value.match(/[\d,]/gm)
-      //   //  && e.target.value >= 0
-      // ) {
       if (
-        // e.target.value > 5.1 &&
         Object.prop_obj.typeObj !== "lines" &&
         Object.prop_obj.typeBarcode !== "datamatrix"
       ) {
@@ -203,7 +192,6 @@ export const PropertiesObj = observer(
         Object.manualH(e.target.value);
       } else if (
         Object.prop_obj.typeObj === "lines"
-        //  && e.target.value >= 0
       ) {
         setValueH(e.target.value);
         Object.manualH(e.target.value);

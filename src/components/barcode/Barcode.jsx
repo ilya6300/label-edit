@@ -30,9 +30,6 @@ export const Barcode = observer(({ obj, add_canvas }) => {
       });
     } else {
       let canvas = bwipjs.toCanvas("mycanvas" + obj.id + add_canvas, {
-        // scale: w, // 3x scaling factor
-        // scaleX: 1,
-        // scaleY: 2,
         bcid: obj.typeBarcode, // Barcode type
         text: obj.body, // Text to encode
         height: obj.h,
@@ -55,13 +52,6 @@ export const Barcode = observer(({ obj, add_canvas }) => {
               : obj.typeBarcode === "datamatrix" && obj.min_size !== 0
               ? obj.h * obj.min_size * Memory.mm * Memory.scale + "px"
               : obj.h * Memory.mm * Memory.scale + "px",
-          // width:
-          //   obj.typeBarcode === "ean13" || obj.typeBarcode === "code128" ? (
-          //     (obj.pxW =
-          //       obj.childNodes.clientWidth / Memory.mm)
-          //   ) : (
-          //     <></>
-          //   ),
         }}
       ></canvas>
       {obj.human_readable === 1 ? (

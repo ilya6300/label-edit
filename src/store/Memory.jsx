@@ -10,28 +10,41 @@ class Memory {
 
   button_left_press = false;
   left_press_timer = false;
+  move_flag = false;
+  post_download_flag = false;
 
   visible_printer_settings = true;
+
+  setPostDownLoadFlag = (boolean) => {
+    this.post_download_flag = boolean;
+  };
 
   setVisiblePrinterSettings = async () => {
     this.visible_printer_settings = true;
   };
-
+  flagMoveCoord = (boolean) => {
+    if (this.button_left_press) {
+      this.move_flag = boolean;
+    } else {
+      this.move_flag = false;
+    }
+  };
   pressLeftDown = () => {
     this.left_press_timer = true;
+    this.move_flag = false;
     setTimeout(() => {
       if (this.left_press_timer) {
         this.button_left_press = true;
       } else {
         this.button_left_press = false;
       }
-    }, 400);
+    }, 50);
   };
   pressLeftUp = () => {
     setTimeout(() => {
       this.left_press_timer = false;
       this.button_left_press = false;
-    }, 100);
+    }, 50);
   };
   // Флаг отображение файлов на этикетке
   visible_objects = true;
@@ -130,7 +143,6 @@ class Memory {
   // При своение имени шаблона
   writeNameTemplate = () => {
     this.name_template = Templates.preview_templates.name;
-    // console.log(this.name_template);
   };
 
   // Флаг отображения свойств объектов

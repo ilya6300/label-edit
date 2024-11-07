@@ -8,7 +8,6 @@ import { BarLabel } from "./BarLabel";
 import { BtnControl } from "../control/BtnControl";
 import service from "../request/service";
 import { GetTemplate } from "./templates/GetTemplate";
-import Fonts from "../store/Fonts";
 import Templates from "../store/Templates";
 import { StartAddFonts } from "./fonts/StartAddFonts";
 import { Loader } from "./Loader";
@@ -19,6 +18,7 @@ import Memory from "../store/Memory";
 import { ImportCompanent } from "./import/ImportCompanent";
 import { MessagesContainer } from "./messages/MessagesContainer";
 import { PrinterSettings } from "./PrinterSettings";
+import { ContainerPostDownloader } from "./messages/ContainerPostDownloader";
 
 export const Editor = observer(() => {
   const [browserNotSupportedFlag, setBrowserNotSupportedFlag] = useState(false);
@@ -28,11 +28,7 @@ export const Editor = observer(() => {
   }, []);
 
   useEffect(() => {
-    // if (window.navigator.userAgent.toLowerCase().match(/firefox/g)) {
-    //   return setBrowserNotSupportedFlag(true);
-    // }
     setNoFonts(false);
-    // Fonts.defaultFont(Fonts.fonts[0]);
   }, [!service.fontsLoading]);
 
   // Класс мм сетки
@@ -73,13 +69,16 @@ export const Editor = observer(() => {
                       <></>
                     )}
                     {!service.fontsLoading ? <AddContainer /> : <></>}
-
+                    {Memory.post_download_flag ? (
+                      <ContainerPostDownloader />
+                    ) : (
+                      <></>
+                    )}
                     <Label
                       flagPreview={flagPreview}
                       setFlagPrevier={setFlagPrevier}
                       clsMM={clsMM}
                     />
-
                     {printerSetting ? (
                       <PrinterSettings setPrinterSetting={setPrinterSetting} />
                     ) : (
@@ -87,7 +86,7 @@ export const Editor = observer(() => {
                     )}
                   </div>
                 )}
-                <button
+                {/* <button
                   style={{ width: "50px" }}
                   onClick={() =>
                     console.log(
@@ -97,25 +96,15 @@ export const Editor = observer(() => {
                       toJS(Object.obj),
                       "downloaded_template",
                       toJS(Templates.downloaded_template),
-                      "width_label",
-                      Memory.width_label,
-                      "height_label",
-                      Memory.height_label,
-                      "gap",
-                      Memory.gap,
-                      "DIRECTION_1",
-                      Memory.DIRECTION_1,
-                      "DIRECTION_2",
-                      Memory.DIRECTION_2,
-                      "ref_x",
-                      Memory.ref_x,
-                      "ref_y",
-                      Memory.ref_y
-                    )
+                      "Object.download_objects",
+                      toJS(Object.download_objects),
+                      "this.preview_templates",
+                      toJS(Templates.preview_templates)
+                            )
                   }
                 >
                   Check model
-                </button>
+                </button> */}
               </>
             ) : (
               <StartAddFonts />

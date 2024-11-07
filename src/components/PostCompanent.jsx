@@ -45,13 +45,11 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
         }
         if (el.typeBarcode === "ean13") {
           obj.code_type = "ean13";
-          // radius на бэке - pxW, font_size - pxH
           obj.radius = el.pxW;
           obj.font_size = el.pxH;
         }
         if (el.typeBarcode === "code128") {
           obj.code_type = "code128";
-          // radius на бэке - pxW, font_size - pxH
           obj.radius = el.pxW;
           obj.font_size = el.pxH;
         }
@@ -135,11 +133,11 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
       Templates.setNewTemplate(false);
     } catch (e) {
       console.error(e);
-    }
+    } 
   };
   // Изменить шаблон
   // Обновление объектов
-  const updateObj = () => {
+  const updateObj = async () => {
     try {
       calculationAutoHeight();
     } catch (e) {
@@ -147,8 +145,8 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     } finally {
       // Временный массив который хранит в себе элементы которые были обновлены
       const update_object = [];
-      setTimeout(() => {
-        Templates.downloaded_template.forEach((old) => {
+      setTimeout(async () => {
+        Object.download_objects.forEach((old) => {
           Object.objects.filter((newT) => {
             // Ищем объекты, и проверяем что они не равны
             if (
@@ -176,7 +174,6 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
                   // Ширина / высота
                   if (key === "w" || key === "h") {
                     if (old.typeObj !== "lines") {
-                      console.log(newT, newT.w);
                       temp.width = Math.round(newT.w * 100) / 100;
                       temp.height = Math.round(newT.h * 100) / 100;
                     } else {
@@ -245,9 +242,11 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
             }
           });
         });
+        let res;
         if (update_object.length !== 0) {
-          service.pathUpdateObj(update_object);
+          res = await service.pathUpdateObj(update_object);
         }
+        return res;
       }, 50);
       // Перебираем ранее загруженный массив, с тем что на этикетке
     }
@@ -292,7 +291,6 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
       id_old_id.push(d.id);
     });
     id_old_id.forEach((id) => {
-      // console.log(id_obj, id_old_id);
       if (!id_obj.includes(id)) {
         delete_objects.push(id);
       }
@@ -305,40 +303,50 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     }
   };
   // Добавить новый элемент на существующею этикетку
-  const newObjPost = () => {
-    const new_objects = [];
-    const id_old_object = [];
-    Templates.downloaded_template.forEach((o) => {
-      console.log(toJS(o));
-      id_old_object.push(o.id);
-    });
-    Object.objects.forEach((newObj) => {
-      console.log(toJS(newObj));
-      if (!id_old_object.includes(newObj.id)) {
-        new_objects.push(newObj);
+  const newObjPost = async () => {
+    try {
+      const new_objects = [];
+      const id_old_object = [];
+      Object.objects_preview.forEach((o) => {
+        id_old_object.push(o.id);
+      });
+      Object.objects.forEach((newObj) => {
+        if (!id_old_object.includes(newObj.id)) {
+          new_objects.push(newObj);
+        }
+      });
+      let res;
+      if (new_objects.length > 0) {
+        res = await service.addNewObj(extractionObj(new_objects));
       }
-    });
-    if (new_objects.length > 0) {
-      service.addNewObj(extractionObj(new_objects));
+
+      return res;
+    } catch (e) {
+      console.error(e);
     }
   };
   // Изменить существующею этикеткуТог
   const pathTemplates = async () => {
-    renameTemplate();
-    updateObj();
-    updateLabel();
-    newObjPost();
-    setTimeout(() => {
-      deleteObject();
-    }, 1000);
-    setTimeout(async () => {
-      setTimeout(async () => {
-        await service.getTemplatesID(Templates.preview_templates.id);
-        await Object.select();
-      }, 500);
-    }, 1000);
-    Memory.visiblePost(false);
-  };
+    try {
+      Memory.setPostDownLoadFlag(true);
+      renameTemplate();
+      newObjPost();
+      updateObj();
+      updateLabel();
+      setTimeout(() => {
+        deleteObject();
+      }, 2000);
+      setTimeout(() => {
+        Object.objects = [];
+        service.getTemplatesID(Templates.template_id);
+        setTimeout(() => {
+          Object.select();
+        }, 1500);
+      }, 3000);
+      Memory.visiblePost(false);
+    } catch (e) {
+      console.error(e);
+    }   };
 
   const modalPostRef = useRef();
   useEffect(() => {

@@ -16,7 +16,6 @@ request.interceptors.response.use(
   },
   (e) => {
     Memory.exchangeFlag(false);
-    // console.log(e);
     throw e;
   }
 );

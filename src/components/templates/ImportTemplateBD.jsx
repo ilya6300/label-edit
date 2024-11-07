@@ -6,7 +6,6 @@ import Templates from "../../store/Templates";
 
 export const ImportTemplateBD = () => {
   const exportTemplate = async () => {
-    // const templateBody = body;
     const templateName = Templates.preview_templates.name;
     const fileExtension = ".tdmc";
     const data = new Blob(

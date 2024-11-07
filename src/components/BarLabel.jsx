@@ -9,7 +9,6 @@ import Templates from "../store/Templates";
 import service from "../request/service";
 import { BarInfo } from "./BarInfo";
 import HistoryStore from "../store/HistoryStore";
-import { ImportCompanent } from "./import/ImportCompanent";
 import iconSettings from "../img/icons/icon-settings.png";
 import Msg from "../store/Msg";
 import { CodeTemplayModal } from "./templates/CodeTemplayModal";
@@ -122,12 +121,10 @@ export const BarLabel = observer(
         targetValue = 1;
       }
       if (Number(e.target.id) === Number(1)) {
-        console.log(1);
         Memory.labelDirection1(targetValue);
         setDirection1(targetValue);
       }
       if (Number(e.target.id) === Number(2)) {
-        console.log(2);
         Memory.labelDirection2(targetValue);
         setDirection2(targetValue);
       }
@@ -186,29 +183,6 @@ export const BarLabel = observer(
       setGValue(temp_g);
     };
 
-    // Выбрать шаблон
-    // const selectTemplate = () => {
-    //   setVisibleTemplates(false);
-    //   setRefX(Templates.preview_templates.reference_x);
-    //   setRefY(Templates.preview_templates.reference_y);
-    //   setDirection1(Templates.preview_templates.direction_x);
-    //   setDirection2(Templates.preview_templates.direction_y);
-    //   setWValue(Templates.preview_templates.width_mm);
-    //   setHValue(Templates.preview_templates.height_mm);
-    //   setGValue(Templates.preview_templates.gap_mm);
-    //   Templates.saveID(Templates.preview_templates.id);
-    //   Object.select();
-    //   Templates.downloadedTemplates(Object.objects_preview);
-    //   setTimeout(() => {
-    //     Object.editBodyPreview();
-    //   }, 1000);
-    // };
-
-    // const deleteTemplate = () => {
-    //   console.log(Templates.preview_templates.id);
-    //   service.deleteTemplate();
-    // };
-
     // Новый шаблон
     const newTemplateFunc = () => {
       Object.newTemplate();
@@ -228,7 +202,6 @@ export const BarLabel = observer(
     };
 
     const changeDpi = (e) => {
-      console.log(e);
       Memory.dpiChange(e.target.value);
     };
 
@@ -249,13 +222,13 @@ export const BarLabel = observer(
         return setPrinterSetting(true);
       }
       const res = await service.trialPrint();
+      if (res === undefined) return;
       if (res.success) {
         setVisibleCodeTemplateFlag(true);
       }
     };
 
     const importTemplates = async (e) => {
-      // reader.readAsText(e.target.files[0]);
       if (!e.target.files[0].name.match(/\.tdmc$/gm)) {
         return Msg.writeMessages(
           "Необходимо загрузить файл типа .tdmc (Template DMC). Экспортированный ранее из редактора этикеток DMC или DMC"
@@ -265,19 +238,15 @@ export const BarLabel = observer(
         const reader = new FileReader();
         reader.onload = async () => {
           const resID = await service.importCodeTemplate(reader.result);
-          // console.log("resID", resID.data.id);
           if (resID.success !== undefined) {
             await service.getTemplatesID(resID.data.id);
           }
         };
         reader.readAsText(e.target.files[0]);
-        console.log(e.target.files[0].name);
       } catch (e) {
         return Msg.writeMessages(e);
       }
-      // return Msg.writeMessages("Файл импортирован успешно!");
       e.target.value = null;
-      // console.log(e.target.files);
     };
 
     const getPingPrint = async () => {
@@ -327,10 +296,6 @@ export const BarLabel = observer(
                   Импорт кода (строками)
                 </BtnVer1>
                 <BtnVer1 onClick={closedTemplates}>Закрыть</BtnVer1>
-                {/* <BtnVer1 onClick={selectTemplate}>Выбрать шаблон</BtnVer1> */}
-                {/* <BtnVer1 onClick={deleteTemplate}>Удалить шаблон</BtnVer1> */}
-
-                {/*  */}
               </>
             )}
             <button onClick={onMM} className={clsMMBtn}>

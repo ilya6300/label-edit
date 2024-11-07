@@ -3,11 +3,9 @@ import Fonts from "../store/Fonts";
 import Memory from "../store/Memory";
 import Templates from "../store/Templates";
 import { request } from "./service.config";
-import { request_dm } from "./service.sizedm";
 import Msg from "../store/Msg";
 import Object from "../store/Object";
 import config from "../config.json";
-import axios from "axios";
 
 class service {
   constructor() {
@@ -15,7 +13,6 @@ class service {
   }
   // Переменные
   server_url = config.url_api;
-  // server_url = "http://10.76.10.37:3000/api/v1/";
   images = [];
   imgLoading = true;
   fontsLoading = true;
@@ -31,7 +28,7 @@ class service {
       const res = await request.get("template_list/print_variables/");
       Memory.varDateWrite(res.data);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -40,16 +37,14 @@ class service {
     this.imgLoading = true;
     try {
       const res = await request.get(`images/`);
-      console.log(toJS(res.data["data"]["response"]));
       if (res.data["data"].length !== 0) {
         this.images = res.data["data"]["response"];
         this.images.forEach((el) => {
           el.data = atob(el.data);
         });
-        console.log(toJS(this.images));
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     } finally {
       this.imgLoading = false;
     }
@@ -62,10 +57,8 @@ class service {
         tag_images: Memory.regPost(name) + ".BMP",
         data: file,
       });
-
-      console.log(res);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     } finally {
       this.getImages();
     }
@@ -73,16 +66,14 @@ class service {
 
   //   Загрузить шрифт
   postFont = async (name, file) => {
-    console.log(name, file);
     try {
       const res = await request.post(`fonts/`, {
         name: String(name),
         tag_fonts: Memory.regPost(String(name)) + ".TTF",
         data: file,
       });
-      console.log(res);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     } finally {
       this.getFonts();
     }
@@ -99,13 +90,12 @@ class service {
             f.name,
             `url(data:application/octet-stream;base64,${f.data})`
           );
-          // console.log("data:application/octet-stream;base64," + props.font.data);
           myFont.load();
           document.fonts.add(myFont);
         });
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
       if (e.code === "ERR_NETWORK") {
         return (this.errorNetwork = true);
       }
@@ -116,19 +106,19 @@ class service {
     }
   };
 
-  //   Загрузить шаблон
+  //   Сохранить шаблон
   postTemplate = async (obj) => {
-    console.log(obj);
     try {
       const res = await request.post(`form_labels/`, obj);
-      console.log(res);
       if (!res.data.success) {
         Memory.visiblePost(true);
       } else {
         Msg.writeMessages("Шаблон успешно сохранён");
+        Templates.saveID(res.data["data"].id);
+        return res.data;
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
   // Получить все шаблоны
@@ -136,14 +126,13 @@ class service {
     this.templatesListLoading = true;
     try {
       const res = await request.get(`template_list/`);
-      console.log(res.data["data"]);
       if (res.data["data"].length !== 0) {
         Memory.templates = res.data["data"]["response"];
       } else {
         Memory.templates = [];
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     } finally {
       this.templatesListLoading = false;
     }
@@ -154,9 +143,10 @@ class service {
     try {
       const res = await request.get(`form_labels/${id}`);
       Templates.preview_templates = res.data["data"];
-      return Templates.convertTemplatesForLabel();
+      Templates.convertTemplatesForLabel();
+      return res.data["data"];
     } catch (e) {
-      console.log(e);
+      console.error(e);
     } finally {
       Memory.writeNameTemplate();
       this.templatesLoading = false;
@@ -170,10 +160,10 @@ class service {
         Memory.visiblePost(true);
       }
       Msg.writeMessages("Шаблон успешно изменён");
-      console.log(res.data);
+      return res.data;
     } catch (e) {
       Msg.writeMessages("Не удалось изменить шаблон.");
-      console.log(e);
+      console.error(e, obj);
     }
   };
   // Обновление параметров этикетки
@@ -183,9 +173,8 @@ class service {
         `form_labels/label/` + Templates.preview_templates.id,
         label
       );
-      console.log(res);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
   // Удаление объекта
@@ -199,12 +188,9 @@ class service {
       },
       data: { id_fields: objects },
     };
-    console.log(objects);
     try {
       const res = await request(deleteData);
-      console.log(res);
     } catch (e) {
-      // Msg.writeMessages("Не удалось удалить объекты");
       console.error(e);
     }
   };
@@ -214,12 +200,11 @@ class service {
       template_id: Templates.preview_templates.id,
       object: objects,
     };
-    console.log(newObj);
     try {
       const res = await request.post("template_fields", newObj);
-      console.log(res);
+      return res.data;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -237,9 +222,8 @@ class service {
 
     try {
       const res = await request(deleteTemplate);
-      console.log(res);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     } finally {
       this.getTemplates();
       Object.resetPreiew();
@@ -252,16 +236,14 @@ class service {
   getSizeDM = async () => {
     try {
       const res = await request("template_list/dm");
-      console.log(res.data["data"]);
       this.dm_table = res.data["data"];
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
   trialPrint = async () => {
     const ping = await this.pingPrinter(true);
-    console.log(ping);
     if (ping !== "Готов к работе") return;
     try {
       const res = await request.post(`trial_printing`, {
@@ -289,7 +271,7 @@ class service {
           "Шаблон не распечатан. Возможные ошибки: 1. Неверные параметры настройки принтера, в редакторе этикеток. 2. Принтер выключен. 3. На принтере отсутствует соединение с локальной сетью"
         );
       }
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -300,7 +282,6 @@ class service {
         port: JSON.parse(localStorage.getItem("printer")).port,
         type_printer: JSON.parse(localStorage.getItem("printer")).type_printer,
       });
-      console.log(res.data);
       if (res.data.success) {
         if (!trial || res.data.data !== "Готов к работе") {
           Msg.writeMessages(`Ответ от принетра. ${res.data.data}`);
@@ -310,7 +291,7 @@ class service {
       }
       return res.data.data;
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return Msg.writeMessages(
         "Ответ от принтера не получен. Возможные ошибки: 1. Неверные параметры настройки принтера, в редакторе этикеток. 2. Принтер выключен. 3. На принтере отсутствует подключение к локальной сети"
       );
@@ -320,9 +301,13 @@ class service {
   getSettingsPrinter = async () => {
     try {
       const res = await request(
-        `trial_printing/setting?host=${
+        `setting?host=${
           JSON.parse(localStorage.getItem("printer")).host
-        }&port=${JSON.parse(localStorage.getItem("printer")).port}`
+        }&port=${
+          JSON.parse(localStorage.getItem("printer")).port
+        }&type_printer=${
+          JSON.parse(localStorage.getItem("printer")).type_printer
+        }`
       );
       return res.data["data"];
     } catch (e) {
@@ -331,10 +316,8 @@ class service {
   };
 
   setSettingsPrinter = async (option) => {
-    console.log(option);
     try {
-      const res = await request.post(`trial_printing/setting`, option);
-      console.log(res);
+      const res = await request.post(`setting`, option);
       return res.data.success;
     } catch (e) {
       console.error(e);
@@ -368,10 +351,9 @@ class service {
           "Не удалось импортировать файл! Содержимое файла имеет некорректный шаблон. Выгрузите, пожалуйста, файл ещё раз из редактора этикеток DMC или DMC. Не открывайте его и не меняйте содержимое, это может привести к повторному сбою при импорте."
         );
       }
-      console.log(res);
       return res.data;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     } finally {
       this.getTemplates();
     }

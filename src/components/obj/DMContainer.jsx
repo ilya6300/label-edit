@@ -191,8 +191,6 @@ export const DMContainer = ({ setDmFlag }) => {
         num++;
       }
     });
-
-    console.log(dm);
     const obj = {
       id: num,
       min_size: dm.size / Memory.dpi,
@@ -224,11 +222,8 @@ export const DMContainer = ({ setDmFlag }) => {
         boxShadow: "none",
       },
     };
-    // if (e.target.id !== "datamatrix") {
     Object.addObj(obj);
-    // } else {
     setDmFlag(false);
-    // }
   };
 
   const selectedDM = async (dm) => {
@@ -246,14 +241,10 @@ export const DMContainer = ({ setDmFlag }) => {
         if (service.dm_table[i].max_data_alpha_num < dm_element.length) {
           i++;
         } else {
-          // console.log(service.dm_table[i]);
           dm_element.size = service.dm_table[i].row_sym_size;
           flag = true;
         }
       }
-      console.log(dm_element);
-
-      // console.log(dm);
       addBarcode(dm_element);
     }
   };
