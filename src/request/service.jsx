@@ -139,11 +139,13 @@ class service {
   };
   // Получить шаблон по id
   getTemplatesID = async (id) => {
+    // console.log(id);
     this.templatesLoading = true;
     try {
       const res = await request.get(`form_labels/${id}`);
       Templates.preview_templates = res.data["data"];
       Templates.convertTemplatesForLabel();
+      console.log(res.data["data"]);
       return res.data["data"];
     } catch (e) {
       console.error(e);
@@ -284,7 +286,7 @@ class service {
       });
       if (res.data.success) {
         if (!trial || res.data.data !== "Готов к работе") {
-          Msg.writeMessages(`Ответ от принетра. ${res.data.data}`);
+          Msg.writeMessages(`Ответ от принтера. ${res.data.data}`);
         }
       } else {
         Msg.writeMessages(`Ошибка принтера. ${res.data.data}`);

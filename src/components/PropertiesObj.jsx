@@ -15,7 +15,7 @@ export const PropertiesObj = observer(
     const [valueH, setValueH] = useState(Object.prop_obj.h);
     const [value, setValue] = useState(Object.prop_obj.body);
     const [fontSize, setFontSize] = useState(
-      Object.prop_obj !== undefined ? Object.prop_obj.style.fontSize : 8
+      Object.prop_obj !== null ? Object.prop_obj.style.fontSize : 8
     );
     const [newName, setNewName] = useState(Object.prop_obj.name);
     // Флаги отображения свойств
@@ -291,14 +291,13 @@ export const PropertiesObj = observer(
           </li>
         ) : (
           <li className="prop_obj">
-            {" "}
             <input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="введите имя"
               className="prop_obj_new_name"
               type="text"
-            />{" "}
+            />
             <span className="btn_ok_new_name" onClick={saveNewName}>
               ок
             </span>
@@ -352,12 +351,12 @@ export const PropertiesObj = observer(
           )}
         </li>
         <li className="prop_obj">
-          <span className="prop_obj_info">X:</span>{" "}
+          <span className="prop_obj_info">X:</span>
           <input
             className="input_coord_prop_obj"
             type="number"
             value={
-              Object.prop_obj.x > 0
+              Object.prop_obj.x >= 0
                 ? Math.round(Object.prop_obj.x * 100) / 100
                 : ""
             }
@@ -371,7 +370,7 @@ export const PropertiesObj = observer(
             className="input_coord_prop_obj"
             type="number"
             value={
-              Object.prop_obj.y > 0
+              Object.prop_obj.y >= 0
                 ? Math.round(Object.prop_obj.y * 100) / 100
                 : ""
             }

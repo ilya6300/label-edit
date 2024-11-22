@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Templates from "../../store/Templates";
 import { observer } from "mobx-react-lite";
+import Theme from "../../store/Theme";
 
 export const CodeTemplayModal = observer(({ setVisibleCodeTemplateFlag }) => {
   const [actionContainer, setActionContainer] = useState("Развернуть");
@@ -33,14 +34,28 @@ export const CodeTemplayModal = observer(({ setVisibleCodeTemplateFlag }) => {
     }
   };
 
+  const copyTemplate = async () => {
+    try {
+      await navigator.clipboard.writeText(Templates.code_type_template);
+    } catch (err) {
+      console.error("Ошибка:", err);
+    }
+  };
+
   return (
-    <div className="modal_template_container">
+    <div
+      className="modal_template_container"
+      style={{ background: Theme.background }}
+    >
       <div className="modal_template_title_container">
         <span>
           Шаблон на языке{" "}
           {JSON.parse(localStorage.getItem("printer")).type_printer}
         </span>
         <div className="modal_template_btn_container">
+          <span className="modal_template_btn" onClick={copyTemplate}>
+            Скопировать
+          </span>
           <span className="modal_template_btn" onClick={visibleBody}>
             {actionContainer}
           </span>

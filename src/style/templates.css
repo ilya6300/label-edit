@@ -1,7 +1,7 @@
 .templates_preiew_container {
   width: 100%;
   min-height: 300px;
-  background: white;
+  /* background: white; */
   display: flex;
   justify-content: space-between;
   max-height: 650px;

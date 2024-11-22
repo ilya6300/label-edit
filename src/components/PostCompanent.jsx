@@ -7,6 +7,7 @@ import Templates from "../store/Templates";
 import { observer } from "mobx-react-lite";
 import Msg from "../store/Msg";
 import { toJS } from "mobx";
+import Theme from "../store/Theme";
 
 export const PostCompanent = observer(({ valueName, setValueName }) => {
   // Извлечение новых элементов
@@ -133,7 +134,7 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
       Templates.setNewTemplate(false);
     } catch (e) {
       console.error(e);
-    } 
+    }
   };
   // Изменить шаблон
   // Обновление объектов
@@ -145,7 +146,11 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     } finally {
       // Временный массив который хранит в себе элементы которые были обновлены
       const update_object = [];
+
       setTimeout(async () => {
+        if (Object.download_objects === null) {
+          return;
+        }
         Object.download_objects.forEach((old) => {
           Object.objects.filter((newT) => {
             // Ищем объекты, и проверяем что они не равны
@@ -247,16 +252,8 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
           res = await service.pathUpdateObj(update_object);
         }
         return res;
-      }, 50);
+      }, 300);
       // Перебираем ранее загруженный массив, с тем что на этикетке
-    }
-  };
-  // Переименовать шаблон
-  const renameTemplate = async () => {
-    if (Memory.name_template !== rename) {
-      Templates.preview_templates.name = rename;
-      Memory.writeNameTemplate();
-      service.pathUpdateLabel({ name: rename });
     }
   };
   // Изменить параметры этикетки
@@ -287,7 +284,7 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     Object.objects.forEach((o) => {
       id_obj.push(o.id);
     });
-    Templates.downloaded_template.forEach((d) => {
+    Object.objects_preview.forEach((d) => {
       id_old_id.push(d.id);
     });
     id_old_id.forEach((id) => {
@@ -325,28 +322,29 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
       console.error(e);
     }
   };
-  // Изменить существующею этикеткуТог
+  // Изменить существующую этикетку
   const pathTemplates = async () => {
     try {
       Memory.setPostDownLoadFlag(true);
-      renameTemplate();
+      // renameTemplate();
       newObjPost();
       updateObj();
       updateLabel();
       setTimeout(() => {
         deleteObject();
-      }, 2000);
-      setTimeout(() => {
+      }, 1000);
+      setTimeout(async () => {
         Object.objects = [];
-        service.getTemplatesID(Templates.template_id);
-        setTimeout(() => {
-          Object.select();
-        }, 1500);
-      }, 3000);
+        await service.getTemplatesID(Templates.template_id);
+        // setTimeout(() => {
+        Object.select();
+        // }, 1500);
+      }, 2000);
       Memory.visiblePost(false);
     } catch (e) {
       console.error(e);
-    }   };
+    }
+  };
 
   const modalPostRef = useRef();
   useEffect(() => {
@@ -357,11 +355,11 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
       Memory.visiblePost(false);
     }
   };
-  const [renameFlag, setRenameFlag] = useState(false);
-  const [rename, setRename] = useState(Memory.name_template);
-  const handlerRename = async (e) => {
-    setRename(e.target.value);
-  };
+  // const [renameFlag, setRenameFlag] = useState(false);
+  // const [rename, setRename] = useState(Memory.name_template);
+  // const handlerRename = async (e) => {
+  //   setRename(e.target.value);
+  // };
 
   return (
     <>
@@ -375,7 +373,11 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
         {Templates.new_template ? "Сохранить новый" : "Сохранить " + valueName}
       </BtnVer1>{" "}
       {Memory.visible_modal_post ? (
-        <div ref={modalPostRef} className="post_template_container_modal">
+        <div
+          ref={modalPostRef}
+          className="post_template_container_modal"
+          style={{ background: Theme.background }}
+        >
           {Templates.new_template ? (
             <>
               {" "}
@@ -398,30 +400,30 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
             </>
           ) : (
             <>
-              {!renameFlag ? (
-                <p className="post_template_modal_text">
-                  Шаблон: {Memory.name_template}
-                </p>
-              ) : (
-                <div className="post_template_modal_rename_container">
-                  <p>Новое название шаблона - {Memory.name_template}</p>
-                  <input
-                    placeholder="Введите новое название шаблона"
-                    className="barlabel_text"
-                    value={rename}
-                    onChange={handlerRename}
-                  />
-                </div>
-              )}
+              {/* {!renameFlag ? ( */}
+              <p className="post_template_modal_text">
+                Шаблон: {Memory.name_template}
+              </p>
+              {/* // ) : (
+              //   <div className="post_template_modal_rename_container">
+              //     <p>Новое название шаблона - {Memory.name_template}</p>
+              //     <input
+              //       placeholder="Введите новое название шаблона"
+              //       className="barlabel_text"
+              //       value={rename}
+              //       onChange={handlerRename}
+              //     />
+              //   </div>
+              // )} */}
               <div className="post_template_modal_btn_container">
                 <BtnVer1 onClick={pathTemplates}>Изменить</BtnVer1>
-                <BtnVer1
+                {/* <BtnVer1
                   onClick={() =>
                     renameFlag ? setRenameFlag(false) : setRenameFlag(true)
                   }
                 >
                   Переименовать
-                </BtnVer1>
+                </BtnVer1> */}
                 <BtnVer1 onClick={() => Memory.visiblePost(false)}>
                   Закрыть
                 </BtnVer1>

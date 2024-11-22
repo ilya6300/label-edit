@@ -4,7 +4,13 @@ import Templates from "./Templates";
 import Msg from "./Msg";
 
 class Memory {
+  constructor() {
+    makeAutoObservable(this);
+  }
+
   mm = 3.709575175750246;
+  cm = 37.09575175750246;
+
   mm_qr = 3.999575175750246;
   dpi = 12;
 
@@ -141,8 +147,12 @@ class Memory {
   };
 
   // При своение имени шаблона
-  writeNameTemplate = () => {
-    this.name_template = Templates.preview_templates.name;
+  writeNameTemplate = (boolean, name) => {
+    if (boolean) {
+      this.name_template = name;
+    } else {
+      this.name_template = Templates.preview_templates.name;
+    }
   };
 
   // Флаг отображения свойств объектов
@@ -160,10 +170,6 @@ class Memory {
 
   // Шаблоны
   templates = [];
-
-  constructor() {
-    makeAutoObservable(this);
-  }
 
   varDateWrite = (data) => {
     this.var_date = data;
@@ -257,6 +263,12 @@ class Memory {
       randomKey = abc[Math.floor(Math.random() * abc.length)];
     }
     return name_slice + key;
+  };
+
+  clearUrl = () => {
+    console.log(window.location);
+    const baseUrl = window.location.origin + window.location.pathname;
+    window.location.href = baseUrl;
   };
 }
 

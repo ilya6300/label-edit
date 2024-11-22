@@ -5,6 +5,7 @@ import { ImgContainer } from "./img_components/ImgContainer";
 import Fonts from "../store/Fonts";
 import { Loader } from "./Loader";
 import { DMContainer } from "./obj/DMContainer";
+import Theme from "../store/Theme";
 
 export const AddContainer = observer(() => {
   const [imgBD, setImgBD] = useState(false);
@@ -29,6 +30,7 @@ export const AddContainer = observer(() => {
       id: num,
       name: "text",
       typeObj: "text",
+      defaultBody: true,
       pxX: 0,
       pxY: 0,
       pxW: 12,
@@ -64,6 +66,7 @@ export const AddContainer = observer(() => {
       id: num,
       name: "block",
       typeObj: "block",
+      defaultBody: true,
       pxX: 0,
       pxY: 0,
       pxW: 50,
@@ -96,6 +99,7 @@ export const AddContainer = observer(() => {
   const addBarcode = (e) => {
     let barcode;
     let width;
+    
     if (e.target.id === "ean13") {
       barcode = "978020137962";
       width = 2;
@@ -116,6 +120,7 @@ export const AddContainer = observer(() => {
       name: "barcode",
       typeObj: "barcode",
       typeBarcode: e.target.id,
+      defaultBody: true,
       pxX: 0,
       pxY: 0,
       pxFakeX: 0,
@@ -240,10 +245,18 @@ export const AddContainer = observer(() => {
   };
 
   return (
-    <ul className="editor_list_obj_container">
+    <ul
+      className="editor_list_obj_container"
+      style={{ border: Theme.theme_border }}
+    >
       {Fonts.default_font !== undefined ? (
         <>
-          <li className="add_obj-title">Добавить элемент</li>
+          <li
+            className="add_obj-title"
+            style={{ borderBottom: Theme.theme_border }}
+          >
+            Добавить элемент
+          </li>
           <li className="add_obj" onClick={addText}>
             Текст (строка)
           </li>

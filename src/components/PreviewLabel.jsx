@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { ThisLabel } from "./ThisLabel";
 import Memory from "../store/Memory";
 import Object from "../store/Object";
+import Theme from "../store/Theme";
 
 export const PreviewLabel = observer(({ setFlagPrevier, clsMM }) => {
   let x, y;
@@ -45,6 +46,7 @@ export const PreviewLabel = observer(({ setFlagPrevier, clsMM }) => {
             Memory.scales[Memory.scale_preview_index].scale +
           60 +
           "px",
+        background: Theme.background,
       }}
     >
       <div className="preview_label_container_reletive">
@@ -89,7 +91,7 @@ export const PreviewLabel = observer(({ setFlagPrevier, clsMM }) => {
             <div
               className="absolute"
               style={{
-                rotate: '180deg',
+                rotate: "180deg",
                 top:
                   Memory.DIRECTION_1 === 1
                     ? -(Memory.height_label * Memory.mm) + "px"

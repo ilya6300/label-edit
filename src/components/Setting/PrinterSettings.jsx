@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { BtnVer1 } from "../UI/btn/BtnVer1";
+import { BtnVer1 } from "../../UI/btn/BtnVer1";
 import { observer } from "mobx-react-lite";
-import { LabelPrintSettingRow } from "../UI/label/LabelPrintSettingRow";
-import Memory from "../store/Memory";
-import service from "../request/service";
-import Msg from "../store/Msg";
+import { LabelPrintSettingRow } from "../../UI/label/LabelPrintSettingRow";
+import Memory from "../../store/Memory";
+import service from "../../request/service";
+import Msg from "../../store/Msg";
+import Theme from "../../store/Theme";
 
-export const PrinterSettings = observer(({ setPrinterSetting }) => {
+export const PrinterSettings = observer(() => {
   useEffect(() => {
     if (localStorage.getItem("printer") === null) {
       const printer = {
@@ -39,7 +40,7 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
   const [shiftYFlag, setshiftYFlag] = useState(false);
 
   const [typePrinter, setTypePrinter] = useState("");
-  const [printerResolution, setPrinterResolution] = useState("");
+  const [printerResolution, setPrinterResolution] = useState("300");
   const [version, setVersion] = useState("");
   const [codepage, setCodepage] = useState("");
   const [density, setDensity] = useState("");
@@ -68,8 +69,16 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
   const checkSettingsPrinter = async () => {
     try {
       const res = await service.getSettingsPrinter();
+      if (res === undefined) {
+        return Msg.writeMessages("Не удалось считать настройки");
+      }
       const printer = JSON.parse(localStorage.getItem("printer"));
-      printer.printer_resolution = res.DPI;
+      console.log(res);
+      if (res.DPI !== undefined) {
+        printer.printer_resolution = res.DPI;
+      } else {
+        printer.printer_resolution = 300;
+      }
       printer.VERSION = res.VERSION;
       printer.CODEPAGE = res.CODEPAGE;
       printer.SPEED = res.SPEED;
@@ -135,6 +144,13 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
     const printer = JSON.parse(localStorage.getItem("printer"));
     const shift_X = printer.SHIFT_X;
     const shift_Y = printer.SHIFT_Y;
+
+    const host_old = printer.host;
+    const port_old = printer.port;
+    const number_labels_old = printer.number_labels;
+    const type_printer_old = printer.type_printer;
+    const printer_resolution_old = printer.printer_resolution;
+
     printer.host = host;
     printer.port = port;
     printer.number_labels = count;
@@ -144,6 +160,15 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
     printer.SHIFT_X = shiftX;
     printer.SHIFT_Y = shiftY;
     localStorage.setItem("printer", JSON.stringify(printer));
+    if (
+      host_old !== host ||
+      Number(port_old) !== Number(port) ||
+      Number(number_labels_old) !== Number(count) ||
+      type_printer_old !== typePrinter ||
+      Number(printer_resolution_old) !== Number(printerResolution)
+    ) {
+      Msg.writeMessages("Настройки принтера успешно сохранены.");
+    }
     if (
       Number(shift_X) !== Number(shiftX) ||
       Number(shift_Y) !== Number(shiftY)
@@ -161,6 +186,8 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
         printer.SHIFT_X = shift_X;
         printer.SHIFT_Y = shift_Y;
         localStorage.setItem("printer", JSON.stringify(printer));
+      } else {
+        Msg.writeMessages("Настройки смещения успешно сохранены.");
       }
     }
   };
@@ -177,8 +204,8 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
   };
 
   return (
-    <div className="printer_setting_container">
-      <p className="printer_setting_title">Параметры принетра</p>
+    <div className="setting_printing">
+      <p>tsc 10.76.8.42, godex 10.76.9.98</p>
       <div className="printer_setting_column_container">
         <ul className="printer_setting_column">
           <LabelPrintSettingRow
@@ -338,7 +365,7 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
             <BtnVer1 onClick={checkSettingsPrinter}>Считать настройки</BtnVer1>
             <BtnVer1 onClick={printCalibration}>Калибровка</BtnVer1>
           </div>
-          <BtnVer1 onClick={savePrinter}>Применить настройки</BtnVer1>
+          <BtnVer1 onClick={savePrinter}>Сохранить</BtnVer1>
         </div>
       </div>
     </div>

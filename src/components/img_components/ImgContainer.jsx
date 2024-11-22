@@ -5,6 +5,7 @@ import { Loader } from "../Loader";
 import { Preview } from "../Preview";
 import { ListImg } from "./ListImg";
 import Memory from "../../store/Memory";
+import Theme from "../../store/Theme";
 
 export const ImgContainer = observer(({ setImgBD, createImg }) => {
   useEffect(() => {
@@ -51,7 +52,10 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
     const reader = new FileReader();
     reader.onload = () => {
       console.log(Memory.regPost(name));
-      service.postImg(name, reader.result.replace(/data:image\/bmp;base64,/g, ""));
+      service.postImg(
+        name,
+        reader.result.replace(/data:image\/bmp;base64,/g, "")
+      );
       // console.log(reader.result);
     };
     reader.readAsDataURL(file);
@@ -94,15 +98,24 @@ export const ImgContainer = observer(({ setImgBD, createImg }) => {
 
   return (
     <div ref={refContainer} className="add_obj_img">
-      <ul className="container_list_img">
-        <li className="add_obj-title">
-          Из списка{" "}
+      <ul
+        className="container_list_img"
+        style={{ background: Theme.background }}
+      >
+        <li
+          className="add_obj-title"
+          style={{ borderBottom: Theme.theme_border }}
+        >
+          Из списка
           <span
             className="container_closed_btn"
             onClick={() => setImgBD(false)}
           ></span>
         </li>
-        <li className="add_obj-title">
+        <li
+          className="add_obj-title"
+          style={{ borderBottom: Theme.theme_border }}
+        >
           Добавить
           <span className="container_add_btn" onClick={() => addImg()}>
             {" "}

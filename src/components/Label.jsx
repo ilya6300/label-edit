@@ -6,6 +6,7 @@ import { NoneProps } from "./NoneProps";
 import { PropertiesPanel } from "./PropertiesPanel";
 import { PreviewLabel } from "./PreviewLabel";
 import { ThisLabel } from "./ThisLabel";
+import Theme from "../store/Theme";
 
 export const Label = observer(({ flagPreview, setFlagPrevier, clsMM }) => {
   // Класс для контейнера свойств
@@ -36,8 +37,10 @@ export const Label = observer(({ flagPreview, setFlagPrevier, clsMM }) => {
                   Memory.height_label * Memory.mm +
                   Memory.gap * Memory.mm * 2 +
                   "px"
-                : 460 + "px",
-            minHeight: 460 + "px",
+                : "auto",
+            // : 460 + "px",
+            // minHeight: 460 + "px",
+            background: Theme.label_background_black,
           }}
         >
           <div
@@ -78,11 +81,11 @@ export const Label = observer(({ flagPreview, setFlagPrevier, clsMM }) => {
           )}
         </div>
       </div>
-      {Object.obj !== null ? (
-        <PropertiesPanel clsContainer={clsContainer} />
-      ) : (
-        <NoneProps />
-      )}
+      {/* {Object.obj !== null ? ( */}
+      <PropertiesPanel clsContainer={clsContainer} />
+      {/* // ) : ( */}
+      {/* // <NoneProps /> */}
+      {/* // )} */}
       {flagPreview ? (
         <PreviewLabel clsMM={clsMM} setFlagPrevier={setFlagPrevier} />
       ) : (

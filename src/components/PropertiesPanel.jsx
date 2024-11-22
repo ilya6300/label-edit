@@ -5,6 +5,9 @@ import { observer } from "mobx-react-lite";
 import { FontsContainer } from "./obj/FontsContainer";
 import { HistoryObj } from "./history/HistoryObj";
 import { VarText } from "./obj/vartext/VarText";
+import Object from "../store/Object";
+import { NoneProps } from "./NoneProps";
+import Theme from "../store/Theme";
 
 export const PropertiesPanel = observer(({ clsContainer }) => {
   const [propActive, setPropActive] = useState(true);
@@ -45,9 +48,9 @@ export const PropertiesPanel = observer(({ clsContainer }) => {
 
   if (!varText && !flagFonts) {
     return (
-      <div className={clsContainer}>
+      <div className={clsContainer} style={{ border: Theme.theme_border }}>
         <ul>
-          <li className="prop_obj-title">
+          <li className="prop_obj-title" style={{ borderBottom: Theme.theme_border }}>
             <span className={clsPropActive} onClick={propsSelect}>
               Свойства
             </span>
@@ -60,7 +63,16 @@ export const PropertiesPanel = observer(({ clsContainer }) => {
           </li>
         </ul>
         {propActive ? (
-          <PropertiesObj setVarText={setVarText} setFlagFonts={setFlagFonts} />
+          <>
+            {Object.obj !== null ? (
+              <PropertiesObj
+                setVarText={setVarText}
+                setFlagFonts={setFlagFonts}
+              />
+            ) : (
+              <NoneProps />
+            )}
+          </>
         ) : (
           <></>
         )}

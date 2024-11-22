@@ -1,8 +1,12 @@
 import React from "react";
+import Theme from "../store/Theme";
 
 export const BarInfo = () => {
   return (
-    <label className="barlabel_info_container">
+    <label
+      className="barlabel_info_container"
+      style={{ background: Theme.btn_background_black, borderRadius: "50%" }}
+    >
       <span className="barlabel_info_btn">?</span>
       <ul className="barlabel_info">
         <li>"Del" - удалить выбранный элемент</li>

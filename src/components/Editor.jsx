@@ -17,8 +17,10 @@ import { ExchangeWithServer } from "./messages/ExchangeWithServer";
 import Memory from "../store/Memory";
 import { ImportCompanent } from "./import/ImportCompanent";
 import { MessagesContainer } from "./messages/MessagesContainer";
-import { PrinterSettings } from "./PrinterSettings";
+import { PrinterSettings } from "./Setting//PrinterSettings";
 import { ContainerPostDownloader } from "./messages/ContainerPostDownloader";
+import Theme from "../store/Theme";
+import { Setting } from "./Setting/Setting";
 
 export const Editor = observer(() => {
   const [browserNotSupportedFlag, setBrowserNotSupportedFlag] = useState(false);
@@ -32,7 +34,7 @@ export const Editor = observer(() => {
   }, [!service.fontsLoading]);
 
   // Класс мм сетки
-  const [clsMM, setClsMM] = useState("");
+  const [clsMM, setClsMM] = useState("none");
   const [printerSetting, setPrinterSetting] = useState(false);
   const [noFonts, setNoFonts] = useState(false);
   const [importC, setImportC] = useState(false);
@@ -62,7 +64,10 @@ export const Editor = observer(() => {
                 {visibleTemplates ? (
                   <GetTemplate setVisibleTemplates={setVisibleTemplates} />
                 ) : (
-                  <div className="editor_list_viewer">
+                  <div
+                    style={{ color: Theme.color }}
+                    className="editor_list_viewer"
+                  >
                     {importC ? (
                       <ImportCompanent setImportC={setImportC} />
                     ) : (
@@ -79,11 +84,7 @@ export const Editor = observer(() => {
                       setFlagPrevier={setFlagPrevier}
                       clsMM={clsMM}
                     />
-                    {printerSetting ? (
-                      <PrinterSettings setPrinterSetting={setPrinterSetting} />
-                    ) : (
-                      <></>
-                    )}
+                    {printerSetting ? <Setting /> : <></>}
                   </div>
                 )}
                 {/* <button
@@ -99,8 +100,10 @@ export const Editor = observer(() => {
                       "Object.download_objects",
                       toJS(Object.download_objects),
                       "this.preview_templates",
-                      toJS(Templates.preview_templates)
-                            )
+                      toJS(Templates.preview_templates),
+                      "Object.objects_preview",
+                      toJS(Object.objects_preview)
+                    )
                   }
                 >
                   Check model

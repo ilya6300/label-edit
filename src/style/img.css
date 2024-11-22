@@ -18,8 +18,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: aliceblue;
+  /* background: aliceblue; */
   overflow: hidden auto;
+  border-radius: 15px;
   /* padding: 0 4px 4px 4px; */
 }
 .add_obj_img_preview_container {
@@ -28,7 +29,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: aliceblue;
+  /* background: aliceblue; */
   padding: 0 4px 4px 4px;
 }
 .window_preview {

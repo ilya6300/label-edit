@@ -2,6 +2,7 @@ import React from "react";
 import service from "../../request/service";
 import Object from "../../store/Object";
 import Memory from "../../store/Memory";
+import Theme from "../../store/Theme";
 
 export const DMContainer = ({ setDmFlag }) => {
   const dm_collection = [
@@ -199,6 +200,7 @@ export const DMContainer = ({ setDmFlag }) => {
       name: "datamatrix",
       typeObj: "barcode",
       typeBarcode: "datamatrix",
+      defaultBody: true,
       pxX: 0,
       pxY: 0,
       pxW: 6,
@@ -250,10 +252,16 @@ export const DMContainer = ({ setDmFlag }) => {
   };
 
   return (
-    <div className="add_obj_img ">
+    <div className="add_obj_img " style={{ background: Theme.background }}>
       <ul className="editor_list_obj_container border_none">
-        <li className="add_obj-title">
-          Выберите ДМ{" "}
+        <li
+          className="add_obj-title"
+          style={{
+            borderBottom: Theme.theme_border,
+            background: Theme.background,
+          }}
+        >
+          Выберите ДМ
           <span
             className="container_closed_btn"
             onClick={() => setDmFlag(false)}

@@ -10,6 +10,7 @@ import { Loader } from "../Loader";
 import { BtnRed } from "../../UI/btn/BtnRed";
 import { BtnVer1 } from "../../UI/btn/BtnVer1";
 import { ImportTemplateBD } from "./ImportTemplateBD";
+import Theme from "../../store/Theme";
 
 export const GetTemplate = observer(({ setVisibleTemplates }) => {
   // Выбор шаблона
@@ -26,7 +27,7 @@ export const GetTemplate = observer(({ setVisibleTemplates }) => {
     service.deleteTemplate();
   };
 
-    const selectTemplateOpenThis = () => {
+  const selectTemplateOpenThis = () => {
     selectTemplate();
     Templates.setNewTemplate(false);
   };
@@ -34,24 +35,30 @@ export const GetTemplate = observer(({ setVisibleTemplates }) => {
     selectTemplate();
     Templates.setNewTemplate(true);
   };
-  const selectTemplate = () => {
+  const selectTemplate = async () => {
     setVisibleTemplates(false);
     Templates.saveID(Templates.preview_templates.id);
     Object.select();
     Templates.downloadedTemplates(Object.objects_preview);
-    setTimeout(() => {
-      Object.editBodyPreview();
-    }, 1000);
+    // setTimeout(async() => {
+    await Object.editBodyPreview();
+    // }, 1000);
   };
 
   return (
     <div className="templates_preiew_container">
-      <div className="templates_preiew_list templates_preiew_container_block-left">
+      <div
+        className="templates_preiew_list templates_preiew_container_block-left"
+        style={{ border: Theme.theme_border }}
+      >
         <ListTemplate selectedTemplate={selectedTemplate} />
       </div>
 
       {Object.objects_preview.length ? (
-        <div className="templates_preiew_preview templates_preiew_container_block-right">
+        <div
+          className="templates_preiew_preview templates_preiew_container_block-right"
+          style={{ border: Theme.theme_border }}
+        >
           {!service.templatesLoading ? (
             <>
               <ThisLabel
@@ -77,7 +84,10 @@ export const GetTemplate = observer(({ setVisibleTemplates }) => {
           )}
         </div>
       ) : (
-        <div className="templates_preiew_preview templates_preiew_container_block-right templates_preiew_container_block-right_text">
+        <div
+          className="templates_preiew_preview templates_preiew_container_block-right templates_preiew_container_block-right_text"
+          style={{ border: Theme.theme_border }}
+        >
           {Memory.templates.length > 0 ? (
             <p>
               Выберите шаблон из списка слева, для предпросмотра. Ваш текуший

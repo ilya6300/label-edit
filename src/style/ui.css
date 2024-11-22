@@ -4,7 +4,7 @@
   border: 1px solid var(--mast-blue-1);
   padding: 3px 5px;
   border-radius: 4px;
-  color: #767574;
+  color: #84827f;
   transition: all 0.4s ease-in-out;
   /* margin-left: 25px; */
   padding: 4px 6px;
@@ -23,8 +23,8 @@
 }
 .btn_ver_1:hover {
   background: var(--mast-blue-1);
-  border: 1px solid var(--mast-blue-1);
-  color: white;
+  /* border: 1px solid var(--mast-blue-1); */
+  color: var(--mast-blue-1);
 }
 .barlabel_number {
   width: 45px;
@@ -72,4 +72,66 @@
   position: absolute;
   right: 8px;
   top: 8px;
+}
+.my_btn_check_active_false {
+  margin: 0 8px 0 0;
+  cursor: pointer;
+  display: block;
+  width: 45px;
+  min-width: 45px;
+  height: 22px;
+  border: 1px solid #acacac78;
+  border-radius: 14px;
+  position: relative;
+  background: #bcbbb940;
+}
+.my_btn_check_active_false_span {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: #acacac78;
+  position: absolute;
+  border-radius: 50%;
+  top: 50%;
+  left: 6%;
+  transform: translate(0, -50%);
+  transition: all 1s ease;
+  /* animation: btn_check_off_span 1s forwards; */
+}
+.my_btn_check_active_false:hover > .my_btn_check_active_false_span {
+  animation: btn_check_on_span 1s forwards;
+}
+.my_btn_check_active_span_1 {
+  font-size: 13px;
+  color: #80808080;
+}
+.my_btn_check_active_true {
+  margin: 0 8px 0 0;
+  cursor: pointer;
+  display: block;
+  width: 45px;
+  min-width: 45px;
+  height: 22px;
+  border: 2px solid var(--mast-blue-1);
+  border-radius: 14px;
+  box-shadow: 0 0 4px 1px var(--mast-blue-1);
+  position: relative;
+  background: #8aa5ff40;
+}
+.my_btn_check_active_true_span {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: var(--mast-blue-1);
+  position: absolute;
+  border-radius: 50%;
+  top: 50%;
+  left: 57%;
+  transform: translate(0, -50%);
+  box-shadow: 0 0 3px 1px var(--mast-blue-1);
+  transition: all 1s ease;
+  /* animation: btn_check_on_span 1s forwards; */
+}
+.my_btn_check_active_true:hover > .my_btn_check_active_true_span {
+  animation: btn_check_off_span 1s forwards;
 }

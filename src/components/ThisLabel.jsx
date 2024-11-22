@@ -11,6 +11,8 @@ export const ThisLabel = observer(
     const documentMouseUp = () => {
       onMouseUpFunc();
     };
+    const __mm = 3.60958;
+    const __cm = 36.5958;
     useEffect(() => {
       document.addEventListener("mouseup", documentMouseUp);
       return () => {
@@ -50,6 +52,7 @@ export const ThisLabel = observer(
     // Подсветить при наведение на точки масщтабирования
     const onMouseMoveFunc = (e) => {
       if (!preview) {
+        // console.log(e);
         x = e.clientX;
         y = e.clientY;
         if (Object.obj !== null) {
@@ -152,6 +155,7 @@ export const ThisLabel = observer(
     const onMouseDownFunc = (e) => {
       if (!preview && e.target.id !== "btn_size") {
         setCanvasX(lblRef.current.getBoundingClientRect().x);
+        console.log(canvasY);
         setCanvasY(lblRef.current.getBoundingClientRect().y);
         Object.getObject(e);
         const reg = Object.obj.target.id.replace(/\D/gm, "");
@@ -246,7 +250,7 @@ export const ThisLabel = observer(
 
     return (
       <div
-        onMouseMove={onMouseMoveFunc}
+        // onMouseMove={onMouseMoveFunc}
         id="label"
         style={{
           width: Memory.width_label * Memory.mm * Memory.scale + "px",
@@ -255,168 +259,193 @@ export const ThisLabel = observer(
         }}
         className="label"
       >
-        <div className={clsMM}>
+        <div
+          className="cls_mm"
+          style={{
+            backgroundImage: clsMM,
+            backgroundSize: `${Memory.mm * Memory.scale}px ${
+              Memory.mm * Memory.scale
+            }px, ${Memory.mm * Memory.scale}px ${Memory.mm * Memory.scale}px, ${
+              Memory.cm * Memory.scale
+            }px ${Memory.cm * Memory.scale}px,
+           ${Memory.cm * Memory.scale}px ${Memory.cm * Memory.scale}px`,
+            backgroundPosition: `0px 0px, 0px 0px, -1px -1px, -1px -1px`,
+          }}
+        >
           <React.StrictMode>
             <div
+              onMouseMove={onMouseMoveFunc}
+              // id="label"
               ref={lblRef}
               className="label_reference "
               style={{
-                width:
-                  (Memory.width_label * Memory.mm + 8) * Memory.scale + "px",
-                height:
-                  (Memory.height_label * Memory.mm + 8) * Memory.scale + "px",
+                width: Memory.width_label * Memory.mm * Memory.scale + "px",
+                height: Memory.height_label * Memory.mm * Memory.scale + "px",
                 borderRadius: Memory.radius_label + "px",
-                marginLeft: Memory.ref_x * Memory.mm - 8 + "px",
-                marginTop: Memory.ref_y * Memory.mm - 8 + "px",
+                marginLeft: Memory.ref_x * Memory.mm * Memory.scale + "px",
+                marginTop: Memory.ref_y * Memory.mm * Memory.scale + "px",
                 border: !preview ? "var(--grey_border)" : "none",
+                position: "relative",
+                color: "black",
               }}
-            ></div>
-            {Memory.visible_objects ? (
-              objects.map((obj) => (
-                <div
-                  onMouseDown={onMouseDownFunc}
-                  onMouseOut={onMouseOutFunc}
-                  key={obj.id}
-                  id={obj.id}
-                  className={!preview ? obj.cls.join(" ") : obj.clsPreview}
-                  style={{
-                    width:
+            >
+              {!preview ? (
+                <span className="label_reference_text_y">reference по - x</span>
+              ) : (
+                ""
+              )}
+            {!preview ? (
+                <span className="label_reference_text_x">reference по - y</span>
+              ) : (
+                ""
+              )}
+              {Memory.visible_objects ? (
+                objects.map((obj) => (
+                  <div
+                    onMouseDown={onMouseDownFunc}
+                    onMouseOut={onMouseOutFunc}
+                    key={obj.id}
+                    id={obj.id}
+                    className={!preview ? obj.cls.join(" ") : obj.clsPreview}
+                    style={{
+                      width:
                         obj.typeBarcode === "datamatrix"
-                        ? obj.pxW * obj.min_size * Memory.mm * Memory.scale +
-                          "px"
-                        : obj.typeObj === "box"
-                        ? obj.pxW * Memory.mm * Memory.scale + "px"
-                        : obj.pxW * Memory.mm * Memory.scale + "px",
-                    height:
-                      obj.typeBarcode === "datamatrix"
-                        ? obj.pxW * obj.min_size * Memory.mm * Memory.scale +
-                          "px"
-                        : obj.typeObj === "box"
-                        ? obj.pxH * Memory.mm * Memory.scale + "px"
-                        : obj.pxH * Memory.mm * Memory.scale + "px",
-                    zIndex: obj.zIndex,
-                    left:
-                      obj.typeObj === "lines" ||
-                      obj.typeObj === "box" ||
-                       obj.typeObj === "img" ||
-                      obj.typeBarcode === "datamatrix" ||
-                      obj.typeBarcode === "qr"
-                        ? obj.pxX * Memory.scale + "px"
-                        : obj.pxFakeX * Memory.scale + "px",
-                    top:
-                      obj.typeObj === "lines" ||
-                      obj.typeObj === "box" ||
-                      obj.typeObj === "img" ||
-                      obj.typeBarcode === "datamatrix" ||
-                      obj.typeBarcode === "qr"
-                        ? obj.pxY * Memory.scale + "px"
-                        : obj.pxFakeY * Memory.scale + "px",
-                    fontSize: obj.style.fontSize * Memory.scale + "pt",
-                    fontFamily: obj.style.fontFamily,
-                    justifyContent:
-                      obj.style.position === "2"
-                        ? "center"
-                        : obj.style.position === "3"
-                        ? "flex-end"
-                        : "flex-start",
-                    rotate:
-                      obj.typeObj !== "lines"
-                        ? obj.style.rotate + "deg"
-                        : obj.style.rotate,
+                          ? obj.pxW * obj.min_size * Memory.mm * Memory.scale +
+                            "px"
+                          : obj.typeObj === "box"
+                          ? obj.pxW * Memory.mm * Memory.scale + "px"
+                          : obj.pxW * Memory.mm * Memory.scale + "px",
+                      height:
+                        obj.typeBarcode === "datamatrix"
+                          ? obj.pxW * obj.min_size * Memory.mm * Memory.scale +
+                            "px"
+                          : obj.typeObj === "box"
+                          ? obj.pxH * Memory.mm * Memory.scale + "px"
+                          : obj.pxH * Memory.mm * Memory.scale + "px",
+                      zIndex: obj.zIndex,
+                      left:
+                        obj.typeObj === "lines" ||
+                        obj.typeObj === "box" ||
+                        obj.typeObj === "img" ||
+                        obj.typeBarcode === "datamatrix" ||
+                        obj.typeBarcode === "qr"
+                          ? obj.pxX * Memory.scale + "px"
+                          : obj.pxFakeX * Memory.scale + "px",
+                      top:
+                        obj.typeObj === "lines" ||
+                        obj.typeObj === "box" ||
+                        obj.typeObj === "img" ||
+                        obj.typeBarcode === "datamatrix" ||
+                        obj.typeBarcode === "qr"
+                          ? obj.pxY * Memory.scale + "px"
+                          : obj.pxFakeY * Memory.scale + "px",
+                      fontSize: obj.style.fontSize * Memory.scale + "pt",
+                      fontFamily: obj.style.fontFamily,
+                      justifyContent:
+                        obj.style.position === "2"
+                          ? "center"
+                          : obj.style.position === "3"
+                          ? "flex-end"
+                          : "flex-start",
+                      rotate:
+                        obj.typeObj !== "lines"
+                          ? obj.style.rotate + "deg"
+                          : obj.style.rotate,
 
-                    opacity:
-                      (obj.active && !preview) || (obj.active && preview)
-                        ? 1
-                        : !obj.active && !preview
-                        ? 0.2
-                        : 0,
-                    boxShadow: !preview ? obj.style.boxShadow : "none",
-                  }}
-                >
-                  {obj.typeBarcode !== "qrcode" &&
-                  obj.typeObj === "barcode" &&
-                  obj.id === Object.prop_obj.id &&
-                  !preview ? (
-                    <div className="barcode_panel_scale_container">
-                      <button
-                        id="btn_size"
-                        className="barcode_panel_scale_btn"
-                        onClick={scaleBarcodeIncrement}
+                      opacity:
+                        (obj.active && !preview) || (obj.active && preview)
+                          ? 1
+                          : !obj.active && !preview
+                          ? 0.2
+                          : 0,
+                      boxShadow: !preview ? obj.style.boxShadow : "none",
+                    }}
+                  >
+                    {obj.typeBarcode !== "qrcode" &&
+                    obj.typeObj === "barcode" &&
+                    obj.id === Object.prop_obj.id &&
+                    !preview ? (
+                      <div className="barcode_panel_scale_container">
+                        <button
+                          id="btn_size"
+                          className="barcode_panel_scale_btn"
+                          onClick={scaleBarcodeIncrement}
+                        >
+                          +
+                        </button>
+                        <button
+                          id="btn_size"
+                          className="barcode_panel_scale_btn"
+                          onClick={scaleBarcodeDecrement}
+                        >
+                          -
+                        </button>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    {obj.typeObj === "text" || obj.typeObj === "block" ? (
+                      obj.body
+                    ) : (
+                      <></>
+                    )}
+                    {obj.typeObj === "barcode" ? (
+                      <Barcode obj={obj} add_canvas={add_canvas} />
+                    ) : (
+                      <></>
+                    )}
+                    {obj.typeObj === "img" ? (
+                      <img
+                        id={obj.id}
+                        style={{
+                          pointerEvents: "none",
+                          width: obj.pxW * Memory.mm * Memory.scale + "px",
+                          height: obj.pxH * Memory.mm * Memory.scale + "px",
+                          border: "none",
+                          left: obj.pxX * Memory.scale + "px",
+                          top: obj.pxY * Memory.scale + "px",
+                        }}
+                        src={"data:image/bmp;base64," + obj.body}
+                        alt="img"
+                      />
+                    ) : (
+                      <></>
+                    )}
+                    {obj.typeObj === "lines" ? (
+                      <div
+                        style={{
+                          width: obj.pxW * Memory.mm * Memory.scale + "px",
+                          height: obj.pxH * Memory.mm * Memory.scale + "px",
+                          background: "black",
+                        }}
+                        id={obj.id}
                       >
-                        +
-                      </button>
-                      <button
-                        id="btn_size"
-                        className="barcode_panel_scale_btn"
-                        onClick={scaleBarcodeDecrement}
-                      >
-                        -
-                      </button>
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  {obj.typeObj === "text" || obj.typeObj === "block" ? (
-                    obj.body
-                  ) : (
-                    <></>
-                  )}
-                  {obj.typeObj === "barcode" ? (
-                    <Barcode obj={obj} add_canvas={add_canvas} />
-                  ) : (
-                    <></>
-                  )}
-                  {obj.typeObj === "img" ? (
-                    <img
-                      id={obj.id}
-                      style={{
-                        pointerEvents: "none",
-                        width: obj.pxW * Memory.mm * Memory.scale + "px",
-                        height: obj.pxH * Memory.mm * Memory.scale + "px",
-                        border: "none",
-                        left: obj.pxX * Memory.scale + "px",
-                        top: obj.pxY * Memory.scale + "px",
-                      }}
-                      src={"data:image/bmp;base64," + obj.body}
-                      alt="img"
-                    />
-                  ) : (
-                    <></>
-                  )}
-                  {obj.typeObj === "lines" ? (
-                    <div
-                      style={{
-                        width: obj.pxW * Memory.mm * Memory.scale + "px",
-                        height: obj.pxH * Memory.mm * Memory.scale + "px",
-                        background: "black",
-                      }}
-                      id={obj.id}
-                    >
-                      {obj.body}
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  {obj.typeObj === "box" ? (
-                    <div
-                      style={{
-                        width: obj.pxW * Memory.mm * Memory.scale + "px",
-                        height: obj.pxH * Memory.mm * Memory.scale + "px",
-                        border: obj.line_thickness / 2 + "px solid",
-                        left: obj.pxX * Memory.scale + "px",
-                        top: obj.pxY * Memory.scale + "px",
-                        borderRadius: obj.borderRadius / 2 + "px",
-                      }}
-                      id={obj.id}
-                    ></div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-              ))
-            ) : (
-              <></>
-            )}
+                        {obj.body}
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                    {obj.typeObj === "box" ? (
+                      <div
+                        style={{
+                          width: obj.pxW * Memory.mm * Memory.scale + "px",
+                          height: obj.pxH * Memory.mm * Memory.scale + "px",
+                          border: obj.line_thickness / 2 + "px solid",
+                          left: obj.pxX * Memory.scale + "px",
+                          top: obj.pxY * Memory.scale + "px",
+                          borderRadius: obj.borderRadius / 2 + "px",
+                        }}
+                        id={obj.id}
+                      ></div>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <></>
+              )}
+            </div>
           </React.StrictMode>
         </div>
       </div>

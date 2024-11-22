@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import React, { useRef } from "react";
+import Theme from "../store/Theme";
 
 export const Preview = observer(
   ({
@@ -16,14 +17,24 @@ export const Preview = observer(
         e.target.value.match(/[a-zA-Z\d_]/gm) ||
         e.target.value.length === 0
       ) {
-        setName(e.target.value.replace(/[!@#№%^$:&?*()_\-=+<>\.,;:а-яёйА-ЯЁЙ\s]/g, ""));
+        setName(
+          e.target.value.replace(/[!@#№%^$:&?*()_\-=+<>\.,;:а-яёйА-ЯЁЙ\s]/g, "")
+        );
       }
     };
 
     const refPreview = useRef(null);
     return (
-      <div className="add_obj_img_preview_container">
-        <p className="add_obj-title">Предпросмотр</p>
+      <div
+        className="add_obj_img_preview_container"
+        style={{ background: Theme.background }}
+      >
+        <p
+          className="add_obj-title"
+          style={{ borderBottom: Theme.theme_border }}
+        >
+          Предпросмотр
+        </p>
         <div className="window_preview" ref={refPreview}>
           <img
             className="window_preview_img"
@@ -39,7 +50,7 @@ export const Preview = observer(
             <input
               value={name}
               onChange={writeName}
-              className="add_img_name_container-inp"
+              className="prop_obj-inp"
               type="text"
               placeholder="Введите название (ENG)"
             />

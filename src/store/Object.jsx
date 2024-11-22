@@ -64,13 +64,9 @@ class Object {
               this.obj.nativeEvent.layerX +
               this.obj.nativeEvent.target.clientWidth
         ) {
-          ID.pxX =
-            (x -
-              (canvasX - Memory.ref_x * Memory.mm) -
-              this.obj.nativeEvent.layerX) /
-            Memory.scale;
+          ID.pxX = (x - canvasX - this.obj.nativeEvent.layerX) / Memory.scale;
           ID.pxFakeX = ID.pxX;
-          ID.x = ID.pxX - Memory.ref_x * Memory.mm;
+          ID.x = ID.pxX;
         }
         // y
         if (
@@ -81,12 +77,8 @@ class Object {
               this.obj.nativeEvent.layerY +
               this.obj.nativeEvent.target.clientHeight
         ) {
-          ID.pxY =
-            (y -
-              (canvasY - Memory.ref_y * Memory.mm) -
-              this.obj.nativeEvent.layerY) /
-            Memory.scale;
-          ID.y = ID.pxY - Memory.ref_y * Memory.mm;
+          ID.pxY = (y - canvasY - this.obj.nativeEvent.layerY) / Memory.scale;
+          ID.y = ID.pxY;
           ID.pxFakeY = ID.pxY;
         }
       }
@@ -98,7 +90,7 @@ class Object {
     if (ID) {
       if (!Memory.move_flag) {
         return;
-      } 
+      }
       const clone = this.objects.find((f) => f.id === 9999);
       if (clone) {
         if (!collision) {
@@ -281,13 +273,13 @@ class Object {
       }
     }
   };
-  editBodyPreview = () => {
+  editBodyPreview = async () => {
     const bloksPreview = document.querySelectorAll(
       ".bardcode_container-block-preview"
     );
     const bloks = document.querySelectorAll(".bardcode_container-block");
 
-    bloks.forEach((b) => {
+    bloks.forEach(async(b) => {
       bloksPreview.forEach((bp) => {
         if (bp.id === b.id) {
           bp.innerHTML = b.innerHTML;
@@ -531,6 +523,13 @@ class Object {
     const ID = this.findID();
     if (ID) {
       ID.borderRadius = int;
+    }
+  };
+
+  setDefaultBodyBolean = async (boleean) => {
+    const ID = this.findID();
+    if (ID) {
+      ID.defaultBody = boleean;
     }
   };
 

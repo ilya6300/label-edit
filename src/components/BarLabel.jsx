@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Memory from "../store/Memory";
 import { observer } from "mobx-react-lite";
 import Object from "../store/Object";
@@ -12,6 +12,7 @@ import HistoryStore from "../store/HistoryStore";
 import iconSettings from "../img/icons/icon-settings.png";
 import Msg from "../store/Msg";
 import { CodeTemplayModal } from "./templates/CodeTemplayModal";
+import Theme from "../store/Theme";
 
 export const BarLabel = observer(
   ({
@@ -40,6 +41,26 @@ export const BarLabel = observer(
 
     const [visibleCodeTemplateFlag, setVisibleCodeTemplateFlag] =
       useState(false);
+
+    const loadingUrlTemplate = async () => {
+      const urlID = String(window.location.search.match(/_id=\d*$/));
+      if (urlID !== "null") {
+        const ID = String(urlID.match(/\d*$/));
+        console.log(urlID, ID);
+        try {
+          await service.getTemplatesID(ID);
+          Templates.saveID(ID);
+          Object.select();
+          Templates.setNewTemplate(false);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+
+    useEffect(() => {
+      loadingUrlTemplate();
+    }, []);
 
     const changeW = (e) => {
       if (e.target.value > 150) {
@@ -182,9 +203,43 @@ export const BarLabel = observer(
       Memory.heigthLabelChange(temp_hl);
       setGValue(temp_g);
     };
+    // Переименовать шаблон
+    const [renameFlag, setRenameFlag] = useState(false);
+    const [rename, setRename] = useState(Memory.name_template);
+    const handlerRename = async (e) => {
+      setRename(e.target.value);
+    };
+    const renameBlockRef = useRef();
+    const closedRenameBlock = (e) => {
+      if (
+        renameBlockRef.current &&
+        !renameBlockRef.current.contains(e.target)
+      ) {
+        setRenameFlag(false);
+      }
+    };
+    useEffect(() => {
+      document.addEventListener("mousedown", closedRenameBlock);
+    }, []);
+
+    const renameTemplate = async () => {
+      if (Memory.name_template !== rename) {
+        Memory.writeNameTemplate(true, rename);
+        service.pathUpdateLabel({ name: rename });
+        setRenameFlag(false);
+      } else {
+        console.error("Memory.name_template не изменился");
+      }
+    };
+
+    const openRenameBlock = async () => {
+      setRename(Memory.name_template);
+      setRenameFlag(true);
+    };
 
     // Новый шаблон
     const newTemplateFunc = () => {
+      Memory.clearUrl();
       Object.newTemplate();
       Templates.setNewTemplate(true);
     };
@@ -192,12 +247,15 @@ export const BarLabel = observer(
     // Включить / отклюяить милимметровую сетку
     const [clsMMBtn, setClsMMBtn] = useState("cls_mm-btn");
     const onMM = () => {
-      if (clsMM === "") {
+      if (clsMM === "none") {
         setClsMMBtn("cls_mm-btn-active");
-        setClsMM("cls_mm");
+        setClsMM(`linear-gradient(rgb(114 114 114 / 75%) 1px, transparent 1px),
+            linear-gradient(90deg, rgb(114 114 114 / 75%) 1px, transparent 1px),
+            linear-gradient(rgb(114 114 114) 1px, transparent 1px),
+            linear-gradient(90deg, rgb(114 114 114) 1px, white 1px)`);
       } else {
         setClsMMBtn("cls_mm-btn");
-        setClsMM("");
+        setClsMM("none");
       }
     };
 
@@ -257,11 +315,40 @@ export const BarLabel = observer(
     };
 
     return (
-      <div className="bar_label">
-        <span className="barlabel_title">
-          <span style={{ width: "150px" }}>
-            {Templates.new_template ? "Новый шаблон" : Memory.name_template}
-          </span>
+      <div className="bar_label" style={{ border: Theme.theme_border }}>
+        <div
+          className="barlabel_title"
+          style={{ borderBottom: Theme.theme_border }}
+        >
+          {Templates.new_template ? (
+            <span style={{ width: "150px" }}>Новый шаблон</span>
+          ) : (
+            <>
+              {!renameFlag ? (
+                <span className="barlabel_rename_btn" onClick={openRenameBlock}>
+                  {Memory.name_template}
+                </span>
+              ) : (
+                <label
+                  ref={renameBlockRef}
+                  className="barlabel_rename_container"
+                >
+                  <input
+                    placeholder="Введите новое название шаблона"
+                    className="barlabel_text"
+                    value={rename}
+                    onChange={handlerRename}
+                  />
+                  <BtnVer1
+                    // style={{ margin: "0", padding: "0" }}
+                    onClick={renameTemplate}
+                  >
+                    <span className="barlabel_rename_enter">&#8629;</span>
+                  </BtnVer1>
+                </label>
+              )}
+            </>
+          )}
           <div className="barlabel_btn_container">
             {!visibleTemplates ? (
               <>
@@ -281,7 +368,7 @@ export const BarLabel = observer(
             ) : (
               <>
                 {/* Окно просмотра шаблона */}
-
+                <BtnVer1 onClick={closedTemplates}>Закрыть</BtnVer1>
                 <input
                   ref={refCodeImport}
                   type="file"
@@ -295,22 +382,32 @@ export const BarLabel = observer(
                 <BtnVer1 onClick={visibleImportC}>
                   Импорт кода (строками)
                 </BtnVer1>
-                <BtnVer1 onClick={closedTemplates}>Закрыть</BtnVer1>
               </>
             )}
-            <button onClick={onMM} className={clsMMBtn}>
+            <button
+              onClick={onMM}
+              className={clsMMBtn}
+              style={{ background: Theme.btn_background_black }}
+            >
               #
             </button>
-            <span className="btn_back_history" onClick={backStepHistory}></span>
+            <span
+              className="btn_back_history"
+              style={{ background: Theme.btn_background_black }}
+              onClick={backStepHistory}
+            ></span>
             <BarInfo />
           </div>
-        </span>
+        </div>
 
         <div className="barlabel_container">
           <div className="barlabel_filter_container">
             <label onChange={changeDpi}>
               dpi:{" "}
-              <select className="barlabel_container_dpi">
+              <select
+                className="barlabel_container_dpi"
+                style={{ background: Theme.btn_background_black }}
+              >
                 <option value="12">300</option>
                 <option value="8">200</option>
               </select>
@@ -385,7 +482,10 @@ export const BarLabel = observer(
             </label>
           </div>
         </div>
-        <div className="barlabel_container_suboptions">
+        <div
+          className="barlabel_container_suboptions"
+          style={{ borderTop: Theme.theme_border }}
+        >
           <div className="barlabel_container_scale">
             <span>Масштаб</span>
             <input
@@ -418,6 +518,7 @@ export const BarLabel = observer(
                 animation: printerSetting
                   ? "setting_printing_rotate 3s infinite linear"
                   : "",
+                filter: Theme.black_theme ? "invert(1)" : "none",
               }}
             />
           </div>

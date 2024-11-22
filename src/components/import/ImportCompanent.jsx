@@ -6,6 +6,7 @@ import Object from "../../store/Object";
 import Fonts from "../../store/Fonts";
 import Msg from "../../store/Msg";
 import service from "../../request/service";
+import Theme from "../../store/Theme";
 
 export const ImportCompanent = observer(({ setImportC }) => {
   const refTextImport = useRef();
@@ -592,7 +593,10 @@ export const ImportCompanent = observer(({ setImportC }) => {
   };
 
   return (
-    <div className="import_container bar_label">
+    <div
+      className="import_container bar_label"
+      style={{ background: Theme.background }}
+    >
       <p className="import_container_title">Импорт шаблона</p>
       <textarea
         ref={refTextImport}

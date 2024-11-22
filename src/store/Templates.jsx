@@ -318,6 +318,7 @@ class Templates {
         Object.addObjPreiew(obj);
       }
     });
+    Memory.writeNameTemplate()
     Object.downloadObjects();
     setTimeout(() => {
       if (this.preview_templates.objects === undefined) {
