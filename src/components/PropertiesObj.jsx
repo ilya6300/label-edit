@@ -5,6 +5,7 @@ import Memory from "../store/Memory";
 import HistoryStore from "../store/HistoryStore";
 import { ListImg } from "./img_components/ListImg";
 import service from "../request/service";
+import Theme from "../store/Theme";
 
 export const PropertiesObj = observer(
   ({ setFlagFonts, inputPropRef, setVarText }) => {
@@ -382,7 +383,7 @@ export const PropertiesObj = observer(
         Object.prop_obj.typeObj !== "img" ? (
           <li className="prop_obj">
             {rotate ? (
-              <span ref={rotateRef} className="prop_obj_position">
+              <span ref={rotateRef} className="prop_obj_position" style={{background: Theme.background}}>
                 <span
                   className="prop_obj_position_span"
                   id="0"
