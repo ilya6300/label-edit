@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Label } from "./Label";
 import { toJS } from "mobx";
-import Object from "../store/Object";
 import { AddContainer } from "./AddContainer";
 import { observer } from "mobx-react-lite";
 import { BarLabel } from "./BarLabel";
 import { BtnControl } from "../control/BtnControl";
 import service from "../request/service";
 import { GetTemplate } from "./templates/GetTemplate";
-import Templates from "../store/Templates";
 import { StartAddFonts } from "./fonts/StartAddFonts";
 import { Loader } from "./Loader";
 import { ServerError } from "./ServerError";
@@ -17,10 +15,13 @@ import { ExchangeWithServer } from "./messages/ExchangeWithServer";
 import Memory from "../store/Memory";
 import { ImportCompanent } from "./import/ImportCompanent";
 import { MessagesContainer } from "./messages/MessagesContainer";
-import { PrinterSettings } from "./Setting//PrinterSettings";
 import { ContainerPostDownloader } from "./messages/ContainerPostDownloader";
 import Theme from "../store/Theme";
 import { Setting } from "./Setting/Setting";
+import Templates from "../store/Templates";
+import Object from "../store/Object";
+import DMcollection from "../store/DMcollection";
+import { ImportContainerDMList } from "./import/ImportContainerDMList";
 
 export const Editor = observer(() => {
   const [browserNotSupportedFlag, setBrowserNotSupportedFlag] = useState(false);
@@ -35,11 +36,14 @@ export const Editor = observer(() => {
 
   // Класс мм сетки
   const [clsMM, setClsMM] = useState("none");
-  const [printerSetting, setPrinterSetting] = useState(false);
+  const [setting, setSetting] = useState(false);
   const [noFonts, setNoFonts] = useState(false);
   const [importC, setImportC] = useState(false);
   const [visibleTemplates, setVisibleTemplates] = useState(false);
   const [flagPreview, setFlagPrevier] = useState(false);
+  const [flagPrinter, setFlagPrinter] = useState(false);
+  const [flagApp, setFlagApp] = useState(true);
+  const [selectedDM, setSelectedDM] = useState(false);
   if (!browserNotSupportedFlag) {
     return (
       <div className="editor_container">
@@ -55,11 +59,14 @@ export const Editor = observer(() => {
                   visibleTemplates={visibleTemplates}
                   setFlagPrevier={setFlagPrevier}
                   flagPreview={flagPreview}
-                  clsMM={clsMM}
-                  setClsMM={setClsMM}
+                  // clsMM={clsMM}
+                  // setClsMM={setClsMM}
                   setImportC={setImportC}
-                  setPrinterSetting={setPrinterSetting}
-                  printerSetting={printerSetting}
+                  setSetting={setSetting}
+                  setting={setting}
+                  setFlagPrinter={setFlagPrinter}
+                  flagApp={flagApp}
+                  setFlagApp={setFlagApp}
                 />
                 {visibleTemplates ? (
                   <GetTemplate setVisibleTemplates={setVisibleTemplates} />
@@ -69,7 +76,16 @@ export const Editor = observer(() => {
                     className="editor_list_viewer"
                   >
                     {importC ? (
-                      <ImportCompanent setImportC={setImportC} />
+                      <ImportCompanent
+                        selectedDM={selectedDM}
+                        setSelectedDM={setSelectedDM}
+                        setImportC={setImportC}
+                      />
+                    ) : (
+                      <></>
+                    )}
+                    {selectedDM ? (
+                      <ImportContainerDMList setSelectedDM={setSelectedDM} />
                     ) : (
                       <></>
                     )}
@@ -83,8 +99,18 @@ export const Editor = observer(() => {
                       flagPreview={flagPreview}
                       setFlagPrevier={setFlagPrevier}
                       clsMM={clsMM}
+                      setClsMM={setClsMM}
                     />
-                    {printerSetting ? <Setting /> : <></>}
+                    {setting ? (
+                      <Setting
+                        flagPrinter={flagPrinter}
+                        setFlagPrinter={setFlagPrinter}
+                        flagApp={flagApp}
+                        setFlagApp={setFlagApp}
+                      />
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 )}
                 {/* <button

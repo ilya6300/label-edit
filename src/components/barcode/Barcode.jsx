@@ -5,7 +5,7 @@ import { observer } from "mobx-react-lite";
 
 export const Barcode = observer(({ obj, add_canvas }) => {
   const [body, setBody] = useState(
-    obj.body.length >= 13 ? obj.body : "0000000000000"
+    obj.fakeBody.length >= 13 ? obj.fakeBody : "0000000000000"
   );
   try {
     if (obj.typeBarcode === "ean13" || obj.typeBarcode === "code128") {
@@ -23,7 +23,7 @@ export const Barcode = observer(({ obj, add_canvas }) => {
         // scaleX: 1,
         // scaleY: 2,
         bcid: "datamatrix", // Barcode type
-        text: "^FNC1" + obj.body, // Text to encode
+        text: "^FNC1" + obj.fakeBody, // Text to encode
         height: obj.w * obj.min_size,
         width: obj.w * obj.min_size,
         parsefnc: true,
@@ -31,7 +31,7 @@ export const Barcode = observer(({ obj, add_canvas }) => {
     } else {
       let canvas = bwipjs.toCanvas("mycanvas" + obj.id + add_canvas, {
         bcid: obj.typeBarcode, // Barcode type
-        text: obj.body, // Text to encode
+        text: obj.fakeBody, // Text to encode
         height: obj.h,
         width: obj.w,
       });
@@ -61,7 +61,7 @@ export const Barcode = observer(({ obj, add_canvas }) => {
           }}
           className="barcode_body"
         >
-          {obj.body}
+          {obj.fakeBody}
         </p>
       ) : obj.human_readable === 2 ? (
         <p
@@ -70,7 +70,7 @@ export const Barcode = observer(({ obj, add_canvas }) => {
           }}
           className="barcode_body"
         >
-          {obj.body}
+          {obj.fakeBody}
         </p>
       ) : obj.human_readable === 3 ? (
         <p
@@ -79,7 +79,7 @@ export const Barcode = observer(({ obj, add_canvas }) => {
           }}
           className="barcode_body"
         >
-          {obj.body}
+          {obj.fakeBody}
         </p>
       ) : (
         <></>

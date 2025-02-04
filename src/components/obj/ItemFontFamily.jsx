@@ -13,7 +13,7 @@ export const ItemFontFamily = observer((props) => {
       style={{
         border:
           Object.prop_obj.style.fontFamily === props.font.name
-            ? "1px solid var(--mast-yellow)"
+            ? "1px solid var(--mast-blue-1)"
             : "",
       }}
       onClick={() => props.selectFontFamily(props.font)}

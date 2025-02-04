@@ -4,21 +4,9 @@ import { Barcode } from "./barcode/Barcode";
 import Object from "../store/Object";
 import { observer } from "mobx-react-lite";
 import keyboard from "../store/keyboard";
-import HistoryStore from "../store/HistoryStore";
 
 export const ThisLabel = observer(
   ({ objects, preview, add_canvas, setClsContainer, clsMM }) => {
-    const documentMouseUp = () => {
-      onMouseUpFunc();
-    };
-    const __mm = 3.60958;
-    const __cm = 36.5958;
-    useEffect(() => {
-      document.addEventListener("mouseup", documentMouseUp);
-      return () => {
-        document.removeEventListener("mouseup", documentMouseUp);
-      };
-    }, []);
     // Переменные размера этикетки (холста)
     const [canvasX, setCanvasX] = useState(null);
     const [canvasY, setCanvasY] = useState(null);
@@ -155,14 +143,13 @@ export const ThisLabel = observer(
     const onMouseDownFunc = (e) => {
       if (!preview && e.target.id !== "btn_size") {
         setCanvasX(lblRef.current.getBoundingClientRect().x);
-        console.log(canvasY);
         setCanvasY(lblRef.current.getBoundingClientRect().y);
         Object.getObject(e);
         const reg = Object.obj.target.id.replace(/\D/gm, "");
         Object.objects.forEach((active) => {
           if (active.id === Number(reg)) {
             if (!active.active) {
-              editBodyFunc(e);
+              // editBodyFunc(e);
               return;
             } else {
               editBodyFunc(e);
@@ -240,10 +227,9 @@ export const ThisLabel = observer(
           Object.getCoordXY();
           Object.getFlagEditSize(false);
           Object.saveAttributeWH();
-
           Object.deleteClone();
           Object.boxShadowObj();
-          HistoryStore.addHistory();
+          // HistoryStore.addHistory();
         }
       }
     };
@@ -274,6 +260,7 @@ export const ThisLabel = observer(
         >
           <React.StrictMode>
             <div
+              onMouseUp={onMouseUpFunc}
               onMouseMove={onMouseMoveFunc}
               // id="label"
               ref={lblRef}
@@ -294,7 +281,7 @@ export const ThisLabel = observer(
               ) : (
                 ""
               )}
-            {!preview ? (
+              {!preview ? (
                 <span className="label_reference_text_x">reference по - y</span>
               ) : (
                 ""
@@ -314,6 +301,9 @@ export const ThisLabel = observer(
                             "px"
                           : obj.typeObj === "box"
                           ? obj.pxW * Memory.mm * Memory.scale + "px"
+                          : obj.typeBarcode === "ean13" ||
+                            obj.typeBarcode === "code128"
+                          ? "auto"
                           : obj.pxW * Memory.mm * Memory.scale + "px",
                       height:
                         obj.typeBarcode === "datamatrix"

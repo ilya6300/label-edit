@@ -4,7 +4,7 @@
   border: 1px solid var(--mast-blue-1);
   padding: 3px 5px;
   border-radius: 4px;
-  color: #84827f;
+  color: #767574;
   transition: all 0.4s ease-in-out;
   /* margin-left: 25px; */
   padding: 4px 6px;
@@ -16,15 +16,18 @@
   border: 1px solid var(--mast-blue-1);
   padding: 3px 5px;
   border-radius: 4px;
-  color: white;
+  color: #767574;
   transition: all 0.4s ease-in-out;
   /* margin-left: 25px; */
   padding: 4px 6px;
 }
 .btn_ver_1:hover {
-  background: var(--mast-blue-1);
+  background: var(--mast-blue-1) !important;
   /* border: 1px solid var(--mast-blue-1); */
-  color: var(--mast-blue-1);
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+.btn_ver_1_activ:hover {
+  background: var(--mast-blue-1) !important;
 }
 .barlabel_number {
   width: 45px;
@@ -87,8 +90,8 @@
 }
 .my_btn_check_active_false_span {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   background: #acacac78;
   position: absolute;
   border-radius: 50%;
@@ -109,9 +112,9 @@
   margin: 0 8px 0 0;
   cursor: pointer;
   display: block;
-  width: 45px;
-  min-width: 45px;
-  height: 22px;
+  width: 40px;
+  min-width: 40px;
+  height: 20px;
   border: 2px solid var(--mast-blue-1);
   border-radius: 14px;
   box-shadow: 0 0 4px 1px var(--mast-blue-1);
@@ -120,8 +123,8 @@
 }
 .my_btn_check_active_true_span {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   background: var(--mast-blue-1);
   position: absolute;
   border-radius: 50%;

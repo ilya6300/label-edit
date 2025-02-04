@@ -1,4 +1,4 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable } from "mobx";
 import Fonts from "../store/Fonts";
 import Memory from "../store/Memory";
 import Templates from "../store/Templates";
@@ -139,13 +139,12 @@ class service {
   };
   // Получить шаблон по id
   getTemplatesID = async (id) => {
-    // console.log(id);
     this.templatesLoading = true;
     try {
       const res = await request.get(`form_labels/${id}`);
       Templates.preview_templates = res.data["data"];
       Templates.convertTemplatesForLabel();
-      console.log(res.data["data"]);
+      console.log(res.data);
       return res.data["data"];
     } catch (e) {
       console.error(e);
@@ -266,6 +265,7 @@ class service {
         },
       });
       Templates.setCodeTypeTemplate(res.data);
+      console.log(res.data);
       return res.data;
     } catch (e) {
       if (e.code === "ERR_NETWORK") {
@@ -333,6 +333,7 @@ class service {
   exportCodeTemplate = async (id) => {
     try {
       const res = await request(`trial_printing/get_template/${id}`);
+      console.log(res.data);
       return res.data;
     } catch (e) {
       console.error(e);

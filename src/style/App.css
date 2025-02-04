@@ -5,7 +5,8 @@
   justify-content: center;
 }
 input,
-textarea, select {
+textarea,
+select {
   outline: 0;
   resize: none;
 }
@@ -43,6 +44,4 @@ a {
 @import url("./templates.css");
 @import url("./error.css");
 @import url("./messages.css");
-
-
-
+@import url("./media.css");

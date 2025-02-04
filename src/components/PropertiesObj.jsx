@@ -6,6 +6,7 @@ import HistoryStore from "../store/HistoryStore";
 import { ListImg } from "./img_components/ListImg";
 import service from "../request/service";
 import Theme from "../store/Theme";
+import { MyBtnCheckActive } from "../UI/btn/MyBtnCheckActive";
 
 export const PropertiesObj = observer(
   ({ setFlagFonts, inputPropRef, setVarText }) => {
@@ -191,9 +192,7 @@ export const PropertiesObj = observer(
       ) {
         setValueH(e.target.value);
         Object.manualH(e.target.value);
-      } else if (
-        Object.prop_obj.typeObj === "lines"
-      ) {
+      } else if (Object.prop_obj.typeObj === "lines") {
         setValueH(e.target.value);
         Object.manualH(e.target.value);
       } else if (Object.prop_obj.typeBarcode === "datamatrix") {
@@ -383,7 +382,11 @@ export const PropertiesObj = observer(
         Object.prop_obj.typeObj !== "img" ? (
           <li className="prop_obj">
             {rotate ? (
-              <span ref={rotateRef} className="prop_obj_position" style={{background: Theme.background}}>
+              <span
+                ref={rotateRef}
+                className="prop_obj_position"
+                style={{ background: Theme.background }}
+              >
                 <span
                   className="prop_obj_position_span"
                   id="0"
@@ -584,8 +587,11 @@ export const PropertiesObj = observer(
             ) : (
               <></>
             )}
-
-            {Object.prop_obj.human_readable_visible ? (
+          <MyBtnCheckActive
+            active={Object.prop_obj.human_readable_visible}
+            onClick={visibleTextBarcodeFunc}
+          />
+            {/* {Object.prop_obj.human_readable_visible ? (
               <span
                 onClick={visibleTextBarcodeFunc}
                 className="my_chexbox-active"
@@ -597,7 +603,7 @@ export const PropertiesObj = observer(
                 className="my_chexbox"
                 style={{ right: 0 }}
               ></span>
-            )}
+            )} */}
           </li>
         ) : (
           <></>
@@ -618,11 +624,15 @@ export const PropertiesObj = observer(
         )}
         <li className="prop_obj">
           <span className="prop_obj_info">Активен</span>
-          {Object.prop_obj.active ? (
+          <MyBtnCheckActive
+            active={Object.prop_obj.active}
+            onClick={activeObjFunc}
+          />
+          {/* {Object.prop_obj.active ? (
             <span onClick={activeObjFunc} className="my_chexbox-active"></span>
           ) : (
             <span onClick={activeObjFunc} className="my_chexbox"></span>
-          )}
+          )} */}
         </li>
         {Object.prop_obj.typeObj === "img" ? (
           <>

@@ -1,0 +1,9 @@
+@media all and (max-width: 1100px) {
+  .barlabel_btn_container {
+    gap: 3px;
+  }
+  .btn_ver_1 {
+    padding: 3px 3px;
+    font-size: 12px;
+  }
+}

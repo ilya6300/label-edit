@@ -23,8 +23,12 @@ export const BarLabel = observer(
     setClsMM,
     clsMM,
     setImportC,
-    setPrinterSetting,
-    printerSetting,
+    setSetting,
+    setting,
+    // flagPrinter,
+    setFlagPrinter,
+    // flagApp,
+    setFlagApp,
   }) => {
     const [wValuse, setWValue] = useState(Memory.width_label);
     const [hValuse, setHValue] = useState(Memory.height_label);
@@ -244,27 +248,8 @@ export const BarLabel = observer(
       Templates.setNewTemplate(true);
     };
 
-    // Включить / отклюяить милимметровую сетку
-    const [clsMMBtn, setClsMMBtn] = useState("cls_mm-btn");
-    const onMM = () => {
-      if (clsMM === "none") {
-        setClsMMBtn("cls_mm-btn-active");
-        setClsMM(`linear-gradient(rgb(114 114 114 / 75%) 1px, transparent 1px),
-            linear-gradient(90deg, rgb(114 114 114 / 75%) 1px, transparent 1px),
-            linear-gradient(rgb(114 114 114) 1px, transparent 1px),
-            linear-gradient(90deg, rgb(114 114 114) 1px, white 1px)`);
-      } else {
-        setClsMMBtn("cls_mm-btn");
-        setClsMM("none");
-      }
-    };
-
     const changeDpi = (e) => {
       Memory.dpiChange(e.target.value);
-    };
-
-    const backStepHistory = () => {
-      HistoryStore.incrementReturnHistory();
     };
 
     const visibleImportC = () => {
@@ -277,7 +262,9 @@ export const BarLabel = observer(
         return alert("Сохраните шаблон или выберите из БД");
       }
       if (localStorage.getItem("printer") === null) {
-        return setPrinterSetting(true);
+        setFlagApp(false);
+        setFlagPrinter(true);
+        return setSetting(true);
       }
       const res = await service.trialPrint();
       if (res === undefined) return;
@@ -307,12 +294,7 @@ export const BarLabel = observer(
       e.target.value = null;
     };
 
-    const getPingPrint = async () => {
-      if (localStorage.getItem("printer") === null) {
-        return setPrinterSetting(true);
-      }
-      await service.pingPrinter();
-    };
+
 
     return (
       <div className="bar_label" style={{ border: Theme.theme_border }}>
@@ -321,7 +303,7 @@ export const BarLabel = observer(
           style={{ borderBottom: Theme.theme_border }}
         >
           {Templates.new_template ? (
-            <span style={{ width: "150px" }}>Новый шаблон</span>
+            <span className="new_name_blank_template">Новый шаблон</span>
           ) : (
             <>
               {!renameFlag ? (
@@ -340,8 +322,10 @@ export const BarLabel = observer(
                     onChange={handlerRename}
                   />
                   <BtnVer1
-                    // style={{ margin: "0", padding: "0" }}
                     onClick={renameTemplate}
+                    maxWidth="28px"
+                    maxHeight="28px"
+                    margin="0"
                   >
                     <span className="barlabel_rename_enter">&#8629;</span>
                   </BtnVer1>
@@ -354,12 +338,15 @@ export const BarLabel = observer(
               <>
                 {/* Редактор */}
                 <BtnVer1 onClick={newTemplateFunc}>Создать новый</BtnVer1>
-                <BtnVer1 onClick={openTemplates}>Шаблоны</BtnVer1>
+
                 <PostCompanent
                   valueName={valueName}
                   setValueName={setValueName}
                 />
-
+                <BtnVer1 onClick={openTemplates}>Шаблоны</BtnVer1>
+                <BtnVer1 onClick={visibleImportC}>
+                  Импорт кода (строками)
+                </BtnVer1>
                 <BtnVer1 onClick={reset}>Очистить текущий</BtnVer1>
                 <BtnVer1 flagPreview={flagPreview} onClick={preview}>
                   Предпросмотр
@@ -379,23 +366,43 @@ export const BarLabel = observer(
                 <BtnVer1 onClick={() => refCodeImport.current.click()}>
                   Импорт из файла
                 </BtnVer1>
-                <BtnVer1 onClick={visibleImportC}>
-                  Импорт кода (строками)
-                </BtnVer1>
               </>
             )}
-            <button
+            <BtnVer1 onClick={trialPrintFunc}>Пробная печать</BtnVer1>
+            {/* <button
               onClick={onMM}
               className={clsMMBtn}
               style={{ background: Theme.btn_background_black }}
             >
               #
-            </button>
-            <span
+            </button> */}
+            {/* <span
               className="btn_back_history"
               style={{ background: Theme.btn_background_black }}
               onClick={backStepHistory}
-            ></span>
+            ></span> */}
+            <div className="barlabel_container_printing">
+              {visibleCodeTemplateFlag ? (
+                <CodeTemplayModal
+                  setVisibleCodeTemplateFlag={setVisibleCodeTemplateFlag}
+                />
+              ) : (
+                <></>
+              )}
+              {/* <BtnVer1 onClick={getPingPrint}>Проверка связи</BtnVer1> */}
+
+              <img
+                onClick={() => setSetting(!setting)}
+                className="barlabel_setting_printer"
+                src={iconSettings}
+                alt="Настройки принтера"
+                style={{
+                  animation: setting
+                    ? "setting_printing_rotate 3s infinite linear"
+                    : "",
+                }}
+              />
+            </div>
             <BarInfo />
           </div>
         </div>
@@ -480,47 +487,6 @@ export const BarLabel = observer(
                 }}
               />
             </label>
-          </div>
-        </div>
-        <div
-          className="barlabel_container_suboptions"
-          style={{ borderTop: Theme.theme_border }}
-        >
-          <div className="barlabel_container_scale">
-            <span>Масштаб</span>
-            <input
-              type="range"
-              min="1"
-              max="4"
-              step="0.25"
-              value={Memory.scale}
-              onChange={(e) => Memory.setScaleLabel(e.target.value)}
-            />
-            <span>{Memory.scale * 100} %</span>
-          </div>
-          <div className="barlabel_container_printing">
-            {visibleCodeTemplateFlag ? (
-              <CodeTemplayModal
-                setVisibleCodeTemplateFlag={setVisibleCodeTemplateFlag}
-              />
-            ) : (
-              <></>
-            )}
-            <span>Действия с принтером</span>
-            <BtnVer1 onClick={getPingPrint}>Проверка связи</BtnVer1>
-            <BtnVer1 onClick={trialPrintFunc}>Пробная печать</BtnVer1>
-            <img
-              onClick={() => setPrinterSetting(!printerSetting)}
-              className="barlabel_setting_printer"
-              src={iconSettings}
-              alt="Настройки принтера"
-              style={{
-                animation: printerSetting
-                  ? "setting_printing_rotate 3s infinite linear"
-                  : "",
-                filter: Theme.black_theme ? "invert(1)" : "none",
-              }}
-            />
           </div>
         </div>
       </div>

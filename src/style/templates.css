@@ -61,16 +61,51 @@
   position: absolute;
   z-index: 3;
   top: 60px;
-  min-width: 400px;
+  min-width: 440px;
   border: 1px solid var(--mast-blue-1);
   border-radius: 8px;
   background: white;
+  overflow: hidden;
+  /* height: auto; */
+  /* animation: open_body_code_template 2s forwards ease; */
 }
 .modal_template_title_container {
   padding: 4px 10px;
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid var(--mast-blue-1);
+}
+
+.modal_template_body_visible > .modal_template_container {
+  /* animation: open_body_code_template 2s infinite ease; */
+}
+
+.modal_template_body_visible {
+  /* padding: 15px 10px; */
+  -webkit-user-select: auto;
+  width: 100%;
+  border: none;
+  height: 0 !important;
+  min-height: 1px !important;
+}
+.modal_template_body_hidden {
+  padding: 15px 10px;
+  /* animation: closed_body_code_template 0.5s forwards ease; */
+  -webkit-user-select: auto;
+  width: 100%;
+  border: none;
+  display: inline-table;
+  height: 100;
+  /* overflow: hidden; */
+}
+.modal_template_body_visible_start {
+  /* padding: 15px 10px; */
+  /* animation: closed_body_code_template 0.5s forwards ease; */
+  -webkit-user-select: auto;
+  width: 100%;
+  border: none;
+  height: 0 !important;
+  min-height: 1px !important;
 }
 .modal_template_btn:hover {
   cursor: pointer;
@@ -81,31 +116,15 @@
   color: var(--mast-blue-1);
   font-size: 11px;
 }
-.modal_template_body_visible {
-  height: 1px;
-  animation: closed_body_code_template 0.5s forwards ease;
-  overflow: hidden;
-  -webkit-user-select: auto;
-}
-.modal_template_body_hidden {
-  height: 1px;
-  padding: 1px 10px;
-  animation: open_body_code_template 0.5s forwards ease;
-  -webkit-user-select: text;
-}
-.modal_template_body_visible_start {
-  height: 1px;
-  overflow: hidden;
-}
 
 @keyframes open_body_code_template {
   0% {
-    height: 1px;
-    padding: 1px 10px;
+    height: 100%;
+    /* padding: 1px 10px; */
   }
   100% {
-    height: 100%;
-    padding: 15px 10px;
+    height: fit-content;
+    /* padding: 15px 10px; */
   }
 }
 @keyframes closed_body_code_template {

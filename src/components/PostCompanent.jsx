@@ -15,7 +15,7 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
     const post_objects = [];
     array.forEach((el) => {
       const obj = {
-        name: el.name,
+        name: el.typeBarcode !== "datamatrix" ? el.name : el.fakeBody,
         enabled: el.active,
         pos_x: Math.round(el.x * 100) / 100,
         pos_y: Math.round(el.y * 100) / 100,
@@ -370,7 +370,7 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
             : Memory.visiblePost(true)
         }
       >
-        {Templates.new_template ? "Сохранить новый" : "Сохранить " + valueName}
+        {Templates.new_template ? "Сохранить новый" : "Сохранить "}
       </BtnVer1>{" "}
       {Memory.visible_modal_post ? (
         <div

@@ -2,6 +2,7 @@ import { makeAutoObservable, toJS } from "mobx";
 import Memory from "./Memory";
 import Templates from "./Templates";
 import keyboard from "./keyboard";
+import HistoryStore from "./HistoryStore";
 
 class Object {
   constructor() {
@@ -52,10 +53,13 @@ class Object {
   getCoordClone = (x, canvasX, y, canvasY, lblRef) => {
     const ID = this.findID(true);
     if (ID) {
+      const old_x = ID.pxX;
+      const old_y = ID.pxY;
       if (ID.editSize || ID.editSizeW || ID.editSizeH) return;
       if (!ID.editSize) {
         if (!Memory.move_flag) return;
         // x
+
         if (
           x - canvasX - this.obj.nativeEvent.layerX > 0 &&
           lblRef.current.getBoundingClientRect().width - 3 >
@@ -82,8 +86,16 @@ class Object {
           ID.pxFakeY = ID.pxY;
         }
       }
+      if (!Memory.move_flag && old_x !== ID.pxX && old_y !== ID.pxY) {
+        console.log(
+          "old_x !== ID.pxX && old_y !== ID.pxY",
+          old_x !== ID.pxX && old_y !== ID.pxY
+        );
+        // HistoryStore.addHistory();
+      }
     }
   };
+
   //   Вычисление X и Y при перимещение
   getCoordXY = (collision) => {
     const ID = this.findID();
@@ -91,6 +103,7 @@ class Object {
       if (!Memory.move_flag) {
         return;
       }
+
       const clone = this.objects.find((f) => f.id === 9999);
       if (clone) {
         if (!collision) {
@@ -111,9 +124,13 @@ class Object {
   manualX = (coord) => {
     const ID = this.findID();
     if (ID) {
+      const old_x = ID.pxX;
       ID.pxX = coord;
       this.fakeCoord();
       ID.x = coord / Memory.mm;
+      if (old_x !== coord) {
+        // HistoryStore.addHistory();
+      }
     }
   };
   // Ручная смена Y координат
@@ -123,6 +140,7 @@ class Object {
       ID.pxY = coord;
       this.fakeCoord();
       ID.y = coord / Memory.mm;
+      // HistoryStore.addHistory();
     }
   };
   //Ручная смена ширины
@@ -136,6 +154,7 @@ class Object {
         ID.pxH = coord;
         ID.h = coord;
       }
+      HistoryStore.addHistory();
     }
   };
   //Ручная смена высоты
@@ -149,6 +168,7 @@ class Object {
         ID.w = coord;
       }
     }
+    HistoryStore.addHistory();
   };
   // Получение клоном ширины и высоты
   getAttributeClone = (x, y, lblRef) => {
@@ -237,12 +257,18 @@ class Object {
   saveAttributeWH = () => {
     const ID = this.findID();
     if (ID) {
+      const old_w = ID.w;
+      const old_h = ID.h;
       const clone = this.findID(true);
       if (clone) {
         ID.pxW = clone.pxW;
         ID.pxH = clone.pxH;
         ID.w = clone.w;
         ID.h = clone.h;
+
+        if (old_w !== clone.w || old_h !== clone.h) {
+          HistoryStore.addHistory();
+        }
       }
     }
   };
@@ -271,6 +297,7 @@ class Object {
         }
         this.editBodyPreview();
       }
+      HistoryStore.addHistory();
     }
   };
   editBodyPreview = async () => {
@@ -279,7 +306,7 @@ class Object {
     );
     const bloks = document.querySelectorAll(".bardcode_container-block");
 
-    bloks.forEach(async(b) => {
+    bloks.forEach(async (b) => {
       bloksPreview.forEach((bp) => {
         if (bp.id === b.id) {
           bp.innerHTML = b.innerHTML;
@@ -292,6 +319,7 @@ class Object {
     const ID = this.findID();
     if (ID && id !== undefined) {
       ID.image_id = id;
+      HistoryStore.addHistory();
     }
   };
   //   Изменить размер текста в боди
@@ -299,6 +327,7 @@ class Object {
     const ID = this.findID();
     if (ID && size !== undefined) {
       ID.style.fontSize = size;
+      HistoryStore.addHistory();
     }
   };
   //   Изменить толщину линии box
@@ -306,11 +335,15 @@ class Object {
     const ID = this.findID();
     if (ID && size !== undefined) {
       ID.line_thickness = size;
+      HistoryStore.addHistory();
     }
   };
   //   Добавить объект в массив
   addObj = (obj) => {
     this.objects = [...this.objects, obj];
+    if (obj.id !== 9999) {
+      HistoryStore.addHistory();
+    }
   };
   // Добавить объект в массив превью
   addObjPreiew = (obj) => {
@@ -319,6 +352,7 @@ class Object {
   // Сбросить массив превью
   resetPreiew = () => {
     this.objects_preview = [];
+    HistoryStore.addHistory();
   };
   //   Записать объект в prop_obj
   setPropObj = (obj) => {
@@ -348,6 +382,7 @@ class Object {
   deleteObject = () => {
     Memory.updateFlagVisibleObj(false);
     this.objects = this.objects.filter((o) => o.id !== this.prop_obj.id);
+    HistoryStore.addHistory();
     this.obj = null;
     Memory.updateFlagVisibleObj(true);
   };
@@ -360,6 +395,7 @@ class Object {
     if (ID) {
       ID.style.fontFamily = family.name;
       ID.font_family_id = family.id;
+      HistoryStore.addHistory();
     }
   };
   // Стартовая установка шрифта объекту
@@ -368,6 +404,7 @@ class Object {
     const ID = this.findID();
     if (ID) {
       ID.style.position = position;
+      HistoryStore.addHistory();
     }
   };
   //   Изменение позиции
@@ -393,6 +430,7 @@ class Object {
       if (ID.typeObj !== "lines") {
         this.fakeCoord();
       }
+      HistoryStore.addHistory();
     }
   };
   // Запись фековых координат
@@ -431,6 +469,7 @@ class Object {
           ID.pxFakeY = ID.pxY;
         }
       }
+      HistoryStore.addHistory();
     }
   };
   // Записать имя
@@ -438,6 +477,7 @@ class Object {
     const ID = this.findID();
     if (ID) {
       ID.name = name;
+      HistoryStore.addHistory();
     }
   };
   // Активировать или деактивировать объект
@@ -445,6 +485,7 @@ class Object {
     const ID = this.findID();
     if (ID) {
       ID.active = boolean;
+      HistoryStore.addHistory();
     }
   };
   // boxshadow
@@ -491,6 +532,7 @@ class Object {
     } else {
       ID.zIndex = 2;
     }
+    HistoryStore.addHistory();
   };
 
   humanReadable = (int) => {
@@ -504,6 +546,7 @@ class Object {
     const ID = this.findID();
     if (ID) {
       ID.human_readable_visible = boleean;
+      HistoryStore.addHistory();
     }
   };
 
@@ -523,6 +566,7 @@ class Object {
     const ID = this.findID();
     if (ID) {
       ID.borderRadius = int;
+      HistoryStore.addHistory();
     }
   };
 
@@ -530,7 +574,14 @@ class Object {
     const ID = this.findID();
     if (ID) {
       ID.defaultBody = boleean;
+      HistoryStore.addHistory();
     }
+  };
+
+  setMinSizeDM = async (value) => {
+    this.objects.forEach((o) => {
+      o.min_size = value;
+    });
   };
 
   download_objects = null;

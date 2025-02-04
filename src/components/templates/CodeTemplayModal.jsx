@@ -36,7 +36,9 @@ export const CodeTemplayModal = observer(({ setVisibleCodeTemplateFlag }) => {
 
   const copyTemplate = async () => {
     try {
-      await navigator.clipboard.writeText(Templates.code_type_template);
+      console.log(refBodyTemplate.current.select());
+      document.execCommand("copy");
+      // await navigator.clipboard.writeText(Templates.code_type_template);
     } catch (err) {
       console.error("Ошибка:", err);
     }
@@ -67,9 +69,11 @@ export const CodeTemplayModal = observer(({ setVisibleCodeTemplateFlag }) => {
           </span>
         </div>
       </div>
-      <div ref={refBodyTemplate} className={classBodyCode}>
+      {/* <div className="modal_template_container_code"> */}
+      <textarea ref={refBodyTemplate} className={classBodyCode}>
         {Templates.code_type_template}
-      </div>
+      </textarea>
+      {/* </div> */}
     </div>
   );
 });

@@ -33,7 +33,7 @@ export const AddContainer = observer(() => {
       defaultBody: true,
       pxX: 0,
       pxY: 0,
-      pxW: 12,
+      pxW: "fit-content",
       pxH: 6,
       pxFakeX: 0,
       pxFakeY: 0,
@@ -41,7 +41,7 @@ export const AddContainer = observer(() => {
       y: 0,
       body: "Текст",
       zIndex: 2,
-      w: 12,
+      w: "fit-content",
       h: 6,
       active: true,
       cls: ["bardcode_container-text "],
@@ -99,7 +99,7 @@ export const AddContainer = observer(() => {
   const addBarcode = (e) => {
     let barcode;
     let width;
-    
+
     if (e.target.id === "ean13") {
       barcode = "978020137962";
       width = 2;
@@ -129,6 +129,7 @@ export const AddContainer = observer(() => {
       pxH: 10,
       x: 0,
       y: 0,
+      fakeBody: barcode,
       body: barcode,
       zIndex: 2,
       w: width,

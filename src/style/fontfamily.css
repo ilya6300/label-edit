@@ -4,9 +4,10 @@
   margin: 4px 0 15px;
 }
 .item_font_family:hover {
-  color: var(--mast-yellow);
+  color: var(--mast-blue-1);
 }
 .list_font_family {
+  width: 220px;
   padding: 8px;
   overflow: auto;
 }
@@ -15,7 +16,7 @@
   font-size: 14px;
 }
 .prop_obj_font_family:hover {
-  color: var(--mast-yellow);
+  color: var(--mast-blue-1);
 }
 .process_loading_fonts {
   color: #8f8c8ce0;
@@ -33,17 +34,17 @@
   transition: all 0.5s ease-in;
   font-size: 13px;
   font-weight: 400;
-  border: 1px double var(--mast-yellow);
+  border: 1px double var(--mast-blue-1);
   padding: 4px 0;
   width: 85px;
   text-align: center;
   border-radius: 4px;
-  color: var(--mast-yellow);
+  color: var(--mast-blue-1);
 }
 .btn_add_font:hover {
   color: white;
-  background-color: var(--mast-yellow);
-  box-shadow: 0 1px 5px 1px var(--mast-yellow);
+  background-color: var(--mast-blue-1);
+  box-shadow: 0 1px 5px 1px var(--mast-blue-1);
 }
 .sample_font {
   border: var(--grey_border);

@@ -58,7 +58,7 @@ class Templates {
           typeObj: "text",
           pxX: el.pos_x * Memory.mm,
           pxY: el.pos_y * Memory.mm,
-          pxW: el.width,
+          pxW: "fit-content",
           pxH: el.height,
           pxFakeX:
             el.rotation === 90
@@ -76,7 +76,7 @@ class Templates {
           y: el.pos_y,
           body: el.data,
           zIndex: 2,
-          w: el.width,
+          w: "fit-content",
           h: el.height,
           active: el.enabled,
           cls: ["bardcode_container-text "],
@@ -85,8 +85,7 @@ class Templates {
             el.font_rel !== null ? el.font_id : Fonts.default_font.id,
           style: {
             fontSize: el.font_size,
-            fontFamily:
-              el.font_rel.name,
+            fontFamily: el.font_rel.name,
             rotate: el.rotation,
             boxShadow: "none",
           },
@@ -144,6 +143,7 @@ class Templates {
           const obj = {
             id: el.id,
             name: el.name,
+            fakeBody: el.name,
             min_size: el.radius,
             size: el.height,
             typeObj: "barcode",
@@ -202,6 +202,7 @@ class Templates {
             x: el.pos_x,
             y: el.pos_y,
             body: el.data,
+            fakeBody: el.data,
             zIndex: 2,
             w: el.width,
             h: el.height,
@@ -318,7 +319,7 @@ class Templates {
         Object.addObjPreiew(obj);
       }
     });
-    Memory.writeNameTemplate()
+    Memory.writeNameTemplate();
     Object.downloadObjects();
     setTimeout(() => {
       if (this.preview_templates.objects === undefined) {

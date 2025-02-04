@@ -3,9 +3,14 @@ import { PrinterSettings } from "./PrinterSettings";
 import Theme from "../../store/Theme";
 import { SettingsApp } from "./SettingsApp";
 
-export const Setting = () => {
-  const [flagApp, setFlagApp] = useState(true);
-  const [flagPrinter, setFlagPrinter] = useState(false);
+export const Setting = ({
+  flagPrinter,
+  setFlagPrinter,
+  flagApp,
+  setFlagApp,
+}) => {
+  // const [flagApp, setFlagApp] = useState(true);
+  // const [flagPrinter, setFlagPrinter] = useState(false);
 
   const switchTab = (appBoolean, printerBoolean) => {
     setFlagApp(appBoolean);

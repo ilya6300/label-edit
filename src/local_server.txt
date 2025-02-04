@@ -1,0 +1,9 @@
+Запуск приложения редактор этикеток на локальном компьютере, с возможностью достучаться до него по локальной сети.
+
+1. Установить NodeJS (node-v23.7.0-x64.msi) из архива или на оф. сайте https://nodejs.org/en/download/current
+2. На powershell cd путь до label-emulator-edit (включительно)
+3. npm install
+4. npm run build
+5. npm install -g serve
+7. serve -s build 
+8. Далее в адресной строке вводим network путь который будет отображён в powershell

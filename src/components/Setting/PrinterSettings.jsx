@@ -7,7 +7,7 @@ import service from "../../request/service";
 import Msg from "../../store/Msg";
 import Theme from "../../store/Theme";
 
-export const PrinterSettings = observer(() => {
+export const PrinterSettings = observer(({ setPrinterSetting }) => {
   useEffect(() => {
     if (localStorage.getItem("printer") === null) {
       const printer = {
@@ -192,6 +192,13 @@ export const PrinterSettings = observer(() => {
     }
   };
 
+  const getPingPrint = async () => {
+    if (localStorage.getItem("printer") === null) {
+      return setPrinterSetting(true);
+    }
+    await service.pingPrinter();
+  };
+
   const printCalibration = async () => {
     rewritPrinting();
     settingsPrinter.calibration = true;
@@ -205,7 +212,6 @@ export const PrinterSettings = observer(() => {
 
   return (
     <div className="setting_printing">
-      <p>tsc 10.76.8.42, godex 10.76.9.98</p>
       <div className="printer_setting_column_container">
         <ul className="printer_setting_column">
           <LabelPrintSettingRow
@@ -364,6 +370,7 @@ export const PrinterSettings = observer(() => {
           <div className="printer_setting_btn_action">
             <BtnVer1 onClick={checkSettingsPrinter}>Считать настройки</BtnVer1>
             <BtnVer1 onClick={printCalibration}>Калибровка</BtnVer1>
+            <BtnVer1 onClick={getPingPrint}>Проверка связи</BtnVer1>
           </div>
           <BtnVer1 onClick={savePrinter}>Сохранить</BtnVer1>
         </div>
