@@ -399,7 +399,7 @@ export const BarLabel = observer(
 						)}
 
 						<BtnVer1 onClick={codePrintFunc}>Код печати</BtnVer1>
-						<BtnVer1 onClick={examplePrintFunc}>Fake print</BtnVer1>
+						<BtnVer1 onClick={examplePrintFunc}>Пример печати</BtnVer1>
 						<BtnVer1 onClick={trialPrintFunc}>Пробная печать</BtnVer1>
 
 						{/* <button
