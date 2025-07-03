@@ -25,7 +25,7 @@ class service {
   // Получить все переменные
   getVar = async () => {
     try {
-      const res = await request.get("template_list/print_variables/");
+      const res = await request("template_list/print_variables/");
       Memory.varDateWrite(res.data);
     } catch (e) {
       console.error(e);
@@ -36,7 +36,7 @@ class service {
   getImages = async () => {
     this.imgLoading = true;
     try {
-      const res = await request.get(`images/`);
+      const res = await request(`images/`);
       if (res.data["data"].length !== 0) {
         this.images = res.data["data"]["response"];
         this.images.forEach((el) => {
@@ -170,7 +170,7 @@ class service {
   // Обновление параметров этикетки
   pathUpdateLabel = async (label) => {
     try {
-      const res = await request.patch(
+      await request.patch(
         `form_labels/label/` + Templates.preview_templates.id,
         label
       );
@@ -190,7 +190,7 @@ class service {
       data: { id_fields: objects },
     };
     try {
-      const res = await request(deleteData);
+      await request(deleteData);
     } catch (e) {
       console.error(e);
     }
@@ -264,9 +264,11 @@ class service {
           ),
         },
       });
-      Templates.setCodeTypeTemplate(res.data);
-      console.log(res.data);
-      return res.data;
+      if (res) {
+        Templates.setCodeTypeTemplate(res.data);
+        console.log(res.data);
+        return res.data;
+      }
     } catch (e) {
       if (e.code === "ERR_NETWORK") {
         Msg.writeMessages(

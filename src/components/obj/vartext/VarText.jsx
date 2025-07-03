@@ -19,7 +19,6 @@ export const VarText = ({ setVarText }) => {
   return (
     <ul className="editor_list_obj_container_prop" style={{ border: Theme.theme_border }}>
       <li className="add_obj-title" style={{ borderBottom: Theme.theme_border }}>
-        {" "}
         Переменные{" "}
         <span
           className="container_closed_btn"

@@ -113,7 +113,7 @@ export const Editor = observer(() => {
                     )}
                   </div>
                 )}
-                {/* <button
+                <button
                   style={{ width: "50px" }}
                   onClick={() =>
                     console.log(
@@ -133,7 +133,7 @@ export const Editor = observer(() => {
                   }
                 >
                   Check model
-                </button> */}
+                </button>
               </>
             ) : (
               <StartAddFonts />

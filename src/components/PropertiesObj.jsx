@@ -32,6 +32,10 @@ export const PropertiesObj = observer(
     useEffect(() => {
       document.addEventListener("mousedown", closedBlockTextPosition);
       document.addEventListener("mousedown", closedRotateBlock);
+      return () => {
+        document.removeEventListener("mousedown", closedBlockTextPosition);
+        document.removeEventListener("mousedown", closedRotateBlock);
+      };
     }, []);
     useEffect(() => {
       setNewName(Object.prop_obj.name);
@@ -587,23 +591,10 @@ export const PropertiesObj = observer(
             ) : (
               <></>
             )}
-          <MyBtnCheckActive
-            active={Object.prop_obj.human_readable_visible}
-            onClick={visibleTextBarcodeFunc}
-          />
-            {/* {Object.prop_obj.human_readable_visible ? (
-              <span
-                onClick={visibleTextBarcodeFunc}
-                className="my_chexbox-active"
-                style={{ right: 0 }}
-              ></span>
-            ) : (
-              <span
-                onClick={visibleTextBarcodeFunc}
-                className="my_chexbox"
-                style={{ right: 0 }}
-              ></span>
-            )} */}
+            <MyBtnCheckActive
+              active={Object.prop_obj.human_readable_visible}
+              onClick={visibleTextBarcodeFunc}
+            />
           </li>
         ) : (
           <></>
@@ -628,11 +619,6 @@ export const PropertiesObj = observer(
             active={Object.prop_obj.active}
             onClick={activeObjFunc}
           />
-          {/* {Object.prop_obj.active ? (
-            <span onClick={activeObjFunc} className="my_chexbox-active"></span>
-          ) : (
-            <span onClick={activeObjFunc} className="my_chexbox"></span>
-          )} */}
         </li>
         {Object.prop_obj.typeObj === "img" ? (
           <>
