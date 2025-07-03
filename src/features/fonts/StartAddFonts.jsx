@@ -45,7 +45,6 @@ export const StartAddFonts = () => {
 
   const saveDefaultFont = () => {
     saveFont(fileFont)
-
   };
 
   if (!begin) {

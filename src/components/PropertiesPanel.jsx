@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { PropertiesObj } from "./PropertiesObj";
 import { LayersObj } from "./LayersObj";
 import { observer } from "mobx-react-lite";
-import { FontsContainer } from "./obj/FontsContainer";
+import { FontsContainer } from "../features/fonts/FontsContainer";
 import { HistoryObj } from "./history/HistoryObj";
 import { VarText } from "./obj/vartext/VarText";
 import Object from "../store/Object";
