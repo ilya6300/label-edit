@@ -1,7 +1,7 @@
 import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
-import { BtnControl } from '../control/BtnControl'
+import { BtnControl } from '../features/control/BtnControl'
 import service from '../request/service'
 import Memory from '../store/Memory'
 import Object from '../store/Object'
