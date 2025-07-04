@@ -1,7 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useRef, useState } from 'react'
 import service from '../../request/service'
-import { BtnClose } from '../../shared/ui'
+import {
+	BtnAdd,
+	BtnClose,
+	Item,
+	ItemLabel,
+	ItemSection,
+	List,
+} from '../../shared/ui'
 import Object from '../../store/Object'
 import { ListFontFamily } from './ListFontFamily'
 
@@ -59,12 +66,15 @@ export const FontsContainer = observer(({ setFlagFonts }) => {
 	}
 
 	return (
-		<ul className='font-family-container'>
-			<li className='add_obj-title'>
-				Шрифты
-				<BtnClose onClick={() => setFlagFonts(false)} />
-			</li>
-
+		<List as='div'>
+			<Item as='div'>
+				<ItemSection>
+					<ItemLabel header>Шрифты</ItemLabel>
+				</ItemSection>
+				<ItemSection side>
+					<BtnClose onClick={() => setFlagFonts(false)} />
+				</ItemSection>
+			</Item>
 			{newFont ? (
 				<>
 					<li className='add_img_name_container-text'>
@@ -89,20 +99,22 @@ export const FontsContainer = observer(({ setFlagFonts }) => {
 					</li>
 				</>
 			) : (
-				<li className='list_font_family_new_font add_obj-title'>
-					<span className=''>Добавить шрифт</span>
-					<span className='container_add_btn' onClick={addFont}>
-						{' '}
+				<Item as='div'>
+					<ItemSection>
+						<ItemLabel header>Добавить шрифт</ItemLabel>
+					</ItemSection>
+					<ItemSection side>
+						<BtnAdd onClick={addFont} />
 						<input
 							ref={refInpFile}
 							onChange={selectedFont}
 							type='file'
 							className='hidden'
 						/>
-					</span>
-				</li>
+					</ItemSection>
+				</Item>
 			)}
 			<ListFontFamily selectFontFamily={closedFontsList} />
-		</ul>
+		</List>
 	)
 })

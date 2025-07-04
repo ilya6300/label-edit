@@ -11,7 +11,7 @@ export const Btn = ({
 	disabled,
 	text,
 	...props
-}) => {
+}: any) => {
 	return (
 		<button
 			className={cls(

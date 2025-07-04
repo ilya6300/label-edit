@@ -2,7 +2,8 @@ import { observer } from 'mobx-react-lite'
 import Fonts from '../../store/Fonts'
 import Object from '../../store/Object'
 import { ItemFontFamily } from './ItemFontFamily'
-import './style.css'
+
+import { List } from '../../shared/ui'
 
 export const ListFontFamily = observer(({ selectFontFamily }) => {
 	// Выбрать шрифт тектса
@@ -11,7 +12,11 @@ export const ListFontFamily = observer(({ selectFontFamily }) => {
 	}
 
 	return (
-		<ul className='font-family-list'>
+		<List
+			style={{
+				gap: 8,
+			}}
+		>
 			{Fonts.fonts.map(font => (
 				<ItemFontFamily
 					selectFontFamily={selectFontFamily}
@@ -20,6 +25,6 @@ export const ListFontFamily = observer(({ selectFontFamily }) => {
 					key={font.id}
 				/>
 			))}
-		</ul>
+		</List>
 	)
 })

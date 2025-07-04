@@ -1,0 +1,24 @@
+.mdc-stack {
+	--stack-gap: 0;
+	--stack-justify: flex-start;
+	display: flex;
+	flex-direction: column;
+	justify-content: var(--stack-justify, flex-start);
+	gap: var(--stack-gap, 0);
+}
+
+.mdc-stack--start {
+	--stack-justify: flex-start;
+}
+.mdc-stack--center {
+	--stack-justify: center;
+}
+.mdc-stack--end {
+	--stack-justify: flex-end;
+}
+.mdc-stack--around {
+	--stack-justify: space-around;
+}
+.mdc-stack--between {
+	--stack-justify: space-between;
+}

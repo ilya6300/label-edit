@@ -1,8 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
-import { cls } from '../../shared/utils'
+import { Item, ItemLabel, ItemSection } from '../../shared/ui'
 import Object from '../../store/Object'
-import './style.css'
 
 export const ItemFontFamily = observer(
 	({ font, selectFontFamily, hoverFontFamily }) => {
@@ -11,25 +10,25 @@ export const ItemFontFamily = observer(
 		}, [])
 
 		return (
-			<li
-				className={cls('font-family-item', {
-					'font-family-item--active':
-						Object.prop_obj.style.fontFamily === font.name,
-				})}
+			<Item
+				bordered
+				active={Object.prop_obj.style.fontFamily === font.name}
 				onClick={() => selectFontFamily(font)}
 				onMouseMove={() => hoverFontFamily(font)}
 			>
-				<div
-					className='font-family-item__font'
+				<ItemSection
 					style={{
 						fontFamily: font.name,
+						gap: 8,
 					}}
 				>
-					<span className='font-family-item__font-name'>{font.name}</span>
-					Это образец шрифта <br /> This is a sample font
-					<br /> 0123456789
-				</div>
-			</li>
+					<ItemLabel header>{font.name}</ItemLabel>
+					<ItemLabel>
+						Это образец шрифта <br /> This is a sample font
+						<br /> 0123456789
+					</ItemLabel>
+				</ItemSection>
+			</Item>
 		)
 	}
 )

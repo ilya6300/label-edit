@@ -1,8 +1,8 @@
-import { cls } from '../../utils/'
+import { cls } from '../../utils'
 import { Btn } from './Btn'
 import './style.css'
 
-export function BtnClose({ className, ...props }) {
+export function BtnClose({ className, ...props }: any) {
 	return (
 		<Btn
 			{...props}

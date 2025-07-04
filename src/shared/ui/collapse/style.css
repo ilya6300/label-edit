@@ -1,0 +1,21 @@
+.mdc-collapse {
+	display: grid;
+	grid-template-rows: 0fr;
+	position: relative;
+	transition: all 200ms ease-in-out;
+}
+.mdc-collapse-panel,
+.mdc-collapse-panel {
+	margin: 0;
+	padding: 0;
+}
+.mdc-collapse-panel {
+	overflow: hidden;
+	transition: all 200ms ease-in-out;
+}
+.mdc-collapse--active {
+	grid-template-rows: 1fr;
+}
+.mdc-collapse--active .mdc-collapse-content {
+	display: block;
+}

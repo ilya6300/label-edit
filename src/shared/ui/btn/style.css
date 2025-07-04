@@ -46,6 +46,8 @@
 .btn-content,
 .btn-loader {
 	display: flex;
+	align-items: center;
+	justify-content: center;
 	z-index: 10;
 }
 .btn-loader {
@@ -90,6 +92,15 @@
 	font-size: 17px;
 	transition: color 0.3s ease-in-out;
 }
-.btn--close:hover {
-	color: var(--mast-yellow);
+.btn--add::before {
+	content: '\271B';
+	font-size: 17px;
+	transition: color 0.3s ease-in-out;
+}
+
+.btn--close,
+.btn--add {
+	&:hover {
+		color: var(--color-hover);
+	}
 }

@@ -1,1 +1,7 @@
+:root {
+	--spacing: 0.25rem;
+	--color-secondary: #2196f3;
+	--color-active: #00f;
+	--color-hover: #f0b323;
+}
 @import './style/App.css';

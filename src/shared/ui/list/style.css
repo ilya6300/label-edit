@@ -1,0 +1,26 @@
+.mdc-list {
+	display: flex;
+	flex-direction: column;
+	overflow: auto;
+	--indent-padding: 0rem;
+}
+.mdc-list-items {
+	--parent-padding: var(--indent-padding, 0rem);
+}
+.mdc-list-items .mdc-list {
+	--indent-padding: calc(
+		var(--parent-padding, 0rem) + var(--spacing, 0.25rem) *
+			var(--padding-multiplier, 3)
+	);
+}
+.mdc-list--bordered {
+	border: 1px solid currentColor;
+}
+.mdc-list--separator {
+	.mdc-item:not(:first-child) {
+		border-top: 1px solid currentColor;
+	}
+	.mdc-item--opened + .mdc-list-items {
+		border-top: 1px solid currentColor;
+	}
+}

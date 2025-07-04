@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PrinterSettings } from "./PrinterSettings";
+import { PrinterSettings } from "../../features/setting/PrinterSettings";
 import Theme from "../../store/Theme";
 import { SettingsApp } from "./SettingsApp";
 

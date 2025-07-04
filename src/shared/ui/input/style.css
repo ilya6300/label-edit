@@ -1,0 +1,55 @@
+.mdc-input {
+	@apply rounded;
+	display: block;
+	width: 100%;
+	border: 1px solid currentColor;
+	padding: calc(3 * var(--spacing));
+	outline: none !important;
+	transition: all 200ms ease-in-out;
+	text-align: right;
+	background-color: color-mix(in srgb, currentColor, transparent 90%);
+	&:focus {
+		color: var(--color-active);
+	}
+	&:placeholder {
+		opacity: 0;
+		&:focus {
+			opacity: 100%;
+		}
+	}
+}
+.mdc-input--dense {
+	padding: 0;
+}
+.mdc-input--underline {
+	border-width: 0;
+	border-bottom-width: 1px;
+}
+.mdc-input__label {
+	pointer-events: none;
+	position: absolute;
+	left: calc(3 * var(--spacing));
+	top: 0;
+	margin-bottom: 0;
+	max-width: 90%;
+	transform-origin: 0 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding-top: calc(3 * var(--spacing));
+	transition: all 200ms ease-in-out;
+	opacity: 70%;
+}
+.mdc-input:focus + .mdc-input__label {
+	opacity: 100%;
+	color: var(--color-active);
+}
+.mdc-input:focus + .mdc-input__label,
+.mdc-input:not(:placeholder-shown) + .mdc-input__label {
+	scale: 0.8;
+	padding-top: calc(3.5 * var(--spacing));
+	translate: 0 -0.9rem;
+}
+.mdc-input__wrap {
+	position: relative;
+}

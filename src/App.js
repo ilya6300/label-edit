@@ -12,7 +12,14 @@ const App = observer(() => {
 	}, [])
 
 	return (
-		<div style={{ background: Theme.background }} className='App'>
+		<div
+			style={{ background: Theme.background }}
+			className='App'
+			style={{
+				width: '100vw',
+				padding: '0 1rem',
+			}}
+		>
 			<Editor />
 		</div>
 	)

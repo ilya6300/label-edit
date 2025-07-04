@@ -1,6 +1,6 @@
 const hasOwn = {}.hasOwnProperty
 
-function parseValue(arg) {
+function parseValue(arg: any): string | number {
 	if (typeof arg === 'string' || typeof arg === 'number') {
 		return arg
 	}
@@ -25,7 +25,7 @@ function parseValue(arg) {
 	return classes
 }
 
-function appendClass(val, newClass) {
+function appendClass(val: string, newClass: string | number): string {
 	if (!newClass) {
 		return val
 	}
@@ -37,6 +37,6 @@ function appendClass(val, newClass) {
 	return val + newClass
 }
 
-export function cls(...args) {
+export function cls(...args: any[]): string {
 	return args.reduce((acc, arg) => appendClass(acc, parseValue(arg)), '')
 }
