@@ -602,6 +602,176 @@ export const ImportCompanent = observer(
 			}
 		}
 
+		const importString = () => {
+			if (refTextImport.current.value < 10) {
+				return
+			}
+			ezplParse.parse(refTextImport.current.value)
+		}
+
+		const ezplParse = {
+			parse(str) {
+				const arr = str
+					.trim()
+					.split('^')
+					.map(v => String(v).trim())
+				arr.shift()
+				let i = 0
+				const count = arr.length
+				while (i < count) {
+					if (/^Q/.test(arr[i])) {
+						let s = arr[i].replace(/^Q/, '').split(',')
+						s[0] && Memory.heigthLabelChange(parseInt(s[0], 10))
+						s[1] && Memory.gapLabelChange(parseInt(s[1], 10))
+					} else if (/^H/.test(arr[i])) {
+						Memory.heigthLabelChange(parseInt(arr[i].replace(/^H/, ''), 10))
+					} else if (/^W/.test(arr[i])) {
+						Memory.heigthLabelChange(parseInt(arr[i].replace(/^W/, ''), 10))
+					} else if (/^R/.test(arr[i])) {
+						Memory.labelRefX(parseInt(arr[i].replace(/^R/, ''), 10))
+					} else if (/^L/.test(arr[i])) {
+						this.parseContent(arr[i].replace(/^L/, ''))
+					}
+					i++
+				} //*/
+			},
+			genObj() {
+				return {
+					id: createID(),
+					zIndex: 2,
+					active: true,
+					editSize: false,
+					editSizeW: false,
+					editSizeH: false,
+					cls: [],
+					clsPreview: '',
+					style: {
+						boxShadow: 'none',
+					},
+				}
+			},
+			parseContent(str) {
+				const lines = str.trim().split(/\n/)
+				const count = lines.length
+				let i = 0
+				while (i < count) {
+					let obj = this.genObj()
+					if (/^AT.?,/.test(lines[i])) {
+						this.textElement(obj, lines[i].replace(/^AT/, ''))
+					} else if (/^XRB/.test(lines[i])) {
+						this.datamatrixElement(
+							obj,
+							lines[i].replace(/^XRB/, ''),
+							lines[i + 1]
+						)
+						setSelectedDM(true)
+						i++
+					} else if (/^Y/.test(lines[i])) {
+						this.putbmpElement(obj, lines[i].replace(/^Y/, ''))
+					} else if (/^L/.test(lines[i])) {
+						this.barElement(obj, lines[i].replace(/^L/, ''))
+					}
+					lines[i] != 'E' && Object.addObj(obj)
+					i++
+				} //*/
+			},
+			textElement(obj, str) {
+				obj.name = 'text'
+				obj.typeObj = 'text'
+				obj.w = 'fit-content'
+				obj.h = 'fit-content'
+				obj.pxW = 'fit-content'
+				obj.pxH = 'fit-content'
+				obj.cls = ['bardcode_container-text ']
+				obj.clsPreview = 'bardcode_container-text-preview'
+				obj.style.fontFamily = Fonts.default_font.name
+
+				const arr = str.split(',').map(v => String(v).trim())
+
+				obj.x = arr[1] / Memory.dpi
+				obj.y = arr[2] / Memory.dpi
+				obj.style.rotate = arr[6]
+				obj.body = arr[9]
+
+				obj.pxFakeX = obj.x * Memory.mm
+				obj.pxX = obj.x * Memory.mm
+				obj.pxFakeY = obj.y * Memory.mm
+				obj.pxY = obj.y * Memory.mm
+			},
+			datamatrixElement(obj, str, body) {
+				obj.name = 'datamatrix'
+				obj.typeObj = 'barcode'
+				obj.typeBarcode = 'datamatrix'
+				const arr = str.trim().split(',')
+
+				obj.x = (parseInt(arr[0], 10) * Memory.mm) / Memory.dpi
+				obj.y = (parseInt(arr[1], 10) * Memory.mm) / Memory.dpi
+				obj.w = parseInt(arr[2].replace(/[^\d]/, ''), 10)
+				obj.h = obj.w
+				obj.style.rotate = parseInt(arr[3].replace(/[^\d]/, ''), 10)
+
+				obj.size = obj.w
+				obj.min_size = obj.w / Memory.dpi
+				obj.pxW = obj.w
+				obj.pxH = obj.h
+				obj.pxX = obj.x
+				obj.pxY = obj.y
+				obj.body = body
+				obj.fakeBody = fakeBodyDM
+			},
+			putbmpElement(obj, str) {
+				obj.name = 'img'
+				obj.typeObj = 'img'
+				obj.body = '#'
+				obj.id = 999
+				obj.w = 10
+				obj.h = 10
+				obj.pxW = 10
+				obj.pxH = 10
+				obj.cls = ['bardcode_container-barcode']
+				obj.clsPreview = 'bardcode_container-barcode-preview'
+				const arr = str.split(',').map(v => String(v).trim())
+
+				obj.x = (parseInt(arr[0], 10) * Memory.mm) / Memory.dpi
+				obj.y = (parseInt(arr[1], 10) * Memory.mm) / Memory.dpi
+				obj.pxX = obj.x
+				obj.pxY = obj.y
+				Msg.writeMessages(
+					'Изображение не загружено, пожалуйста, передобавьте его вручную.'
+				)
+			},
+			barElement(obj, str) {
+				obj.name = 'Линия'
+				obj.typeObj = 'bar'
+				obj.cls = ['bardcode_container-barcode']
+				obj.clsPreview = 'bardcode_container-barcode-preview'
+
+				const arr = str.split(',').map(v => String(v).trim())
+				console.log(arr)
+				obj.x = (parseInt(arr[1], 10) * Memory.mm) / Memory.dpi
+				obj.y = (parseInt(arr[2], 10) * Memory.mm) / Memory.dpi
+
+				const x = (parseInt(arr[4], 10) * Memory.mm) / Memory.dpi
+				const y = (parseInt(arr[5], 10) * Memory.mm) / Memory.dpi
+
+				obj.w = Math.abs(obj.x - x)
+				obj.h = Math.abs(obj.y - y)
+
+				obj.pxFakeX = obj.x
+				obj.pxFakeY = obj.y
+
+				obj.pxW = obj.w
+				obj.pxH = obj.h
+			},
+
+			regElement(str) {},
+			boxElement(str) {},
+			qrcodeElement(str) {},
+			blockElement(str) {},
+			regBodyElement(str) {},
+			regAttributeElement(str) {},
+		}
+
 		// Из файла
 		const txtRef = useRef()
 
@@ -632,7 +802,7 @@ export const ImportCompanent = observer(
 				></textarea>
 
 				<div className='import_container_btn_container'>
-					<BtnVer1 onClick={importStringTemplate}>Импортировать</BtnVer1>
+					<BtnVer1 onClick={importString}>Импортировать</BtnVer1>
 					<BtnVer1 onClick={() => setImportC(false)}>Закрыть </BtnVer1>
 					<BtnVer1 onClick={() => txtRef.current.click()}>
 						Из файла .txt{' '}
