@@ -1,0 +1,21 @@
+.mdc-group {
+	--group-gap: 0;
+	--group-justify: flex-start;
+	display: flex;
+	flex-direction: row;
+	justify-content: var(--group-justify, flex-start);
+	gap: var(--group-gap, 0);
+}
+
+.mdc-group--start {
+	--group-justify: flex-start;
+}
+.mdc-group--center {
+	--group-justify: center;
+}
+.mdc-group--end {
+	--group-justify: flex-end;
+}
+.mdc-group--between {
+	--group-justify: space-between;
+}

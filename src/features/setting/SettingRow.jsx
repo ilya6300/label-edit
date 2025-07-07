@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Btn, Input, Item, ItemSection } from '../../shared/ui'
 
 export const SettingRow = ({
-	name,
+	label,
 	type,
 	placeholder,
 	value,
@@ -13,7 +13,7 @@ export const SettingRow = ({
 	const [edit, setEdit] = useState(false)
 	return (
 		<Item dense>
-			<ItemSection>{name}</ItemSection>
+			<ItemSection>{label}</ItemSection>
 			{edit && editing ? (
 				<>
 					<ItemSection end>

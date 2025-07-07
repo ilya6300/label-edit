@@ -1,0 +1,30 @@
+.mdc-options {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+.mdc-options--inline {
+	flex-direction: row;
+	gap: 1rem;
+}
+.mdc-options__option {
+	flex: 1 1 auto;
+	display: flex;
+	gap: 0.5rem;
+	cursor: pointer;
+}
+.mdc-options__option,
+.mdc-options__option * {
+	transition: all 200ms ease-in-out;
+}
+
+.mdc-options__option--active {
+	color: var(--color-secondary);
+}
+
+.mdc-options__label {
+	cursor: pointer;
+}
+.mdc-options__input {
+	cursor: pointer;
+}

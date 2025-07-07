@@ -1,33 +1,17 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useState } from 'react'
+import { storeMessage } from '../../entites/messege/store'
 import { storePrinter } from '../../entites/printer/store'
 import service from '../../request/service'
 import Memory from '../../store/Memory'
-import Msg from '../../store/Msg'
 
-import { Btn, Stack } from '../../shared/ui'
+import { Btn, Group, List, Stack } from '../../shared/ui'
 import { SettingRow } from './SettingRow'
+import { SettingRowOptions } from './SettingRowOptions'
 
 export const PrinterSettings = observer(({ setPrinterSetting }) => {
 	const conf = storePrinter.getConfig()
 	useEffect(() => {
-		if (localStorage.getItem('printer') === null) {
-			const printer = {
-				host: '127.0.0.1',
-				port: 9100,
-				number_labels: 1,
-				type_printer: 'tspl',
-				printer_resolution: 300,
-				VERSION: '',
-				CODEPAGE: '',
-				DENSITY: '',
-				RIBBON: '',
-				SHIFT_X: '',
-				SHIFT_Y: '',
-				SPEED: '',
-			}
-			localStorage.setItem('printer', JSON.stringify(printer))
-		}
 		writeOptionsSettingsPrinter()
 	}, [])
 	const [host, setHost] = useState('')
@@ -58,9 +42,6 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 		setCountFlag(false)
 		setDensityFlag(false)
 	}
-	const selectTypePrinter = e => {
-		setTypePrinter(e.target.value)
-	}
 	const selectDpiPrinter = e => {
 		setPrinterResolution(e.target.value)
 	}
@@ -72,22 +53,19 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 		try {
 			const res = await service.getSettingsPrinter()
 			if (res === undefined) {
-				return Msg.writeMessages('Не удалось считать настройки')
+				return storeMessage.error('Не удалось считать настройки')
 			}
-			const printer = JSON.parse(localStorage.getItem('printer'))
-			console.log(res)
-			if (res.DPI !== undefined) {
-				printer.printer_resolution = res.DPI
-			} else {
-				printer.printer_resolution = 300
-			}
-			printer.VERSION = res.VERSION
-			printer.CODEPAGE = res.CODEPAGE
-			printer.SPEED = res.SPEED
-			printer.DENSITY = res.DENSITY
-			printer.SHIFT_X = res['SHIFT X']
-			printer.SHIFT_Y = res['SHIFT Y']
-			localStorage.setItem('printer', JSON.stringify(printer))
+
+			storePrinter.setConfig({
+				printer_resolution: res.DPI ?? 300,
+				VERSION: res.VERSION,
+				CODEPAGE: res.CODEPAGE,
+				SPEED: res.SPEED,
+				DENSITY: res.DENSITY,
+				SHIFT_X: res['SHIFT X'],
+				SHIFT_Y: res['SHIFT Y'],
+			})
+
 			writeOptionsSettingsPrinter()
 		} catch (e) {
 			console.error(e)
@@ -95,7 +73,7 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 	}
 
 	const writeOptionsSettingsPrinter = () => {
-		const printer = JSON.parse(localStorage.getItem('printer'))
+		const printer = storePrinter.getConfig()
 		setHost(printer.host)
 		setPort(printer.port)
 		setTypePrinter(printer.type_printer)
@@ -110,58 +88,49 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 	}
 
 	const settingsPrinter = {
-		host:
-			JSON.parse(localStorage.getItem('printer')) !== null
-				? JSON.parse(localStorage.getItem('printer')).host
-				: '',
-		port:
-			JSON.parse(localStorage.getItem('printer')) !== null
-				? JSON.parse(localStorage.getItem('printer')).port
-				: '',
-		type_printer:
-			JSON.parse(localStorage.getItem('printer')) !== null
-				? JSON.parse(localStorage.getItem('printer')).type_printer
-				: '',
+		host: storePrinter.host,
+		port: storePrinter.port,
+		type_printer: storePrinter.type_printer,
 	}
 
 	const rewritPrinting = () => {
-		const printer = JSON.parse(localStorage.getItem('printer'))
-		printer.host = host
-		printer.port = port
-		printer.number_labels = count
-		printer.type_printer = typePrinter
-		printer.printer_resolution = printerResolution
-		printer.DENSITY = density
-		printer.SHIFT_X = shiftX
-		printer.SHIFT_Y = shiftY
-		localStorage.setItem('printer', JSON.stringify(printer))
-		settingsPrinter.host = JSON.parse(localStorage.getItem('printer')).host
-		settingsPrinter.port = JSON.parse(localStorage.getItem('printer')).port
-		settingsPrinter.type_printer = JSON.parse(
-			localStorage.getItem('printer')
-		).type_printer
+		storePrinter.setConfig({
+			host,
+			port,
+			number_labels: count,
+			type_printer: typePrinter,
+			printer_resolution: printerResolution,
+			DENSITY: density,
+			SHIFT_X: shiftX,
+			SHIFT_Y: shiftY,
+		})
+
+		settingsPrinter.host = storePrinter.host
+		settingsPrinter.port = storePrinter.port
+		settingsPrinter.type_printer = storePrinter.type_printer
 	}
 
 	const savePrinter = async () => {
-		const printer = JSON.parse(localStorage.getItem('printer'))
-		const shift_X = printer.SHIFT_X
-		const shift_Y = printer.SHIFT_Y
+		const shift_X = storePrinter.SHIFT_X
+		const shift_Y = storePrinter.SHIFT_Y
 
-		const host_old = printer.host
-		const port_old = printer.port
-		const number_labels_old = printer.number_labels
-		const type_printer_old = printer.type_printer
-		const printer_resolution_old = printer.printer_resolution
+		const host_old = storePrinter.host
+		const port_old = storePrinter.port
+		const number_labels_old = storePrinter.number_labels
+		const type_printer_old = storePrinter.type_printer
+		const printer_resolution_old = storePrinter.printer_resolution
 
-		printer.host = host
-		printer.port = port
-		printer.number_labels = count
-		printer.type_printer = typePrinter
-		printer.printer_resolution = printerResolution
-		printer.DENSITY = density
-		printer.SHIFT_X = shiftX
-		printer.SHIFT_Y = shiftY
-		localStorage.setItem('printer', JSON.stringify(printer))
+		storePrinter.setConfig({
+			host,
+			port,
+			number_labels: count,
+			type_printer: typePrinter,
+			printer_resolution: printerResolution,
+			DENSITY: density,
+			SHIFT_X: shiftX,
+			SHIFT_Y: shiftY,
+		})
+
 		if (
 			host_old !== host ||
 			Number(port_old) !== Number(port) ||
@@ -169,7 +138,7 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 			type_printer_old !== typePrinter ||
 			Number(printer_resolution_old) !== Number(printerResolution)
 		) {
-			Msg.writeMessages('Настройки принтера успешно сохранены.')
+			storeMessage.success('Настройки принтера успешно сохранены.')
 		}
 		if (
 			Number(shift_X) !== Number(shiftX) ||
@@ -181,21 +150,21 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 			}
 			const res = await service.setSettingsPrinter(settingsPrinter)
 			if (!res) {
-				Msg.writeMessages(
+				storeMessage.error(
 					'Не удалось применить новые настройки. Ответ от принтера не получен. Возможные ошибки: 1. Неверные параметры настройки принтера, в редакторе этикеток. 2. Принтер выключен. 3. На принтере отсутствует подключение к локальной сети'
 				)
-				const printer = JSON.parse(localStorage.getItem('printer'))
-				printer.SHIFT_X = shift_X
-				printer.SHIFT_Y = shift_Y
-				localStorage.setItem('printer', JSON.stringify(printer))
+				storePrinter.setConfig({
+					SHIFT_X: shift_X,
+					SHIFT_Y: shift_Y,
+				})
 			} else {
-				Msg.writeMessages('Настройки смещения успешно сохранены.')
+				storeMessage.success('Настройки смещения успешно сохранены.')
 			}
 		}
 	}
 
 	const getPingPrint = async () => {
-		if (localStorage.getItem('printer') === null) {
+		if (!storePrinter.loadConfig()) {
 			return setPrinterSetting(true)
 		}
 		await service.pingPrinter()
@@ -206,7 +175,7 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 		settingsPrinter.calibration = true
 		const res = await service.setSettingsPrinter(settingsPrinter)
 		if (!res) {
-			Msg.writeMessages(
+			storeMessage.error(
 				'Не удалось применить новые настройки. Ответ от принтера не получен. Возможные ошибки: 1. Неверные параметры настройки принтера, в редакторе этикеток. 2. Принтер выключен. 3. На принтере отсутствует подключение к локальной сети'
 			)
 		}
@@ -214,12 +183,12 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 
 	return (
 		<div className='setting_printing'>
-			<div className='printer_setting_column_container'>
-				<ul className='printer_setting_column'>
+			<Group justify='center' style={{ width: '100%' }} gap='2rem'>
+				<List style={{ width: '100%', maxWidth: 450 }}>
 					<SettingRow
 						editing
 						type='text'
-						name='ip-адрес:'
+						label='ip-адрес:'
 						value={host}
 						onChange={e => setValue(e, setHost)}
 						onClick={() => setPrinterSettings('host', host)}
@@ -227,7 +196,7 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 					<SettingRow
 						editing
 						type='number'
-						name='Порт:'
+						label='Порт:'
 						value={port}
 						onChange={e => setValue(e, setPort)}
 						onClick={() => setPrinterSettings('port', port)}
@@ -235,102 +204,48 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 					<SettingRow
 						editing
 						type='number'
-						name='Кол-во:'
+						label='Кол-во:'
 						value={count}
 						onChange={e => setValue(e, setCount)}
 						onClick={() => setPrinterSettings('number_labels', count)}
 					/>
-
-					<li className='printer_setting_row'>
-						Тип принтера:
-						<div className='printer_setting_radio_btn_container'>
-							<label
-								className='printer_setting_radio_label'
-								style={{
-									color:
-										typePrinter === 'tspl' ? 'var(--mast-blue-1)' : '#8f8c8ce0',
-								}}
-							>
-								tspl
-								<input
-									checked={typePrinter === 'tspl' ? true : false}
-									className='printer_setting_radio_btn'
-									name='printer'
-									type='radio'
-									value='tspl'
-									onChange={selectTypePrinter}
-								/>
-							</label>
-							<label
-								style={{
-									color:
-										typePrinter === 'ezpl' ? 'var(--mast-blue-1)' : '#8f8c8ce0',
-								}}
-								className='printer_setting_radio_label'
-							>
-								ezpl
-								<input
-									checked={typePrinter === 'ezpl' ? true : false}
-									className='printer_setting_radio_btn'
-									name='printer'
-									type='radio'
-									value='ezpl'
-									onChange={selectTypePrinter}
-								/>
-							</label>
-						</div>
-					</li>
+					<SettingRowOptions
+						label='Тип принтера:'
+						value={typePrinter}
+						options={[
+							{
+								value: 'tspl',
+								label: 'tspl',
+							},
+							{
+								value: 'ezpl',
+								label: 'ezpl',
+							},
+						]}
+						onChange={setTypePrinter}
+					/>
 					{Memory.visible_printer_settings ? (
 						<>
-							<SettingRow />
-							<li className='printer_setting_row'>
-								dpi:
-								<div className='printer_setting_radio_btn_container'>
-									<label
-										className='printer_setting_radio_label'
-										style={{
-											color:
-												printerResolution == 200
-													? 'var(--mast-blue-1)'
-													: '#8f8c8ce0',
-										}}
-									>
-										200
-										<input
-											checked={printerResolution == 200 ? true : false}
-											className='printer_setting_radio_btn'
-											name='dpi'
-											type='radio'
-											value='200'
-											onChange={selectDpiPrinter}
-										/>
-									</label>
-									<label
-										className='printer_setting_radio_label'
-										style={{
-											color:
-												printerResolution == 300
-													? 'var(--mast-blue-1)'
-													: '#8f8c8ce0',
-										}}
-									>
-										300
-										<input
-											checked={printerResolution == 300 ? true : false}
-											className='printer_setting_radio_btn'
-											name='dpi'
-											type='radio'
-											value='300'
-											onChange={selectDpiPrinter}
-										/>
-									</label>
-								</div>
-							</li>
-							<SettingRow name='Версия ПО:' value={version} />
+							<SettingRowOptions
+								label='dpi:'
+								value={printerResolution}
+								options={[
+									{
+										value: 200,
+										label: '200',
+									},
+									{
+										value: 300,
+										label: '300',
+									},
+								]}
+								onChange={setPrinterResolution}
+							/>
+							<SettingRow label='Версия ПО:' value={version} />
 							<SettingRow
 								editing
 								type='number'
-								name='Смещение ТПГ по X:'
+								label='Смещение ТПГ по X:'
 								value={shiftX}
 								onChange={e => setValue(e, setShiftX)}
 								onClick={() => setPrinterSettings('SHIFT_X', shiftX)}
@@ -338,19 +253,19 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 							<SettingRow
 								editing
 								type='number'
-								name='Смещение ТПГ по Y:'
+								label='Смещение ТПГ по Y:'
 								value={shiftY}
 								onChange={e => setValue(e, setShiftY)}
 								onClick={() => setPrinterSettings('SHIFT_Y', shiftY)}
 							/>
-							<SettingRow name='Плотность печати:' value={density} />
-							<SettingRow name='Скорость печати:' value={speed} />
-							<SettingRow name='Страница кодировки:' value={codepage} />
+							<SettingRow label='Плотность печати:' value={density} />
+							<SettingRow label='Скорость печати:' value={speed} />
+							<SettingRow label='Страница кодировки:' value={codepage} />
 						</>
 					) : (
 						<></>
 					)}
-				</ul>
+				</List>
 				<Stack justify='between' style={{ width: 160, height: '100%' }}>
 					<Stack justify='start' gap='1rem'>
 						<Btn outline onClick={checkSettingsPrinter}>
@@ -367,7 +282,7 @@ export const PrinterSettings = observer(({ setPrinterSetting }) => {
 						Сохранить
 					</Btn>
 				</Stack>
-			</div>
+			</Group>
 		</div>
 	)
 })

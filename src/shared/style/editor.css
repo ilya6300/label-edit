@@ -441,7 +441,7 @@
 .printer_setting_column {
 	width: 100%;
 	max-width: 450px;
-	height: 355px;
+	height: 365px;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;

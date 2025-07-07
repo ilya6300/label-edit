@@ -1,3 +1,5 @@
+const name = 'printer'
+
 class Printer {
 	config = {
 		host: '127.0.0.1',
@@ -24,7 +26,7 @@ class Printer {
 			return true
 		}
 		try {
-			const config = localStorage.getItem('config.printer')
+			const config = localStorage.getItem(name)
 			if (config) {
 				this.config = JSON.parse(config)
 				this.loaded = true
@@ -53,7 +55,7 @@ class Printer {
 	}
 	saveConfig() {
 		try {
-			localStorage.setItem('config.printer', JSON.stringify(this.config))
+			localStorage.setItem(name, JSON.stringify(this.config))
 			this.loaded = true
 		} catch (e) {
 			console.log(e)
