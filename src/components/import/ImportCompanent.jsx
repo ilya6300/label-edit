@@ -606,10 +606,14 @@ export const ImportCompanent = observer(
 			if (refTextImport.current.value < 10) {
 				return
 			}
-			ezplParse.parse(refTextImport.current.value)
+			if (/\^Q/.test(refTextImport.current.value)) {
+				ezplParser.parse(refTextImport.current.value)
+			} else {
+				importStringTemplate()
+			}
 		}
 
-		const ezplParse = {
+		const ezplParser = {
 			parse(str) {
 				const arr = str
 					.trim()
@@ -643,8 +647,8 @@ export const ImportCompanent = observer(
 					editSize: false,
 					editSizeW: false,
 					editSizeH: false,
-					cls: [],
-					clsPreview: '',
+					cls: ['bardcode_container-barcode'],
+					clsPreview: 'bardcode_container-barcode-preview',
 					style: {
 						boxShadow: 'none',
 					},
@@ -666,8 +670,15 @@ export const ImportCompanent = observer(
 						)
 						setSelectedDM(true)
 						i++
+					} else if (/^W/.test(lines[i])) {
+						this.qrcodeElement(obj, lines[i].replace(/^W/, ''), lines[i + 1])
+						i++
 					} else if (/^Y/.test(lines[i])) {
 						this.putbmpElement(obj, lines[i].replace(/^Y/, ''))
+					} else if (/^BE/.test(lines[i])) {
+						this.barcodeElementEAN13(obj, lines[i].replace(/^BE/, ''))
+					} else if (/^BQ/.test(lines[i])) {
+						this.barcodeElementCode128(obj, lines[i].replace(/^BQ/, ''))
 					} else if (/^L/.test(lines[i])) {
 						this.barElement(obj, lines[i].replace(/^L/, ''))
 					}
@@ -682,8 +693,6 @@ export const ImportCompanent = observer(
 				obj.h = 'fit-content'
 				obj.pxW = 'fit-content'
 				obj.pxH = 'fit-content'
-				obj.cls = ['bardcode_container-text ']
-				obj.clsPreview = 'bardcode_container-text-preview'
 				obj.style.fontFamily = Fonts.default_font.name
 
 				const arr = str.split(',').map(v => String(v).trim())
@@ -728,8 +737,6 @@ export const ImportCompanent = observer(
 				obj.h = 10
 				obj.pxW = 10
 				obj.pxH = 10
-				obj.cls = ['bardcode_container-barcode']
-				obj.clsPreview = 'bardcode_container-barcode-preview'
 				const arr = str.split(',').map(v => String(v).trim())
 
 				obj.x = (parseInt(arr[0], 10) * Memory.mm) / Memory.dpi
@@ -742,34 +749,106 @@ export const ImportCompanent = observer(
 			},
 			barElement(obj, str) {
 				obj.name = 'Линия'
-				obj.typeObj = 'bar'
-				obj.cls = ['bardcode_container-barcode']
-				obj.clsPreview = 'bardcode_container-barcode-preview'
+				obj.typeObj = 'lines'
+				obj.style.rotate = 0
 
 				const arr = str.split(',').map(v => String(v).trim())
-				console.log(arr)
-				obj.x = (parseInt(arr[1], 10) * Memory.mm) / Memory.dpi
-				obj.y = (parseInt(arr[2], 10) * Memory.mm) / Memory.dpi
 
-				const x = (parseInt(arr[4], 10) * Memory.mm) / Memory.dpi
-				const y = (parseInt(arr[5], 10) * Memory.mm) / Memory.dpi
+				const p1 = [
+					parseInt(arr[1], 10) / Memory.dpi,
+					parseInt(arr[2], 10) / Memory.dpi,
+				]
+				const p2 = [
+					parseInt(arr[4], 10) / Memory.dpi,
+					parseInt(arr[5], 10) / Memory.dpi,
+				]
 
-				obj.w = Math.abs(obj.x - x)
-				obj.h = Math.abs(obj.y - y)
+				obj.x = Math.min(p1[0], p2[0])
+				obj.y = Math.min(p1[1], p2[1])
 
-				obj.pxFakeX = obj.x
-				obj.pxFakeY = obj.y
+				const x = Math.max(p1[0], p2[0])
+				const y = Math.max(p1[1], p2[1])
+
+				const dx = Math.abs(x - obj.x)
+				const dy = Math.abs(y - obj.y)
+
+				obj.w = y === 0 || dy === 0 ? dx : parseInt(arr[3], 10) / Memory.dpi
+				obj.h = x === 0 || dx === 0 ? dy : parseInt(arr[3], 10) / Memory.dpi
+
+				obj.pxX = obj.x * Memory.mm
+				obj.pxY = obj.y * Memory.mm
 
 				obj.pxW = obj.w
 				obj.pxH = obj.h
 			},
+			barcodeElement(obj, str, type) {
+				const arr = str.split(',').map(v => String(v).trim())
 
-			regElement(str) {},
-			boxElement(str) {},
-			qrcodeElement(str) {},
-			blockElement(str) {},
-			regBodyElement(str) {},
-			regAttributeElement(str) {},
+				obj.x = parseInt(arr[1], 10) / Memory.dpi
+				obj.y = parseInt(arr[2], 10) / Memory.dpi
+
+				obj.w = parseInt(arr[4], 10)
+				obj.h = parseInt(arr[5], 10) / Memory.dpi
+
+				obj.human_readable = parseInt(arr[7], 10)
+				obj.human_readable =
+					obj.human_readable === 1 || obj.human_readable === 2
+						? 1
+						: obj.human_readable === 3 || obj.human_readable === 4
+						? 2
+						: obj.human_readable === 5 || obj.human_readable === 6
+						? 3
+						: 0
+				obj.style.rotate = parseInt(arr[6], 10)
+				obj.style.position = 'left'
+				obj.body = arr[8]
+
+				obj.pxFakeX = obj.x * Memory.mm
+				obj.pxX = obj.x * Memory.mm
+				obj.pxFakeY = obj.y * Memory.mm
+				obj.pxY = obj.y * Memory.mm
+				obj.pxH = Math.round(obj.h)
+			},
+			barcodeElementEAN13(obj, str) {
+				obj.name = 'barcode'
+				obj.typeObj = 'barcode'
+				obj.typeBarcode = 'ean13'
+				obj.human_readable_visible = false
+				obj.fakeBody = '978020137962'
+				this.barcodeElement(obj, str, 'EAN13')
+			},
+			barcodeElementCode128(obj, str) {
+				obj.name = 'barcode'
+				obj.typeObj = 'barcode'
+				obj.typeBarcode = 'code128'
+				obj.human_readable_visible = false
+				obj.fakeBody = 'barcode046037210206'
+				this.barcodeElement(obj, str, '128')
+			},
+			qrcodeElement(obj, str, body) {
+				obj.name = 'qrcode'
+				obj.typeObj = 'barcode'
+				obj.typeBarcode = 'qrcode'
+				obj.w = 10
+				obj.h = 10
+				obj.pxW = 10
+				obj.pxH = 10
+
+				const arr = str.split(',').map(v => String(v).trim())
+
+				obj.x = parseInt(arr[0], 10) / Memory.dpi
+				obj.y = parseInt(arr[1], 10) / Memory.dpi
+				obj.style.rotate = parseInt(arr[8], 10)
+
+				obj.pxFakeX = obj.x * Memory.mm
+				obj.pxX = obj.x * Memory.mm
+
+				obj.pxFakeY = obj.y * Memory.mm
+				obj.pxY = obj.y * Memory.mm
+
+				obj.body = body
+				obj.fakeBody = 'barcode046037210206'
+			},
 		}
 
 		// Из файла
