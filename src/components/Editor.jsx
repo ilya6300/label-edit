@@ -18,7 +18,6 @@ import { Loader } from './Loader'
 import { BrowserNotSupported } from './messages/BrowserNotSupported'
 import { ContainerPostDownloader } from './messages/ContainerPostDownloader'
 import { ExchangeWithServer } from './messages/ExchangeWithServer'
-import { MessagesContainer } from './messages/MessagesContainer'
 import { ServerError } from './ServerError'
 import { Setting } from './Setting/Setting'
 import { GetTemplate } from './templates/GetTemplate'
@@ -47,7 +46,6 @@ export const Editor = observer(() => {
 	if (!browserNotSupportedFlag) {
 		return (
 			<div className='editor_container'>
-				<MessagesContainer />
 				{Memory.exchange ? <ExchangeWithServer /> : <></>}
 				<BtnControl />
 				{!service.fontsLoading && !service.errorNetwork ? (
