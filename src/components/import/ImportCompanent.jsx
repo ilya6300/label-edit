@@ -10,11 +10,54 @@ import Theme from '../../store/Theme'
 export const ImportCompanent = observer(
 	({ setImportC, selectedDM, setSelectedDM }) => {
 		const refTextImport = useRef()
+		const parseSplit = str => {
+			return str
+				.trim()
+				.split(',')
+				.map(v => v.trim())
+		}
+		const setDirection = (x, y) => {
+			if (x < 0 || x > 1) {
+				throw new Error(
+					`Неверное значение значение derection по x-координате. Допускается 0 или 1. Вы аытаетесь записать значение ${x} в шаблон`
+				)
+			}
+			if (y < 0 || y > 1) {
+				throw new Error(
+					`Неверное значение значение derection по y-координате. Допускается 0 или 1. Вы аытаетесь записать значение ${y} в шаблон`
+				)
+			}
+			Memory.labelDirection1(x)
+			//Memory.labelDirection2(y);
+		}
+		const setSize = (w, h) => {
+			if (w < 15 || w > 150) {
+				throw new Error(
+					`Неверное значение ширины. Нижний порог ширины 15мм, верхний 150мм. Вы пытаетесь записать значение ${w}`
+				)
+			}
+			if (h < 15 || h > 400) {
+				throw new Error(
+					`Неверное значение высоты. Нижний порог высоты 15мм, верхний 150мм. Вы пытаетесь записать значение ${h}`
+				)
+			}
+			Memory.widthLabelChange(w)
+			Memory.heigthLabelChange(h)
+		}
+		const setGap = (x, y) => {
+			if (x < 0 || x > 30) {
+				throw new Error(`Неверное значение gap.`)
+			}
+			Memory.gapLabelChange(x)
+		}
+		const setReference = (x, y) => {
+			Memory.labelRefX(x)
+			Memory.labelRefY(y)
+		}
 
 		const removeSpace = string => {
 			return string.replace(/ |mm/g, '')
 		}
-
 		const regAttributeLabel = (string, flagTwo) => {
 			if (!flagTwo) {
 				const regString = new RegExp(`${string}\\d*`)
@@ -521,71 +564,7 @@ export const ImportCompanent = observer(
 		}
 
 		const importStringTemplate = () => {
-			if (refTextImport.current.value < 10) {
-				return
-			}
 			try {
-				if (refTextImport.current.value.match('SIZE')) {
-					// Атрибуты этикетки
-					if (
-						regAttributeLabel('DIRECTION') < 0 ||
-						regAttributeLabel('DIRECTION') > 1
-					) {
-						return Msg.writeMessages(
-							`Неверное значение значение derection по x-координате. Допускается 0 или 1. Вы аытаетесь записать значение ${regAttributeLabel(
-								'DIRECTION'
-							)} в шаблон`
-						)
-					} else {
-						Memory.labelDirection1(regAttributeLabel('DIRECTION'))
-					}
-					if (
-						regAttributeLabel('DIRECTION') < 0 ||
-						regAttributeLabel('DIRECTION') > 1
-					) {
-						return Msg.writeMessages(
-							`Неверное значение значение derection по y-координате. Допускается 0 или 1. Вы аытаетесь записать значение ${regAttributeLabel(
-								'DIRECTION'
-							)} в шаблон`
-						)
-					}
-					// else {
-					//   Memory.labelDirection2(regAttributeLabel("DIRECTION", true));
-					// }
-					if (
-						regAttributeLabel('SIZE') < 15 ||
-						regAttributeLabel('SIZE') > 150
-					) {
-						return Msg.writeMessages(
-							`Неверное значение ширины. Нижний порог ширины 15мм, верхний 150мм. Вы пытаетесь записать значение ${regAttributeLabel(
-								'SIZE'
-							)}`
-						)
-					} else {
-						Memory.widthLabelChange(regAttributeLabel('SIZE'))
-					}
-					if (
-						regAttributeLabel('SIZE', true) < 15 ||
-						regAttributeLabel('SIZE', true) > 400
-					) {
-						return Msg.writeMessages(
-							`Неверное значение высоты. Нижний порог высоты 15мм, верхний 150мм. Вы пытаетесь записать значение ${regAttributeLabel(
-								'SIZE',
-								true
-							)}`
-						)
-					} else {
-						Memory.heigthLabelChange(regAttributeLabel('SIZE', true))
-					}
-					if (regAttributeLabel('GAP') < 0 || regAttributeLabel('GAP') > 30) {
-						return Msg.writeMessages(`Неверное значение gap.}`)
-					} else {
-						Memory.gapLabelChange(regAttributeLabel('GAP'))
-					}
-					Memory.labelRefX(regAttributeLabel('REFERENCE'))
-					// Memory.labelRefY(regAttributeLabel("REFERENCE", true));
-				}
-
 				// Объекты
 				const elemets = new RegExp(
 					`DMATRIX.*|TEXT.*|BLOCK.*|EAN13.*|CODE128.*|QRCODE.*|PUTBMP.*|BOX.*|BAR.*`,
@@ -606,14 +585,161 @@ export const ImportCompanent = observer(
 			if (refTextImport.current.value < 10) {
 				return
 			}
-			if (/\^Q/.test(refTextImport.current.value)) {
-				ezplParser.parse(refTextImport.current.value)
-			} else {
-				importStringTemplate()
+			try {
+				if (ezplParser.test(refTextImport.current.value)) {
+					ezplParser.parse(refTextImport.current.value)
+				} else if (tsplParser.test(refTextImport.current.value)) {
+					tsplParser.parse(refTextImport.current.value)
+				}
+			} catch (e) {
+				console.log(e)
+				Msg.writeMessages(e.message)
 			}
 		}
 
+		const tsplParser = {
+			test(str) {
+				return true
+			},
+			genObj() {
+				return {
+					id: createID(),
+					zIndex: 2,
+					active: true,
+					editSize: false,
+					editSizeW: false,
+					editSizeH: false,
+					cls: ['bardcode_container-barcode'],
+					clsPreview: 'bardcode_container-barcode-preview',
+					style: {
+						boxShadow: 'none',
+					},
+				}
+			},
+			parse(str) {
+				const lines = str
+					.trim()
+					.split(/\n/)
+					.map(v => String(v).trim())
+				console.log(lines)
+				lines.forEach(line => {
+					if (/^DIRECTION/.test(line)) {
+						this.parseDirection(line.replace(/^DIRECTION/, ''))
+					} else if (/^SIZE/.test(line)) {
+						this.parseSize(line.replace(/^SIZE/, ''))
+					} else if (/^GAP/.test(line)) {
+						this.parseGap(line.replace(/^GAP/, ''))
+					} else if (/^REFERENCE/.test(line)) {
+						this.parseReference(line.replace(/^REFERENCE/, ''))
+					} else if (/^DMATRIX/.test(line)) {
+						this.parseDmatrix(line.replace(/^DMATRIX/, ''))
+					} else if (/^TEXT/.test(line)) {
+						this.parseText(line.replace(/^TEXT/, ''))
+					}
+				})
+			},
+			parseDirection(str) {
+				const arr = parseSplit(str).map(v => Number(v.trim()))
+				setDirection(...arr)
+			},
+			parseSize(str) {
+				const arr = parseSplit(str).map(v => parseInt(v, 10))
+				setSize(...arr)
+			},
+			parseGap(str) {
+				const arr = parseSplit(str).map(v => parseInt(v, 10))
+				setGap(...arr)
+			},
+			parseReference(str) {
+				const arr = parseSplit(str).map(v => parseInt(v, 10))
+				setReference(...arr)
+			},
+			parseDmatrix(str) {
+				const arr = parseSplit(str)
+				const obj = this.genObj()
+				obj.name = 'datamatrix'
+				obj.typeObj = 'barcode'
+				obj.typeBarcode = 'datamatrix'
+
+				obj.x = parseInt(arr[0], 10) / Memory.dpi
+				obj.y = parseInt(arr[1], 10) / Memory.dpi
+
+				obj.pxX = obj.x
+				obj.pxY = obj.y
+				// obj.w = parseInt(arr[2], 10);
+				if (/^x/.test(arr[5])) {
+					obj.w = parseInt(arr[5].replace(/^x/, ''), 10)
+				} else {
+					obj.w = 6
+				}
+				if (/^r/.test(arr[6])) {
+					obj.style.rotate = parseInt(arr[6], 10) || 0
+				}
+
+				obj.h = obj.w
+				obj.size = obj.w
+				obj.min_size = obj.w / Memory.dpi
+				obj.pxW = obj.w
+				obj.pxH = obj.h
+
+				obj.body = arr[8].replace(/^"/, '').replace(/"$/, '')
+				obj.fakeBody = fakeBodyDM
+				Object.addObj(obj)
+				setSelectedDM(true)
+			},
+
+			parseText(str) {
+				const arr = parseSplit(str)
+				console.log(arr, parseInt(arr[2], 10))
+				const obj = this.genObj()
+				obj.name = 'text'
+				obj.typeObj = 'text'
+				obj.w = 'fit-content'
+				obj.h = 'fit-content'
+				obj.pxW = 'fit-content'
+				obj.pxH = 'fit-content'
+				obj.style.fontFamily = Fonts.default_font.name
+
+				obj.x = parseInt(arr[0], 10) / Memory.dpi
+				obj.y = parseInt(arr[1], 10) / Memory.dpi
+				obj.w = 12
+				obj.h = 6
+
+				obj.pxFakeX = obj.x * Memory.mm
+				obj.pxX = obj.x * Memory.mm
+				obj.pxFakeY = obj.y * Memory.mm
+				obj.pxY = obj.y * Memory.mm
+				obj.font_family_id = Fonts.default_font.id
+				obj.pxW = obj.w
+				obj.pxH = obj.h
+				obj.fontFamily = '0'
+				Msg.writeMessages(
+					'В шаблоне будет использоваться шрифт принетра по умолчанию. Если хотите изменить шрифт в текстовом элементе, выберите нужный шрифт вручную, в свойствах элемента.'
+				)
+
+				obj.style.rotate = parseInt(arr[3], 10)
+				obj.body = arr[6].replace(/^"/, '').replace(/"$/, '')
+
+				if (parseInt(arr[2], 10) === 2) {
+					obj.style.fontSize = 7
+				} else if (parseInt(arr[2], 10) === 0) {
+					obj.style.fontSize = 12
+				} else if (parseInt(arr[2], 10) === 1) {
+					obj.style.fontSize = 6
+				} else if (parseInt(arr[2], 10) === 3) {
+					obj.style.fontSize = 8
+				} else if (parseInt(arr[2], 10) === 4) {
+					obj.style.fontSize = 12
+				}
+
+				Object.addObj(obj)
+			},
+		}
+
 		const ezplParser = {
+			test(str) {
+				return /\^Q/.test(str)
+			},
 			parse(str) {
 				const arr = str
 					.trim()
@@ -655,7 +781,10 @@ export const ImportCompanent = observer(
 				}
 			},
 			parseContent(str) {
-				const lines = str.trim().split(/\n/)
+				const lines = str
+					.trim()
+					.split(/\n/)
+					.map(v => String(v).trim())
 				const count = lines.length
 				let i = 0
 				while (i < count) {
