@@ -54,6 +54,7 @@ export const ImportCompanent = observer(
 			Memory.labelRefX(x)
 			Memory.labelRefY(y)
 		}
+		const removeQuote = str => str.replace(/^"/, '').replace(/"$/, '')
 
 		const removeSpace = string => {
 			return string.replace(/ |mm/g, '')
@@ -601,7 +602,7 @@ export const ImportCompanent = observer(
 			test(str) {
 				return true
 			},
-			genObj() {
+			genObj(def = {}) {
 				return {
 					id: createID(),
 					zIndex: 2,
@@ -614,6 +615,7 @@ export const ImportCompanent = observer(
 					style: {
 						boxShadow: 'none',
 					},
+					...def,
 				}
 			},
 			parse(str) {
@@ -635,6 +637,18 @@ export const ImportCompanent = observer(
 						this.parseDmatrix(line.replace(/^DMATRIX/, ''))
 					} else if (/^TEXT/.test(line)) {
 						this.parseText(line.replace(/^TEXT/, ''))
+					} else if (/^BLOCK/.test(line)) {
+						this.parseBlock(line.replace(/^BLOCK/, ''))
+					} else if (/^BARCODE/.test(line)) {
+						this.parseBarcode(line.replace(/^BARCODE/, ''))
+					} else if (/^QRCODE/.test(line)) {
+						this.parseQrcode(line.replace(/^QRCODE/, ''))
+					} else if (/^PUTBMP/.test(line)) {
+						this.parsePutbmp(line.replace(/^PUTBMP/, ''))
+					} else if (/^BOX/.test(line)) {
+						this.parseBox(line.replace(/^BOX/, ''))
+					} else if (/^BAR/.test(line)) {
+						this.parseBar(line.replace(/^BAR/, ''))
 					}
 				})
 			},
@@ -656,16 +670,17 @@ export const ImportCompanent = observer(
 			},
 			parseDmatrix(str) {
 				const arr = parseSplit(str)
-				const obj = this.genObj()
-				obj.name = 'datamatrix'
-				obj.typeObj = 'barcode'
-				obj.typeBarcode = 'datamatrix'
+				const obj = this.genObj({
+					name: 'datamatrix',
+					typeObj: 'barcode',
+					typeBarcode: 'datamatrix',
+				})
 
 				obj.x = parseInt(arr[0], 10) / Memory.dpi
 				obj.y = parseInt(arr[1], 10) / Memory.dpi
 
-				obj.pxX = obj.x
-				obj.pxY = obj.y
+				obj.pxX = obj.x * Memory.mm
+				obj.pxY = obj.y * Memory.mm
 				// obj.w = parseInt(arr[2], 10);
 				if (/^x/.test(arr[5])) {
 					obj.w = parseInt(arr[5].replace(/^x/, ''), 10)
@@ -682,22 +697,22 @@ export const ImportCompanent = observer(
 				obj.pxW = obj.w
 				obj.pxH = obj.h
 
-				obj.body = arr[8].replace(/^"/, '').replace(/"$/, '')
+				obj.body = removeQuote(arr[8])
 				obj.fakeBody = fakeBodyDM
 				Object.addObj(obj)
 				setSelectedDM(true)
 			},
-
 			parseText(str) {
 				const arr = parseSplit(str)
-				console.log(arr, parseInt(arr[2], 10))
-				const obj = this.genObj()
-				obj.name = 'text'
-				obj.typeObj = 'text'
-				obj.w = 'fit-content'
-				obj.h = 'fit-content'
-				obj.pxW = 'fit-content'
-				obj.pxH = 'fit-content'
+				const obj = this.genObj({
+					name: 'text',
+					typeObj: 'text',
+					w: 'fit-content',
+					h: 'fit-content',
+					pxW: 'fit-content',
+					pxH: 'fit-content',
+				})
+
 				obj.style.fontFamily = Fonts.default_font.name
 
 				obj.x = parseInt(arr[0], 10) / Memory.dpi
@@ -718,7 +733,7 @@ export const ImportCompanent = observer(
 				)
 
 				obj.style.rotate = parseInt(arr[3], 10)
-				obj.body = arr[6].replace(/^"/, '').replace(/"$/, '')
+				obj.body = removeQuote(arr[6])
 
 				if (parseInt(arr[2], 10) === 2) {
 					obj.style.fontSize = 7
@@ -731,6 +746,200 @@ export const ImportCompanent = observer(
 				} else if (parseInt(arr[2], 10) === 4) {
 					obj.style.fontSize = 12
 				}
+
+				Object.addObj(obj)
+			},
+			parseBlock(str) {
+				const arr = parseSplit(str)
+				const obj = this.genObj({
+					name: 'block',
+					typeObj: 'block',
+					cls: ['bardcode_container-block'],
+					clsPreview: 'bardcode_container-block-preview',
+				})
+				obj.style.fontFamily = Fonts.default_font.name
+
+				obj.x = parseInt(arr[0], 10) / Memory.dpi
+				obj.y = parseInt(arr[1], 10) / Memory.dpi
+
+				obj.w = parseInt(arr[2], 10) / Memory.dpi
+				obj.h = parseInt(arr[3], 10) / Memory.dpi
+
+				obj.pxX = obj.x * Memory.mm
+				obj.pxY = obj.y * Memory.mm
+				obj.pxW = obj.w
+				obj.pxH = obj.h
+
+				obj.pxFakeX = obj.x
+				obj.pxFakeY = obj.y * Memory.mm
+				obj.font_family_id = Fonts.default_font.id
+				obj.fontFamily = '0'
+				Msg.writeMessages(
+					'В шаблоне будет использоваться шрифт принетра по умолчанию. Если хотите изменить шрифт в текстовом элементе, выберите нужный шрифт вручную, в свойствах элемента.'
+				)
+
+				switch (parseInt(arr[5], 10)) {
+					case 1:
+						obj.style.rotate = 90
+						break
+					case 2:
+						obj.style.rotate = 180
+						break
+					case 3:
+						obj.style.rotate = 270
+						break
+					default:
+						obj.style.rotate = 0
+				}
+				obj.style.position = arr[9]
+
+				switch (parseInt(arr[4], 10)) {
+					case 1:
+						obj.style.fontSize = 6
+						break
+					case 2:
+						obj.style.fontSize = 7
+						break
+					case 3:
+						obj.style.fontSize = 8
+						break
+					default:
+						obj.style.fontSize = 12
+				}
+				obj.body = removeQuote(arr[11])
+				Object.addObj(obj)
+			},
+			parseBarcode(str) {
+				const arr = parseSplit(str)
+				const obj = this.genObj({
+					name: 'barcode',
+					typeObj: 'barcode',
+				})
+				if (str.match(/EAN13/)) {
+					obj.typeBarcode = 'ean13'
+					obj.fakeBody = '978020137962'
+				} else if (str.match(/128/)) {
+					obj.typeBarcode = 'code128'
+					obj.fakeBody = 'barcode046037210206'
+				} else {
+					throw new Error('Найдена ошибка в типе barcode')
+				}
+
+				obj.x = parseInt(arr[0], 10) / Memory.dpi
+				obj.y = parseInt(arr[1], 10) / Memory.dpi
+				obj.h = parseInt(arr[3], 10) / Memory.dpi
+				obj.human_readable = parseInt(arr[4], 10)
+				obj.human_readable_visible = obj.human_readable > 0
+				obj.style.position = parseInt(arr[4], 10)
+				obj.style.rotate = parseInt(arr[5], 10)
+				obj.w = parseInt(arr[6], 10)
+
+				obj.pxX = obj.x * Memory.mm
+				obj.pxY = obj.y * Memory.mm
+				obj.pxFakeX = obj.x * Memory.mm
+				obj.pxFakeY = obj.y * Memory.mm
+				obj.pxW = obj.w
+				obj.pxH = Math.round(obj.h)
+				obj.body = removeQuote(arr[8])
+				Object.addObj(obj)
+			},
+			parseQrcode(str) {
+				const arr = parseSplit(str)
+				const obj = this.genObj({
+					name: 'qrcode',
+					typeObj: 'barcode',
+					typeBarcode: 'qrcode',
+					cls: ['bardcode_container-barcode'],
+					clsPreview: 'bardcode_container-barcode-preview',
+					w: 10,
+					h: 10,
+					pxW: 10,
+					pxH: 10,
+				})
+
+				obj.x = parseInt(arr[0], 10) / Memory.dpi
+				obj.y = parseInt(arr[1], 10) / Memory.dpi
+
+				obj.style.rotate = parseInt(arr[5], 10)
+
+				obj.pxX = obj.x * Memory.mm
+				obj.pxY = obj.y * Memory.mm
+
+				obj.pxFakeX = obj.x * Memory.mm
+				obj.pxFakeY = obj.y * Memory.mm
+
+				obj.body = removeQuote(arr[8])
+
+				obj.fakeBody = 'barcode046037210206'
+				Object.addObj(obj)
+			},
+			parsePutbmp(str) {
+				const arr = parseSplit(str)
+				const obj = this.genObj({
+					name: 'img',
+					typeObj: 'img',
+					cls: ['bardcode_container-barcode'],
+					clsPreview: 'bardcode_container-barcode-preview',
+					body: '#',
+					id: 999,
+					w: 10,
+					h: 10,
+					pxW: 10,
+					pxH: 10,
+				})
+
+				obj.x = (parseInt(arr[0], 10) * Memory.mm) / Memory.dpi
+				obj.y = (parseInt(arr[1], 10) * Memory.mm) / Memory.dpi
+
+				obj.pxX = obj.x
+				obj.pxY = obj.y
+
+				Msg.writeMessages(
+					'Изображение не загружено, пожалуйста, передобавьте его вручную.'
+				)
+
+				Object.addObj(obj)
+			},
+			parseBox(str) {
+				const arr = parseSplit(str)
+				const obj = this.genObj({
+					name: 'Бокс',
+					typeObj: 'box',
+					cls: ['bardcode_container-barcode'],
+					clsPreview: 'bardcode_container-barcode-preview',
+				})
+				obj.x = (parseInt(arr[0], 10) * Memory.mm) / Memory.dpi
+				obj.y = (parseInt(arr[1], 10) * Memory.mm) / Memory.dpi
+				obj.w = parseInt(arr[2], 10) / Memory.dpi
+				obj.h = parseInt(arr[3], 10) / Memory.dpi
+				obj.line_thickness = parseInt(arr[4], 10)
+				obj.borderRadius = parseInt(arr[5], 10)
+
+				obj.pxX = obj.x
+				obj.pxY = obj.y
+				obj.pxW = obj.w
+				obj.pxH = obj.h
+
+				Object.addObj(obj)
+			},
+			parseBar(str) {
+				const arr = parseSplit(str)
+				const obj = this.genObj({
+					name: 'Бокс',
+					typeObj: 'box',
+					cls: ['bardcode_container-barcode'],
+					clsPreview: 'bardcode_container-barcode-preview',
+				})
+
+				obj.x = (parseInt(arr[0], 10) * Memory.mm) / Memory.dpi
+				obj.y = (parseInt(arr[1], 10) * Memory.mm) / Memory.dpi
+				obj.w = parseInt(arr[2], 10) / Memory.dpi
+				obj.h = parseInt(arr[3], 10) / Memory.dpi
+
+				obj.pxFakeX = obj.x
+				obj.pxFakeY = obj.y
+				obj.pxW = obj.w
+				obj.pxH = obj.h
 
 				Object.addObj(obj)
 			},
