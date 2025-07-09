@@ -91,6 +91,9 @@
 	max-width: 100%;
 	font-family: inherit;
 }
+.mdc-item__section--row {
+	flex-direction: row;
+}
 .mdc-item__section--main {
 	flex: 1;
 }

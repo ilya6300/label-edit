@@ -4,7 +4,6 @@ import { ListVatText } from './ListVatText'
 
 export const VarText = ({ setVarText }) => {
 	const selectVar = e => {
-		console.log(e, Object.prop_obj.defaultBody)
 		if (Object.prop_obj.defaultBody) {
 			Object.editBody(e.data)
 			Object.setDefaultBodyBolean(false)

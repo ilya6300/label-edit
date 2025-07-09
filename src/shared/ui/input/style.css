@@ -52,4 +52,6 @@
 }
 .mdc-input__wrap {
 	position: relative;
+	display: block;
+	width: 100%;
 }

@@ -1,14 +1,18 @@
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
-import service from '../request/service'
-import HistoryStore from '../store/HistoryStore'
-import Memory from '../store/Memory'
-import Object from '../store/Object'
-import Theme from '../store/Theme'
-import { MyBtnCheckActive } from '../UI/btn/MyBtnCheckActive'
-import { ListImg } from './img_components/ListImg'
+import { ListImg } from '../../components/img_components/ListImg'
+import service from '../../request/service'
+import HistoryStore from '../../store/HistoryStore'
+import Memory from '../../store/Memory'
+import Object from '../../store/Object'
+import Theme from '../../store/Theme'
 
-export const PropertiesObj = observer(
+import { List } from '../../shared/ui'
+import { ItemEditable } from './ItemEditable'
+import { ItemField } from './ItemField'
+import { ItemOptions } from './ItemOptions'
+
+export const ListProperties = observer(
 	({ setFlagFonts, inputPropRef, setVarText }) => {
 		// Переменные свойств
 		const [valueX, setValueX] = useState(Object.prop_obj.x)
@@ -283,150 +287,134 @@ export const PropertiesObj = observer(
 		}
 
 		return (
-			<ul className='list_props'>
-				{!nameFlag ? (
-					<li onClick={saveNewName} className='prop_obj'>
-						<span className='prop_obj_info'>Имя: </span>
-						{Object.prop_obj.name}
-					</li>
-				) : (
-					<li className='prop_obj'>
-						<input
-							value={newName}
-							onChange={e => setNewName(e.target.value)}
-							placeholder='введите имя'
-							className='prop_obj_new_name'
-							type='text'
-						/>
-						<span className='btn_ok_new_name' onClick={saveNewName}>
-							ок
-						</span>
-					</li>
-				)}
+			<List dense>
+				<ItemEditable
+					editable
+					label='Имя:'
+					value={newName}
+					placeholder='введите имя'
+					type='text'
+					onChange={e => setNewName(e.target.value)}
+					onClick={saveNewName}
+				/>
 				{Object.prop_obj.typeBarcode === 'ean13' ||
 				Object.prop_obj.typeBarcode === 'code128' ? (
-					<li className='prop_obj'>{Object.prop_obj.typeBarcode}</li>
+					<ItemEditable label={Object.prop_obj.typeBarcode} />
 				) : (
 					<></>
 				)}
-				<li className='prop_obj'>
-					<span className='prop_obj_info'>Ширина:</span>{' '}
-					{Object.prop_obj.w !== 'fit-content' ? (
-						<>
-							{' '}
-							<input
-								className='input_coord_prop_obj'
-								type='number'
-								value={
-									Object.prop_obj.w !== ''
-										? Math.round(Object.prop_obj.w * 100) / 100
-										: ''
-								}
-								onChange={rewriteManualW}
-							/>{' '}
-							мм
-						</>
-					) : (
-						'Нет'
-					)}
-				</li>
-				<li className='prop_obj'>
-					<span className='prop_obj_info'>Высота:</span>{' '}
-					{Object.prop_obj.w !== 'fit-content' ? (
-						<>
-							<input
-								className='input_coord_prop_obj'
-								type='number'
-								value={
-									Object.prop_obj.h !== ''
-										? Math.round(Object.prop_obj.h * 100) / 100
-										: ''
-								}
-								onChange={rewriteManualH}
-							/>{' '}
-							мм
-						</>
-					) : (
-						'Нет'
-					)}
-				</li>
-				<li className='prop_obj'>
-					<span className='prop_obj_info'>X:</span>
-					<input
-						className='input_coord_prop_obj'
-						type='number'
-						value={
-							Object.prop_obj.x >= 0
-								? Math.round(Object.prop_obj.x * 100) / 100
-								: ''
-						}
-						onChange={rewriteManualX}
-					/>
-					мм
-				</li>
-				<li className='prop_obj'>
-					<span className='prop_obj_info'>Y:</span>{' '}
-					<input
-						className='input_coord_prop_obj'
-						type='number'
-						value={
-							Object.prop_obj.y >= 0
-								? Math.round(Object.prop_obj.y * 100) / 100
-								: ''
-						}
-						onChange={rewriteManualY}
-					/>
-					мм
-				</li>
+				<ItemField
+					edit={Object.prop_obj.w !== 'fit-content'}
+					label='Ширина:'
+					type='number'
+					value={
+						Object.prop_obj.w !== ''
+							? Math.round(Object.prop_obj.w * 100) / 100
+							: ''
+					}
+					unit='mm'
+					onChange={rewriteManualW}
+				/>
+				<ItemField
+					edit={Object.prop_obj.w !== 'fit-content'}
+					label='Высота:'
+					type='number'
+					value={
+						Object.prop_obj.h !== ''
+							? Math.round(Object.prop_obj.h * 100) / 100
+							: ''
+					}
+					unit='mm'
+					onChange={rewriteManualH}
+				/>
+
+				<ItemField
+					edit
+					label='X:'
+					type='number'
+					value={
+						Object.prop_obj.x >= 0
+							? Math.round(Object.prop_obj.x * 100) / 100
+							: ''
+					}
+					unit='mm'
+					onChange={rewriteManualX}
+				/>
+				<ItemField
+					edit
+					label='Y:'
+					type='number'
+					value={
+						Object.prop_obj.y >= 0
+							? Math.round(Object.prop_obj.y * 100) / 100
+							: ''
+					}
+					unit='mm'
+					onChange={rewriteManualY}
+				/>
+
 				{Object.prop_obj.typeObj !== 'box' &&
 				Object.prop_obj.typeObj !== 'img' ? (
-					<li className='prop_obj'>
-						{rotate ? (
-							<span
-								ref={rotateRef}
-								className='prop_obj_position'
-								style={{ background: Theme.background }}
-							>
+					<>
+						<ItemOptions
+							label='Поворот:'
+							unit='%'
+							optiuons={[
+								{ value: 0 },
+								{ value: 90 },
+								{ value: 180 },
+								{ value: 270 },
+							]}
+							value={Math.round(Object.prop_obj.style.rotate)}
+						/>
+						<li className='prop_obj'>
+							{rotate ? (
 								<span
-									className='prop_obj_position_span'
-									id='0'
-									onClick={rotateFunc}
+									ref={rotateRef}
+									className='prop_obj_position'
+									style={{ background: Theme.background }}
 								>
-									0
-								</span>{' '}
-								<span
-									className='prop_obj_position_span'
-									id='90'
-									onClick={rotateFunc}
-								>
-									90
-								</span>{' '}
-								<span
-									className='prop_obj_position_span'
-									id='180'
-									onClick={rotateFunc}
-								>
-									180
-								</span>{' '}
-								<span
-									className='prop_obj_position_span'
-									id='270'
-									onClick={rotateFunc}
-								>
-									270
+									<span
+										className='prop_obj_position_span'
+										id='0'
+										onClick={rotateFunc}
+									>
+										0
+									</span>{' '}
+									<span
+										className='prop_obj_position_span'
+										id='90'
+										onClick={rotateFunc}
+									>
+										90
+									</span>{' '}
+									<span
+										className='prop_obj_position_span'
+										id='180'
+										onClick={rotateFunc}
+									>
+										180
+									</span>{' '}
+									<span
+										className='prop_obj_position_span'
+										id='270'
+										onClick={rotateFunc}
+									>
+										270
+									</span>
 								</span>
+							) : (
+								<></>
+							)}
+							<span className='prop_obj_info'>Поворот:</span>
+							<span
+								className='prop_obj_info_modal'
+								onClick={() => setRotate(true)}
+							>
+								{Math.round(Object.prop_obj.style.rotate)} %
 							</span>
-						) : (
-							<></>
-						)}
-						<span className='prop_obj_info'>Поворот:</span>
-						<span
-							className='prop_obj_info_modal'
-							onClick={() => setRotate(true)}
-						>
-							{Math.round(Object.prop_obj.style.rotate)} %
-						</span>
-					</li>
+						</li>
+					</>
 				) : (
 					<></>
 				)}
@@ -481,16 +469,14 @@ export const PropertiesObj = observer(
 				{Object.prop_obj.typeObj === 'text' ||
 				Object.prop_obj.typeObj === 'block' ? (
 					<>
-						{' '}
-						<li className='prop_obj'>
-							<span className='prop_obj_info'>Размер :</span>
-							<input
-								className='prop_obj_font_size'
-								type='number'
-								value={fontSize}
-								onChange={updateFontSizeFunc}
-							/>
-						</li>
+						<ItemField
+							edit
+							label='Размер:'
+							type='number'
+							value={fontSize}
+							onChange={updateFontSizeFunc}
+						/>
+
 						{Object.prop_obj.typeObj !== 'box' ? (
 							<li className='prop_obj'>
 								Шрифт:{' '}
@@ -587,23 +573,23 @@ export const PropertiesObj = observer(
 						) : (
 							<></>
 						)}
-						<MyBtnCheckActive
+						{/*******<MyBtnCheckActive
 							active={Object.prop_obj.human_readable_visible}
 							onClick={visibleTextBarcodeFunc}
-						/>
+						/>*/}
 						{/* {Object.prop_obj.human_readable_visible ? (
-              <span
-                onClick={visibleTextBarcodeFunc}
-                className="my_chexbox-active"
-                style={{ right: 0 }}
-              ></span>
-            ) : (
-              <span
-                onClick={visibleTextBarcodeFunc}
-                className="my_chexbox"
-                style={{ right: 0 }}
-              ></span>
-            )} */}
+							  <span
+								onClick={visibleTextBarcodeFunc}
+								className="my_chexbox-active"
+								style={{ right: 0 }}
+							  ></span>
+							) : (
+							  <span
+								onClick={visibleTextBarcodeFunc}
+								className="my_chexbox"
+								style={{ right: 0 }}
+							  ></span>
+							)} */}
 					</li>
 				) : (
 					<></>
@@ -624,15 +610,15 @@ export const PropertiesObj = observer(
 				)}
 				<li className='prop_obj'>
 					<span className='prop_obj_info'>Активен</span>
-					<MyBtnCheckActive
+					{/******<MyBtnCheckActive
 						active={Object.prop_obj.active}
 						onClick={activeObjFunc}
-					/>
+					/>*/}
 					{/* {Object.prop_obj.active ? (
-            <span onClick={activeObjFunc} className="my_chexbox-active"></span>
-          ) : (
-            <span onClick={activeObjFunc} className="my_chexbox"></span>
-          )} */}
+							<span onClick={activeObjFunc} className="my_chexbox-active"></span>
+						  ) : (
+							<span onClick={activeObjFunc} className="my_chexbox"></span>
+						  )} */}
 				</li>
 				{Object.prop_obj.typeObj === 'img' ? (
 					<>
@@ -659,7 +645,7 @@ export const PropertiesObj = observer(
 				<li className='prop_obj-delete' onClick={deleteObj}>
 					Удалить ( Del )
 				</li>
-			</ul>
+			</List>
 		)
 	}
 )

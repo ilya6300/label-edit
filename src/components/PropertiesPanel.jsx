@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { FontsContainer } from '../features/fonts/FontsContainer'
+import { ListProperties } from '../features/properties/ListProperties'
 import { VarText } from '../features/varibles/VarText'
 import Object from '../store/Object'
 import Theme from '../store/Theme'
@@ -68,10 +69,16 @@ export const PropertiesPanel = observer(({ clsContainer }) => {
 				{propActive ? (
 					<>
 						{Object.obj !== null ? (
-							<PropertiesObj
-								setVarText={setVarText}
-								setFlagFonts={setFlagFonts}
-							/>
+							<>
+								<ListProperties
+									setVarText={setVarText}
+									setFlagFonts={setFlagFonts}
+								/>
+								<PropertiesObj
+									setVarText={setVarText}
+									setFlagFonts={setFlagFonts}
+								/>
+							</>
 						) : (
 							<NoneProps />
 						)}
