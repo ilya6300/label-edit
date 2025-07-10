@@ -9,6 +9,7 @@ interface ListProps {
 	children?: React.ReactNode
 	className?: string
 	separator?: boolean
+	visible?: boolean
 	dense?: boolean
 	bordered?: boolean
 	role?: string
@@ -26,6 +27,7 @@ export const List = memo(
 		className,
 		separator,
 		dense,
+		visible,
 		bordered,
 		role,
 		...props
@@ -41,6 +43,7 @@ export const List = memo(
 					'mdc-list',
 					{
 						'mdc-list--dense': dense,
+						'mdc-list--visible': visible,
 						'mdc-list--separator': separator,
 						'mdc-list--bordered': bordered,
 					},

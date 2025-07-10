@@ -4,6 +4,9 @@
 	overflow: auto;
 	--indent-padding: 0rem;
 }
+.mdc-list--visible {
+	overflow: visible;
+}
 .mdc-list-items {
 	--parent-padding: var(--indent-padding, 0rem);
 }

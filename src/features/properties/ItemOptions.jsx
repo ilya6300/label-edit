@@ -1,26 +1,35 @@
-import { useState } from 'react'
-
 import { observer } from 'mobx-react-lite'
 
-import { Item, ItemLabel, ItemSection, Options } from '../../shared/ui'
+import { Item, ItemLabel, ItemSection, Options, Popover } from '../../shared/ui'
 
 export const ItemOptions = observer(
-	({ label, value, onChange, options, unit }) => {
-		const [opened, setOpened] = useState(false)
+	({ label, value, onChange, options, unit, labels }) => {
 		return (
-			<Item>
-				<ItemSection>{label}</ItemSection>
-				<ItemSection
-					end
-					row
-					onClick={() => setOpened(true)}
-					style={{ cursor: 'pointer', color: 'var(--color-secondary)' }}
-				>
-					<ItemLabel>{value}</ItemLabel>
-					{unit && <ItemLabel side>{unit}</ItemLabel>}
-					<Options value={value} options={options} onChange={onChange} />
-				</ItemSection>
-			</Item>
+			<Popover autoClose>
+				<Popover.Target>
+					<Item>
+						<ItemSection>{label}</ItemSection>
+						<ItemSection
+							end
+							row
+							style={{ cursor: 'pointer', color: 'var(--color-secondary)' }}
+						>
+							<ItemLabel>{labels ? labels[value] : value}</ItemLabel>
+							{unit && <ItemLabel side>{unit}</ItemLabel>}
+						</ItemSection>
+					</Item>
+				</Popover.Target>
+				<Popover.Dropdown>
+					<Options
+						inline
+						value={value}
+						options={options}
+						onChange={(...args) => {
+							onChange(...args)
+						}}
+					/>
+				</Popover.Dropdown>
+			</Popover>
 		)
 	}
 )

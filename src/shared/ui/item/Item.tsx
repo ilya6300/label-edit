@@ -56,15 +56,19 @@ export const Item = memo(
 
 		const attrs = useMemo(() => {
 			const attrs: Record<string, any> = {
-				className: cls('mdc-item', className, {
-					'mdc-item--dense': dense,
-					'mdc-item--active': active,
-					'mdc-item--disabled': disabled,
-					'mdc-item--clickable': isClickable,
-					'mdc-item--hoverable': isHoverable,
-					'mdc-item--vertical': vertical,
-					'mdc-item--bordered': bordered,
-				}),
+				className: cls(
+					'mdc-item',
+					{
+						'mdc-item--dense': dense,
+						'mdc-item--active': active,
+						'mdc-item--disabled': disabled,
+						'mdc-item--clickable': isClickable,
+						'mdc-item--hoverable': isHoverable,
+						'mdc-item--vertical': vertical,
+						'mdc-item--bordered': bordered,
+					},
+					className
+				),
 				role: disRoleTag.includes(as) ? undefined : role ?? 'listitem',
 				disabled: disabled,
 			}

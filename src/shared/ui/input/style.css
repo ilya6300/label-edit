@@ -9,7 +9,7 @@
 	text-align: right;
 	background-color: color-mix(in srgb, currentColor, transparent 90%);
 	&:focus {
-		color: var(--color-active);
+		color: var(--color-secondary);
 	}
 	&:placeholder {
 		opacity: 0;
@@ -42,7 +42,7 @@
 }
 .mdc-input:focus + .mdc-input__label {
 	opacity: 100%;
-	color: var(--color-active);
+	color: var(--color-secondary);
 }
 .mdc-input:focus + .mdc-input__label,
 .mdc-input:not(:placeholder-shown) + .mdc-input__label {

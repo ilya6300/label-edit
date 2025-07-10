@@ -1,6 +1,10 @@
 const hasOwn = {}.hasOwnProperty
 
-function parseValue(arg: any): string | number {
+type Arg = undefined | string | number | Record<string, any>
+type Args = Arg | Arg[]
+type Ret = string | number
+
+function parseValue(arg: Args): Ret {
 	if (typeof arg === 'string' || typeof arg === 'number') {
 		return arg
 	}
@@ -37,6 +41,9 @@ function appendClass(val: string, newClass: string | number): string {
 	return val + newClass
 }
 
-export function cls(...args: any[]): string {
-	return args.reduce((acc, arg) => appendClass(acc, parseValue(arg)), '')
+export function cls(...args: Arg[]): string {
+	return args.reduce(
+		(acc, arg): string => appendClass(acc as string, parseValue(arg)),
+		''
+	) as string
 }

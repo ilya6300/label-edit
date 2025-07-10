@@ -5,9 +5,9 @@ import service from '../../request/service'
 import HistoryStore from '../../store/HistoryStore'
 import Memory from '../../store/Memory'
 import Object from '../../store/Object'
-import Theme from '../../store/Theme'
 
 import { List } from '../../shared/ui'
+import { ItemAction } from './ItemAction'
 import { ItemEditable } from './ItemEditable'
 import { ItemField } from './ItemField'
 import { ItemOptions } from './ItemOptions'
@@ -106,10 +106,6 @@ export const ListProperties = observer(
 			Object.textAlign(e.target.id)
 		}
 
-		// Изменение поворота
-		const rotateFunc = e => {
-			Object.updateRotate(e.target.id)
-		}
 		// Записать имя
 		const saveNewName = () => {
 			if (!nameFlag) {
@@ -286,8 +282,16 @@ export const ListProperties = observer(
 			Object.getFlagEditSize(true)
 		}
 
+		const showTypeBarcode =
+			Object.prop_obj.typeBarcode === 'ean13' ||
+			Object.prop_obj.typeBarcode === 'code128'
+		const showRotate =
+			Object.prop_obj.typeObj !== 'box' && Object.prop_obj.typeObj !== 'img'
+		const showFontFamily =
+			Object.prop_obj.typeObj === 'text' || Object.prop_obj.typeObj === 'block'
+
 		return (
-			<List dense>
+			<List visible dense>
 				<ItemEditable
 					editable
 					label='Имя:'
@@ -297,11 +301,8 @@ export const ListProperties = observer(
 					onChange={e => setNewName(e.target.value)}
 					onClick={saveNewName}
 				/>
-				{Object.prop_obj.typeBarcode === 'ean13' ||
-				Object.prop_obj.typeBarcode === 'code128' ? (
+				{showTypeBarcode && (
 					<ItemEditable label={Object.prop_obj.typeBarcode} />
-				) : (
-					<></>
 				)}
 				<ItemField
 					edit={Object.prop_obj.w !== 'fit-content'}
@@ -327,7 +328,6 @@ export const ListProperties = observer(
 					unit='mm'
 					onChange={rewriteManualH}
 				/>
-
 				<ItemField
 					edit
 					label='X:'
@@ -353,121 +353,38 @@ export const ListProperties = observer(
 					onChange={rewriteManualY}
 				/>
 
-				{Object.prop_obj.typeObj !== 'box' &&
-				Object.prop_obj.typeObj !== 'img' ? (
-					<>
-						<ItemOptions
-							label='Поворот:'
-							unit='%'
-							optiuons={[
-								{ value: 0 },
-								{ value: 90 },
-								{ value: 180 },
-								{ value: 270 },
-							]}
-							value={Math.round(Object.prop_obj.style.rotate)}
-						/>
-						<li className='prop_obj'>
-							{rotate ? (
-								<span
-									ref={rotateRef}
-									className='prop_obj_position'
-									style={{ background: Theme.background }}
-								>
-									<span
-										className='prop_obj_position_span'
-										id='0'
-										onClick={rotateFunc}
-									>
-										0
-									</span>{' '}
-									<span
-										className='prop_obj_position_span'
-										id='90'
-										onClick={rotateFunc}
-									>
-										90
-									</span>{' '}
-									<span
-										className='prop_obj_position_span'
-										id='180'
-										onClick={rotateFunc}
-									>
-										180
-									</span>{' '}
-									<span
-										className='prop_obj_position_span'
-										id='270'
-										onClick={rotateFunc}
-									>
-										270
-									</span>
-								</span>
-							) : (
-								<></>
-							)}
-							<span className='prop_obj_info'>Поворот:</span>
-							<span
-								className='prop_obj_info_modal'
-								onClick={() => setRotate(true)}
-							>
-								{Math.round(Object.prop_obj.style.rotate)} %
-							</span>
-						</li>
-					</>
-				) : (
-					<></>
+				{showRotate && (
+					<ItemOptions
+						label='Поворот:'
+						unit='%'
+						options={[
+							{ value: 0 },
+							{ value: 90 },
+							{ value: 180 },
+							{ value: 270 },
+						]}
+						onChange={Object.updateRotate}
+						value={Math.round(Object.prop_obj.style.rotate)}
+					/>
 				)}
-
-				{Object.prop_obj.typeObj === 'block' ? (
-					<li ref={blockTextPositionRef} className='prop_obj'>
-						<span className='prop_obj_info'>Позиция:</span>{' '}
-						<label
-							onClick={() => setBlockTextPosition(true)}
-							className='prop_obj_position_label'
-						>
-							<span className='prop_obj_info_modal'>
-								{String(Object.prop_obj.style.position) === '2'
-									? 'в центре'
-									: String(Object.prop_obj.style.position) === '3'
-									? 'справа'
-									: 'слева'}
-							</span>
-							{blockTextPosition ? (
-								<span className='prop_obj_position'>
-									<span
-										className='prop_obj_position_span'
-										id='1'
-										onClick={blockAlign}
-									>
-										Лево
-									</span>
-									<span
-										className='prop_obj_position_span'
-										id='2'
-										onClick={blockAlign}
-									>
-										Центр
-									</span>
-									<span
-										className='prop_obj_position_span'
-										id='3'
-										onClick={blockAlign}
-									>
-										Право
-									</span>
-								</span>
-							) : (
-								<></>
-							)}
-						</label>
-					</li>
-				) : (
-					<></>
+				{Object.prop_obj.typeObj === 'block' && (
+					<ItemOptions
+						label='Позиция:'
+						options={[
+							{ value: 1, label: 'Лево' },
+							{ value: 2, label: 'Центр' },
+							{ value: 3, label: 'Право' },
+						]}
+						labels={{
+							1: 'слева',
+							2: 'в центре',
+							3: 'справа',
+						}}
+						onChange={Object.textAlign}
+						value={Math.round(Object.prop_obj.style.position)}
+					/>
 				)}
-
-				{Object.prop_obj.typeObj === 'text' ||
-				Object.prop_obj.typeObj === 'block' ? (
+				{showFontFamily && (
 					<>
 						<ItemField
 							edit
@@ -476,45 +393,34 @@ export const ListProperties = observer(
 							value={fontSize}
 							onChange={updateFontSizeFunc}
 						/>
-
-						{Object.prop_obj.typeObj !== 'box' ? (
-							<li className='prop_obj'>
-								Шрифт:{' '}
-								<span onClick={openFontsList} className='prop_obj_font_family'>
-									{Object.prop_obj.style.fontFamily}
-								</span>
-							</li>
-						) : (
-							<></>
+						{Object.prop_obj.typeObj !== 'box' && (
+							<ItemAction
+								label='Шрифт:'
+								value={Object.prop_obj.style.fontFamily}
+								onClick={openFontsList}
+							/>
 						)}
 					</>
-				) : (
-					<></>
 				)}
-				{Object.prop_obj.typeObj === 'box' ? (
+				{Object.prop_obj.typeObj === 'box' && (
 					<>
-						<li className='prop_obj'>
-							<span className='prop_obj_info'>Размер :</span>
-							<input
-								className='prop_obj_font_size'
-								type='number'
-								value={Object.prop_obj.line_thickness}
-								onChange={updateLineSizeFunc}
-							/>
-						</li>
-						<li className='prop_obj'>
-							<span className='prop_obj_info'>Скругление:</span>
-							<input
-								className='prop_obj_font_size'
-								type='number'
-								value={Object.prop_obj.borderRadius}
-								onChange={radiusBoxFunc}
-							/>
-						</li>
+						<ItemField
+							edit
+							label='Размер:'
+							type='number'
+							value={Object.prop_obj.line_thickness}
+							onChange={updateLineSizeFunc}
+						/>
+						<ItemField
+							edit
+							label='Скругление:'
+							type='number'
+							value={Object.prop_obj.borderRadius}
+							onChange={radiusBoxFunc}
+						/>
 					</>
-				) : (
-					<></>
 				)}
+
 				{Object.prop_obj.typeObj !== 'lines' &&
 				Object.prop_obj.typeObj !== 'box' &&
 				Object.prop_obj.typeObj !== 'img' ? (
@@ -552,8 +458,7 @@ export const ListProperties = observer(
 					<></>
 				)}
 
-				{Object.prop_obj.typeBarcode === 'code128' ||
-				Object.prop_obj.typeBarcode === 'ean13' ? (
+				{showTypeBarcode && (
 					<li className='prop_obj'>
 						<span className='prop_obj_info prop_obj_info-human_readable_visible'>
 							Текст виден
@@ -591,22 +496,15 @@ export const ListProperties = observer(
 							  ></span>
 							)} */}
 					</li>
-				) : (
-					<></>
 				)}
-				{Object.prop_obj.typeObj === 'text' ||
-				Object.prop_obj.typeObj === 'block' ? (
-					<li className='prop_obj-reset_text'>
-						<span onClick={resetBody}>Сбросить текст</span>
+				{showFontFamily && (
+					<>
+						<ItemAction label='Сбросить текст' onClick={resetBody} />
 						{Memory.buffer_text_flag &&
-						Memory.buffer_obj.id === Object.prop_obj.id ? (
-							<span onClick={restoryBody}>Восстановить</span>
-						) : (
-							''
-						)}
-					</li>
-				) : (
-					<></>
+							Memory.buffer_obj.id === Object.prop_obj.id && (
+								<ItemAction value='Восстановить' onClick={restoryBody} />
+							)}
+					</>
 				)}
 				<li className='prop_obj'>
 					<span className='prop_obj_info'>Активен</span>

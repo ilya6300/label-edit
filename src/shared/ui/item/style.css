@@ -85,14 +85,15 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: flex-start;
+	gap: var(--spacing);
 	width: auto;
 	height: auto;
 	min-width: 0;
 	max-width: 100%;
 	font-family: inherit;
 }
-.mdc-item__section--row {
-	flex-direction: row;
+.mdc-item__section--row.mdc-item__section--end {
+	justify-content: flex-end;
 }
 .mdc-item__section--main {
 	flex: 1;
@@ -115,6 +116,10 @@
 .mdc-item__section--end,
 .mdc-item__section ~ .mdc-item__section--side {
 	align-items: flex-end;
+}
+.mdc-item__section--row {
+	flex-direction: row;
+	align-items: center;
 }
 .mdc-item__section--side > .mdc-icon {
 	font-size: 1rem;

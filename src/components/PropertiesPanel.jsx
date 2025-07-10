@@ -8,7 +8,6 @@ import Theme from '../store/Theme'
 import { HistoryObj } from './history/HistoryObj'
 import { LayersObj } from './LayersObj'
 import { NoneProps } from './NoneProps'
-import { PropertiesObj } from './PropertiesObj'
 
 export const PropertiesPanel = observer(({ clsContainer }) => {
 	const [propActive, setPropActive] = useState(true)
@@ -69,16 +68,10 @@ export const PropertiesPanel = observer(({ clsContainer }) => {
 				{propActive ? (
 					<>
 						{Object.obj !== null ? (
-							<>
-								<ListProperties
-									setVarText={setVarText}
-									setFlagFonts={setFlagFonts}
-								/>
-								<PropertiesObj
-									setVarText={setVarText}
-									setFlagFonts={setFlagFonts}
-								/>
-							</>
+							<ListProperties
+								setVarText={setVarText}
+								setFlagFonts={setFlagFonts}
+							/>
 						) : (
 							<NoneProps />
 						)}
