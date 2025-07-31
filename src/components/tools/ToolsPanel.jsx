@@ -39,6 +39,20 @@ export const ToolsPanel = observer(({ setClsMM, clsMM }) => {
 		if (e.target.files.length === 0) {
 			return
 		}
+		const allowedExtensions = ['bmp', 'jpeg', 'png']
+		if (
+			!allowedExtensions
+				.map(item => 'image/' + item)
+				.includes(e.target.files[0].type)
+		) {
+			return alert(
+				'Вы пытаетесь добавить файл ' +
+					e.target.files[0].type +
+					`. Вы можете загрузить только изображение с расширение .${allowedExtensions.join(
+						', .'
+					)}`
+			)
+		}
 		const reader = new FileReader()
 		reader.onload = () => {
 			storeBg.setImage(reader.result)
@@ -100,12 +114,22 @@ export const ToolsPanel = observer(({ setClsMM, clsMM }) => {
 				style={{ background: Theme.btn_background_black }}
 				title='Загрузить фон'
 			>
-				&#10052;
+				<svg
+					xmlns='http://www.w3.org/2000/svg'
+					width='256'
+					height='256'
+					viewBox='0 0 256 256'
+				>
+					<path
+						fill='currentColor'
+						d='M160 80H48a16 16 0 0 0-16 16v112a16 16 0 0 0 16 16h112a16 16 0 0 0 16-16V96a16 16 0 0 0-16-16m0 128H48V96h112ZM136 40a8 8 0 0 1 8-8h16a8 8 0 0 1 0 16h-16a8 8 0 0 1-8-8m88 8v8a8 8 0 0 1-16 0v-8h-8a8 8 0 0 1 0-16h8a16 16 0 0 1 16 16m0 48v16a8 8 0 0 1-16 0V96a8 8 0 0 1 16 0m0 56v8a16 16 0 0 1-16 16h-8a8 8 0 0 1 0-16h8v-8a8 8 0 0 1 16 0M80 56v-8a16 16 0 0 1 16-16h8a8 8 0 0 1 0 16h-8v8a8 8 0 0 1-16 0'
+					/>
+				</svg>
 				<input
 					ref={bgFile}
 					onChange={selectedBG}
 					type='file'
-					//accept='.bmp'
+					accept='image/bmp, image/png, image/jpeg'
 					className='hidden'
 				/>
 			</button>
