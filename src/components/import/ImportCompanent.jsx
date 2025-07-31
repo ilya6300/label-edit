@@ -483,6 +483,7 @@ export const ImportCompanent = observer(
 					let obj = this.genObj()
 					if (/^AT.?,/.test(lines[i])) {
 						this.textElement(obj, lines[i].replace(/^AT/, ''))
+						Object.addObj(obj)
 					} else if (/^XRB/.test(lines[i])) {
 						this.datamatrixElement(
 							obj,
@@ -491,21 +492,26 @@ export const ImportCompanent = observer(
 						)
 						setSelectedDM(true)
 						i++
+						Object.addObj(obj)
 					} else if (/^W/.test(lines[i])) {
 						this.qrcodeElement(obj, lines[i].replace(/^W/, ''), lines[i + 1])
 						i++
+						Object.addObj(obj)
 					} else if (/^Y/.test(lines[i])) {
 						this.putbmpElement(obj, lines[i].replace(/^Y/, ''))
+						Object.addObj(obj)
 					} else if (/^BE/.test(lines[i])) {
 						this.barcodeElementEAN13(obj, lines[i].replace(/^BE/, ''))
+						Object.addObj(obj)
 					} else if (/^BQ/.test(lines[i])) {
 						this.barcodeElementCode128(obj, lines[i].replace(/^BQ/, ''))
+						Object.addObj(obj)
 					} else if (/^L/.test(lines[i])) {
 						this.barElement(obj, lines[i].replace(/^L/, ''))
+						Object.addObj(obj)
 					} else {
 						unprocessed.push(lines[i])
 					}
-					lines[i] != 'E' && Object.addObj(obj)
 					i++
 				} //*/
 				setUnprocessed(v => ({ ...v, unprocessedBody: unprocessed }))
