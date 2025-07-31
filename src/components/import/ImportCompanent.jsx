@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BtnVer1 } from '../../UI/btn/BtnVer1'
 import Fonts from '../../store/Fonts'
 import Memory from '../../store/Memory'
@@ -13,6 +13,10 @@ export const ImportCompanent = observer(
 		const [fakeBodyDM, setFakeBodyDM] = useState(
 			'0104603721020607215>(egukLfdK5r93zoJf'
 		)
+		const [{ unprocessedKey, unprocessedBody }, setUnprocessed] = useState({
+			unprocessedKey: [],
+			unprocessedBody: [],
+		})
 		const setDirection = (x, y) => {
 			if (x < 0 || x > 1) {
 				throw new Error(
@@ -430,6 +434,7 @@ export const ImportCompanent = observer(
 				arr.shift()
 				let i = 0
 				const count = arr.length
+				const unprocessed = []
 				while (i < count) {
 					if (/^Q/.test(arr[i])) {
 						let s = arr[i].replace(/^Q/, '').split(',')
@@ -438,14 +443,17 @@ export const ImportCompanent = observer(
 					} else if (/^H/.test(arr[i])) {
 						Memory.heigthLabelChange(parseInt(arr[i].replace(/^H/, ''), 10))
 					} else if (/^W/.test(arr[i])) {
-						Memory.heigthLabelChange(parseInt(arr[i].replace(/^W/, ''), 10))
+						Memory.widthLabelChange(parseInt(arr[i].replace(/^W/, ''), 10))
 					} else if (/^R/.test(arr[i])) {
 						Memory.labelRefX(parseInt(arr[i].replace(/^R/, ''), 10))
 					} else if (/^L/.test(arr[i])) {
 						this.parseContent(arr[i].replace(/^L/, ''))
+					} else {
+						unprocessed.push(arr[i])
 					}
 					i++
 				} //*/
+				setUnprocessed(v => ({ ...v, unprocessedKey: unprocessed }))
 			},
 			genObj(def = {}) {
 				return {
@@ -470,6 +478,7 @@ export const ImportCompanent = observer(
 					.map(v => String(v).trim())
 				const count = lines.length
 				let i = 0
+				const unprocessed = []
 				while (i < count) {
 					let obj = this.genObj()
 					if (/^AT.?,/.test(lines[i])) {
@@ -493,10 +502,13 @@ export const ImportCompanent = observer(
 						this.barcodeElementCode128(obj, lines[i].replace(/^BQ/, ''))
 					} else if (/^L/.test(lines[i])) {
 						this.barElement(obj, lines[i].replace(/^L/, ''))
+					} else {
+						unprocessed.push(lines[i])
 					}
 					lines[i] != 'E' && Object.addObj(obj)
 					i++
 				} //*/
+				setUnprocessed(v => ({ ...v, unprocessedBody: unprocessed }))
 			},
 			textElement(obj, str) {
 				obj.name = 'text'
@@ -695,12 +707,22 @@ export const ImportCompanent = observer(
 			console.log(e.target.files)
 		}
 
+		useEffect(() => {
+			console.log(unprocessedKey)
+		}, [unprocessedKey])
+		useEffect(() => {
+			console.log(unprocessedBody)
+		}, [unprocessedBody])
 		return (
 			<div
 				className='import_container bar_label'
 				style={{ background: Theme.background }}
 			>
 				<p className='import_container_title'>Импорт шаблона</p>
+				<h3>
+					<div>Необработанные ключи: {unprocessedKey.join(' ')}</div>
+					<div>Необработанное тело: {unprocessedBody.join(' ')}</div>
+				</h3>
 				<textarea
 					ref={refTextImport}
 					placeholder='Скопируйте в данное поле текст шаблона для принтера, на языке TSPL или EZPL (В разработке)...'
