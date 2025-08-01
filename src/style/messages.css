@@ -38,7 +38,8 @@
   color: white;
   border-radius: 8px;
   /* border: 3px solid var(--mast-yellow); */
-  box-shadow: 0 0 6px 3px var(--mast-yellow);
+  filter: drop-shadow(2px 4px 6px black);
+  /* box-shadow: 0 0 6px 3px var(--mast-yellow); */
 }
 .item_message-closed {
   cursor: pointer;
@@ -52,7 +53,7 @@
   padding: 0 6px 1px 6px;
   border-radius: 50%;
   background: var(--myGrey);
-  box-shadow: 0 0 4px 2px var(--mast-yellow);
+  filter: drop-shadow(2px 4px 6px black);
   transition: all 0.4s ease-in;
 }
 .item_message-closed p {
