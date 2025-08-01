@@ -103,6 +103,38 @@ export const ImportCompanent = observer(
 					.map(v => String(v).trim())
 				lines.forEach(line => this.parseLine(line))
 			},
+			fakeCoord(obj) {
+				if (obj.typeObj !== 'block') {
+					if (obj.style.rotate === 0) {
+						obj.pxFakeX = obj.pxX
+						obj.pxFakeY = obj.pxY
+					} else if (obj.style.rotate === 90) {
+						obj.pxFakeX = obj.pxX - (obj.pxW / 2 + obj.pxH / 2) * Memory.mm
+						obj.pxFakeY = obj.pxY + (obj.pxW / 2 - obj.pxH / 2) * Memory.mm
+					} else if (obj.style.rotate === 180) {
+						obj.pxFakeX = obj.pxX - obj.pxW * Memory.mm
+						obj.pxFakeY = obj.pxY - obj.pxH * Memory.mm
+					} else if (obj.style.rotate === 270) {
+						obj.pxFakeX = obj.pxX - (obj.pxW / 2 - obj.pxH / 2) * Memory.mm
+						obj.pxFakeY = obj.pxY - (obj.pxH / 2 + obj.pxW / 2) * Memory.mm
+					}
+				} else {
+					if (obj.style.rotate === 90) {
+						obj.pxFakeX = obj.pxX + (obj.pxH / 2 - obj.pxW / 2) * Memory.mm
+						obj.pxFakeY = obj.pxY + (obj.pxW / 2 - obj.pxH / 2) * Memory.mm
+					} else if (obj.style.rotate === 180) {
+						obj.pxFakeX = obj.pxX - obj.pxW * Memory.mm
+						obj.pxFakeY = obj.pxY - obj.pxH * Memory.mm
+					} else if (obj.style.rotate === 270) {
+						obj.pxFakeX = obj.pxX - (obj.pxW / 2 - obj.pxH / 2) * Memory.mm
+						obj.pxFakeY = obj.pxY - (obj.pxH / 2 + obj.pxW / 2) * Memory.mm
+					} else {
+						obj.pxFakeX = obj.pxX
+						obj.pxFakeY = obj.pxY
+					}
+				}
+			},
+
 			parseLine(line) {
 				;[
 					'DIRECTION',
@@ -198,13 +230,17 @@ export const ImportCompanent = observer(
 				obj.pxFakeY = obj.y * Memory.mm
 				obj.font_family_id = Fonts.default_font.id
 
+				obj.w = 12
+				obj.pxW = 12
+				obj.h = 6
+				obj.pxH = 6
 				obj.fontFamily = '0'
 				Msg.writeMessages(
 					'В шаблоне будет использоваться шрифт принетра по умолчанию. Если хотите изменить шрифт в текстовом элементе, выберите нужный шрифт вручную, в свойствах элемента.'
 				)
 
 				obj.style.rotate = parseInt(arr[3], 10)
-				obj.body = removeQuote(arr[6])
+				obj.body = removeQuote(arr[7] || arr[6])
 
 				switch (parseInt(arr[2], 10)) {
 					case 1:
@@ -219,6 +255,8 @@ export const ImportCompanent = observer(
 					default:
 						obj.style.fontSize = 12
 				}
+
+				this.fakeCoord(obj)
 
 				Object.addObj(obj)
 			},
@@ -235,38 +273,26 @@ export const ImportCompanent = observer(
 				obj.x = parseInt(arr[0], 10) / Memory.dpi
 				obj.y = parseInt(arr[1], 10) / Memory.dpi
 
-				obj.w =
-					Math.abs(parseInt(arr[2], 10) - parseInt(arr[0], 10)) / Memory.dpi
-				obj.h =
-					Math.abs(parseInt(arr[3], 10) - parseInt(arr[1], 10)) / Memory.dpi
+				obj.w = parseInt(arr[2], 10) / Memory.dpi
+				obj.h = parseInt(arr[3], 10) / Memory.dpi
 
 				obj.pxX = obj.x * Memory.mm
 				obj.pxY = obj.y * Memory.mm
+				obj.pxFakeX = obj.x * Memory.mm
+				obj.pxFakeY = obj.y * Memory.mm
+
 				obj.pxW = obj.w
 				obj.pxH = obj.h
 
-				obj.pxFakeX = obj.x * Memory.mm
-				obj.pxFakeY = obj.y * Memory.mm
 				obj.font_family_id = Fonts.default_font.id
 				obj.fontFamily = '0'
 				Msg.writeMessages(
 					'В шаблоне будет использоваться шрифт принетра по умолчанию. Если хотите изменить шрифт в текстовом элементе, выберите нужный шрифт вручную, в свойствах элемента.'
 				)
 
-				switch (parseInt(arr[5], 10)) {
-					case 1:
-						obj.style.rotate = 90
-						break
-					case 2:
-						obj.style.rotate = 180
-						break
-					case 3:
-						obj.style.rotate = 270
-						break
-					default:
-						obj.style.rotate = 0
-				}
-				obj.style.position = arr[9]
+				obj.style.rotate = parseInt(arr[5], 10)
+
+				obj.style.position = arr[8]
 
 				switch (parseInt(arr[4], 10)) {
 					case 1:
@@ -281,7 +307,10 @@ export const ImportCompanent = observer(
 					default:
 						obj.style.fontSize = 12
 				}
-				obj.body = removeQuote(arr[11])
+				obj.body = removeQuote(arr[11] || arr[10] || arr[9] || arr[8])
+
+				this.fakeCoord(obj)
+
 				Object.addObj(obj)
 			},
 			parseBARCODE(str) {
@@ -315,7 +344,8 @@ export const ImportCompanent = observer(
 				obj.pxFakeY = obj.y * Memory.mm
 				obj.pxW = obj.w
 				obj.pxH = Math.round(obj.h)
-				obj.body = removeQuote(arr[8])
+				obj.body = removeQuote(arr[9] || arr[8])
+				this.fakeCoord(obj)
 				Object.addObj(obj)
 			},
 			parseQRCODE(str) {
@@ -346,6 +376,7 @@ export const ImportCompanent = observer(
 				obj.body = removeQuote(arr[8])
 
 				obj.fakeBody = 'barcode046037210206'
+				this.fakeCoord(obj)
 				Object.addObj(obj)
 			},
 			parsePUTBMP(str) {
@@ -372,7 +403,7 @@ export const ImportCompanent = observer(
 				Msg.writeMessages(
 					'Изображение не загружено, пожалуйста, передобавьте его вручную.'
 				)
-
+				this.fakeCoord(obj)
 				Object.addObj(obj)
 			},
 			parseBOX(str) {
@@ -396,7 +427,7 @@ export const ImportCompanent = observer(
 				obj.pxY = obj.y * Memory.mm
 				obj.pxW = obj.w
 				obj.pxH = obj.h
-
+				this.fakeCoord(obj)
 				Object.addObj(obj)
 			},
 			parseBAR(str) {
@@ -417,7 +448,7 @@ export const ImportCompanent = observer(
 				obj.pxY = obj.y * Memory.mm
 				obj.pxW = obj.w
 				obj.pxH = obj.h
-
+				this.fakeCoord(obj)
 				Object.addObj(obj)
 			},
 		}
@@ -455,6 +486,37 @@ export const ImportCompanent = observer(
 				} //*/
 				setUnprocessed(v => ({ ...v, unprocessedKey: unprocessed }))
 			},
+			fakeCoord(obj) {
+				if (obj.typeObj !== 'block') {
+					if (obj.style.rotate === 0) {
+						obj.pxFakeX = obj.pxX
+						obj.pxFakeY = obj.pxY
+					} else if (obj.style.rotate === 90) {
+						obj.pxFakeX = obj.pxX - (obj.pxW / 2 + obj.pxH / 2) * Memory.mm
+						obj.pxFakeY = obj.pxY + (obj.pxW / 2 - obj.pxH / 2) * Memory.mm
+					} else if (obj.style.rotate === 180) {
+						obj.pxFakeX = obj.pxX - obj.pxW * Memory.mm
+						obj.pxFakeY = obj.pxY - obj.pxH * Memory.mm
+					} else if (obj.style.rotate === 270) {
+						obj.pxFakeX = obj.pxX - (obj.pxW / 2 - obj.pxH / 2) * Memory.mm
+						obj.pxFakeY = obj.pxY - (obj.pxH / 2 + obj.pxW / 2) * Memory.mm
+					}
+				} else {
+					if (obj.style.rotate === 90) {
+						obj.pxFakeX = obj.pxX + (obj.pxH / 2 - obj.pxW / 2) * Memory.mm
+						obj.pxFakeY = obj.pxY + (obj.pxW / 2 - obj.pxH / 2) * Memory.mm
+					} else if (obj.style.rotate === 180) {
+						obj.pxFakeX = obj.pxX - obj.pxW * Memory.mm
+						obj.pxFakeY = obj.pxY - obj.pxH * Memory.mm
+					} else if (obj.style.rotate === 270) {
+						obj.pxFakeX = obj.pxX - (obj.pxW / 2 - obj.pxH / 2) * Memory.mm
+						obj.pxFakeY = obj.pxY - (obj.pxH / 2 + obj.pxW / 2) * Memory.mm
+					} else {
+						obj.pxFakeX = obj.pxX
+						obj.pxFakeY = obj.pxY
+					}
+				}
+			},
 			genObj(def = {}) {
 				return {
 					id: createID(),
@@ -481,9 +543,10 @@ export const ImportCompanent = observer(
 				const unprocessed = []
 				while (i < count) {
 					let obj = this.genObj()
+					let e = false
 					if (/^AT.?,/.test(lines[i])) {
 						this.textElement(obj, lines[i].replace(/^AT/, ''))
-						Object.addObj(obj)
+						e = true
 					} else if (/^XRB/.test(lines[i])) {
 						this.datamatrixElement(
 							obj,
@@ -492,25 +555,29 @@ export const ImportCompanent = observer(
 						)
 						setSelectedDM(true)
 						i++
-						Object.addObj(obj)
+						e = true
 					} else if (/^W/.test(lines[i])) {
 						this.qrcodeElement(obj, lines[i].replace(/^W/, ''), lines[i + 1])
 						i++
-						Object.addObj(obj)
+						e = true
 					} else if (/^Y/.test(lines[i])) {
 						this.putbmpElement(obj, lines[i].replace(/^Y/, ''))
-						Object.addObj(obj)
+						e = true
 					} else if (/^BE/.test(lines[i])) {
 						this.barcodeElementEAN13(obj, lines[i].replace(/^BE/, ''))
-						Object.addObj(obj)
+						e = true
 					} else if (/^BQ/.test(lines[i])) {
 						this.barcodeElementCode128(obj, lines[i].replace(/^BQ/, ''))
-						Object.addObj(obj)
+						e = true
 					} else if (/^L/.test(lines[i])) {
 						this.barElement(obj, lines[i].replace(/^L/, ''))
-						Object.addObj(obj)
+						e = true
 					} else {
 						unprocessed.push(lines[i])
+					}
+					if (e) {
+						this.fakeCoord(obj)
+						Object.addObj(obj)
 					}
 					i++
 				} //*/
@@ -695,7 +762,7 @@ export const ImportCompanent = observer(
 					tsplParser.parse(refTextImport.current.value)
 				}
 			} catch (e) {
-				console.log(e)
+				console.error(e)
 				Msg.writeMessages(e.message)
 			}
 		}
