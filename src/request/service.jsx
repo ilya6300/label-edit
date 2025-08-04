@@ -399,7 +399,7 @@ const fakeVariable = {
 	sizing_l: '1,53',
 	pack_name: 'Агрегат',
 	cell: '35',
-// >>>>>>> origin/drozdov
+	// >>>>>>> origin/drozdov
 }
 
 class service {
@@ -407,7 +407,7 @@ class service {
 		makeAutoObservable(this)
 	}
 	// Переменные
-	server_url = config.url_api
+	server_url = localStorage.getItem('api.host') || config.url_api
 	images = []
 	imgLoading = true
 	fontsLoading = true

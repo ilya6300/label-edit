@@ -443,8 +443,9 @@
 	max-width: 450px;
 	height: 355px;
 	display: flex;
+	gap: 4px;
 	flex-direction: column;
-	justify-content: space-between;
+	justify-content: flex-start;
 }
 .printer_setting_btn_container {
 	display: flex;
@@ -464,7 +465,7 @@
 	cursor: pointer;
 }
 .printer_setting_row_inpt {
-	width: 120px;
+	width: 250px;
 	margin: 0 15px 0 3px;
 	border: none;
 	border-radius: 4px;
