@@ -219,7 +219,7 @@ export const ImportCompanent = observer(
 					clsPreview: 'bardcode_container-text-preview',
 				})
 
-				obj.style.fontFamily = Fonts.default_font.name
+				obj.style.fontFamily = 'ArialRegular' || Fonts.default_font.name
 
 				obj.x = parseInt(arr[0], 10) / Memory.dpi
 				obj.y = parseInt(arr[1], 10) / Memory.dpi
@@ -228,7 +228,7 @@ export const ImportCompanent = observer(
 				obj.pxFakeX = obj.x * Memory.mm
 				obj.pxY = obj.y * Memory.mm
 				obj.pxFakeY = obj.y * Memory.mm
-				obj.font_family_id = Fonts.default_font.id
+				obj.font_family_id = 4 || Fonts.default_font.id
 
 				obj.w = 12
 				obj.pxW = 12
@@ -252,8 +252,14 @@ export const ImportCompanent = observer(
 					case 3:
 						obj.style.fontSize = 8
 						break
-					default:
+					case 4:
+						obj.style.fontSize = 10
+						break
+					case 5:
 						obj.style.fontSize = 12
+						break
+					default:
+						obj.style.fontSize = 6
 				}
 
 				this.fakeCoord(obj)
@@ -268,7 +274,7 @@ export const ImportCompanent = observer(
 					cls: ['bardcode_container-block'],
 					clsPreview: 'bardcode_container-block-preview',
 				})
-				obj.style.fontFamily = Fonts.default_font.name
+				obj.style.fontFamily = 'ArialRegular' || Fonts.default_font.name
 
 				obj.x = parseInt(arr[0], 10) / Memory.dpi
 				obj.y = parseInt(arr[1], 10) / Memory.dpi
@@ -284,7 +290,7 @@ export const ImportCompanent = observer(
 				obj.pxW = obj.w
 				obj.pxH = obj.h
 
-				obj.font_family_id = Fonts.default_font.id
+				obj.font_family_id = 4 || Fonts.default_font.id
 				obj.fontFamily = '0'
 				Msg.writeMessages(
 					'В шаблоне будет использоваться шрифт принетра по умолчанию. Если хотите изменить шрифт в текстовом элементе, выберите нужный шрифт вручную, в свойствах элемента.'
@@ -304,8 +310,14 @@ export const ImportCompanent = observer(
 					case 3:
 						obj.style.fontSize = 8
 						break
-					default:
+					case 4:
+						obj.style.fontSize = 10
+						break
+					case 5:
 						obj.style.fontSize = 12
+						break
+					default:
+						obj.style.fontSize = 6
 				}
 				obj.body = removeQuote(arr[11] || arr[10] || arr[9] || arr[8])
 
@@ -590,7 +602,9 @@ export const ImportCompanent = observer(
 				obj.h = 'fit-content'
 				obj.pxW = 'fit-content'
 				obj.pxH = 'fit-content'
-				obj.style.fontFamily = Fonts.default_font.name
+				obj.style.fontFamily = 'AriaRegular' || Fonts.default_font.name
+
+				obj.font_family_id = 4 || Fonts.default_font.id
 
 				const arr = str.split(',').map(v => String(v).trim())
 
