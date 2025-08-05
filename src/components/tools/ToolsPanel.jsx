@@ -108,7 +108,7 @@ export const ToolsPanel = observer(({ setClsMM, clsMM }) => {
 					<></>
 				)}
 			</div>
-			<br />
+
 			<button
 				onClick={addBg}
 				className='btn_bg'
