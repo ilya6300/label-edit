@@ -41,8 +41,8 @@ export const Label = observer(
               height:
                 Memory.height_label > 43
                   ? 40 +
-                    Memory.height_label * Memory.mm +
-                    Memory.gap * Memory.mm * 2 +
+                    (Memory.height_label * Memory.mm +
+                    Memory.gap * Memory.mm * 2) * Memory.scale +
                     "px"
                   : "auto",
               // : 460 + "px",
@@ -68,7 +68,7 @@ export const Label = observer(
               setClsContainer={setClsContainer}
             />
 
-            {Memory.height_label > 75 ? (
+            {/* {Memory.height_label > 75 ? (
               <div
                 className="label"
                 style={{
@@ -85,7 +85,7 @@ export const Label = observer(
               ></div>
             ) : (
               <></>
-            )}
+            )} */}
           </div>
         </div>
 

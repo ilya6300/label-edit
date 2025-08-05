@@ -1,39 +1,39 @@
-import { toJS } from 'mobx'
-import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
-import { BtnControl } from '../control/BtnControl'
-import service from '../request/service'
-import Memory from '../store/Memory'
-import Object from '../store/Object'
-import Templates from '../store/Templates'
-import Theme from '../store/Theme'
-import { AddContainer } from './AddContainer'
-import { BarLabel } from './BarLabel'
-import { StartAddFonts } from './fonts/StartAddFonts'
-import { ImportCompanent } from './import/ImportCompanent'
-import { ImportContainerDMList } from './import/ImportContainerDMList'
-import { Label } from './Label'
-import { Loader } from './Loader'
-import { BrowserNotSupported } from './messages/BrowserNotSupported'
-import { ContainerPostDownloader } from './messages/ContainerPostDownloader'
-import { ExchangeWithServer } from './messages/ExchangeWithServer'
-import { MessagesContainer } from './messages/MessagesContainer'
-import { ServerError } from './ServerError'
-import { Setting } from './Setting/Setting'
-import { GetTemplate } from './templates/GetTemplate'
+import { toJS } from "mobx";
+import { observer } from "mobx-react-lite";
+import { useEffect, useState } from "react";
+import { BtnControl } from "../control/BtnControl";
+import service from "../request/service";
+import Memory from "../store/Memory";
+import Object from "../store/Object";
+import Templates from "../store/Templates";
+import Theme from "../store/Theme";
+import { AddContainer } from "./AddContainer";
+import { BarLabel } from "./BarLabel";
+import { StartAddFonts } from "./fonts/StartAddFonts";
+import { ImportCompanent } from "./import/ImportCompanent";
+import { ImportContainerDMList } from "./import/ImportContainerDMList";
+import { Label } from "./Label";
+import { Loader } from "./Loader";
+import { BrowserNotSupported } from "./messages/BrowserNotSupported";
+import { ContainerPostDownloader } from "./messages/ContainerPostDownloader";
+import { ExchangeWithServer } from "./messages/ExchangeWithServer";
+import { MessagesContainer } from "./messages/MessagesContainer";
+import { ServerError } from "./ServerError";
+import { Setting } from "./Setting/Setting";
+import { GetTemplate } from "./templates/GetTemplate";
 
 export const Editor = observer(() => {
-	const [browserNotSupportedFlag, setBrowserNotSupportedFlag] = useState(false)
+  const [browserNotSupportedFlag, setBrowserNotSupportedFlag] = useState(false);
 
-	useEffect(() => {
-		service.getFonts()
-	}, [])
+  useEffect(() => {
+    service.getFonts();
+  }, []);
 
-	useEffect(() => {
-		setNoFonts(false)
-	}, [!service.fontsLoading])
+  useEffect(() => {
+    setNoFonts(false);
+  }, [!service.fontsLoading]);
 
-// <<<<<<< HEAD
+  // <<<<<<< HEAD
   // Класс мм сетки
   const [clsMM, setClsMM] = useState("none");
   const [setting, setSetting] = useState(false);
@@ -113,7 +113,7 @@ export const Editor = observer(() => {
                     )}
                   </div>
                 )}
-                <button
+                {/* <button
                   style={{ width: "50px" }}
                   onClick={() =>
                     console.log(
@@ -133,7 +133,7 @@ export const Editor = observer(() => {
                   }
                 >
                   Check model
-                </button>
+                </button> */}
               </>
             ) : (
               <StartAddFonts />
