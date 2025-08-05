@@ -357,7 +357,6 @@ export const ImportCompanent = observer(
 				obj.pxW = obj.w
 				obj.pxH = Math.round(obj.h)
 				obj.body = removeQuote(arr[9] || arr[8])
-				this.fakeCoord(obj)
 				Object.addObj(obj)
 			},
 			parseQRCODE(str) {
@@ -388,7 +387,6 @@ export const ImportCompanent = observer(
 				obj.body = removeQuote(arr[8])
 
 				obj.fakeBody = 'barcode046037210206'
-				this.fakeCoord(obj)
 				Object.addObj(obj)
 			},
 			parsePUTBMP(str) {
@@ -399,23 +397,21 @@ export const ImportCompanent = observer(
 					cls: ['bardcode_container-barcode'],
 					clsPreview: 'bardcode_container-barcode-preview',
 					body: '#',
-					id: 999,
 					w: 10,
 					h: 10,
 					pxW: 10,
 					pxH: 10,
 				})
 
-				obj.x = (parseInt(arr[0], 10) * Memory.mm) / Memory.dpi
-				obj.y = (parseInt(arr[1], 10) * Memory.mm) / Memory.dpi
+				obj.x = parseInt(arr[0], 10) / Memory.dpi
+				obj.y = parseInt(arr[1], 10) / Memory.dpi
 
-				obj.pxX = obj.x
-				obj.pxY = obj.y
+				obj.pxX = obj.x * Memory.mm
+				obj.pxY = obj.y * Memory.mm
 
 				Msg.writeMessages(
 					'Изображение не загружено, пожалуйста, передобавьте его вручную.'
 				)
-				this.fakeCoord(obj)
 				Object.addObj(obj)
 			},
 			parseBOX(str) {
@@ -439,7 +435,6 @@ export const ImportCompanent = observer(
 				obj.pxY = obj.y * Memory.mm
 				obj.pxW = obj.w
 				obj.pxH = obj.h
-				this.fakeCoord(obj)
 				Object.addObj(obj)
 			},
 			parseBAR(str) {
@@ -460,7 +455,6 @@ export const ImportCompanent = observer(
 				obj.pxY = obj.y * Memory.mm
 				obj.pxW = obj.w
 				obj.pxH = obj.h
-				this.fakeCoord(obj)
 				Object.addObj(obj)
 			},
 		}
@@ -588,7 +582,6 @@ export const ImportCompanent = observer(
 						unprocessed.push(lines[i])
 					}
 					if (e) {
-						this.fakeCoord(obj)
 						Object.addObj(obj)
 					}
 					i++
@@ -617,6 +610,7 @@ export const ImportCompanent = observer(
 				obj.pxX = obj.x * Memory.mm
 				obj.pxFakeY = obj.y * Memory.mm
 				obj.pxY = obj.y * Memory.mm
+				this.fakeCoord(obj)
 			},
 			datamatrixElement(obj, str, body) {
 				obj.name = 'datamatrix'
