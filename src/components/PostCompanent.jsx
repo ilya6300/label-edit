@@ -94,12 +94,12 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
 			obj.style.height = 'auto'
 			obj.style.width = 'auto'
 			if (ID) {
-				setTimeout(() => {
-					ID.pxH = obj.offsetHeight / Memory.mm
-					ID.h = obj.offsetHeight / Memory.mm
-					ID.pxW = obj.offsetWidth / Memory.mm
-					ID.w = obj.offsetWidth / Memory.mm
-				}, block.length)
+				//setTimeout(() => {
+				ID.pxH = obj.offsetHeight / Memory.mm
+				ID.h = obj.offsetHeight / Memory.mm
+				ID.pxW = obj.offsetWidth / Memory.mm
+				ID.w = obj.offsetWidth / Memory.mm
+				//}, block.length)
 			}
 		})
 	}
@@ -146,111 +146,107 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
 			// Временный массив который хранит в себе элементы которые были обновлены
 			const update_object = []
 
-			setTimeout(async () => {
-				if (Object.download_objects === null) {
-					return
-				}
-				Object.download_objects.forEach(old => {
-					Object.objects.filter(newT => {
-						// Ищем объекты, и проверяем что они не равны
-						if (
-							old.id === newT.id &&
-							JSON.stringify(old) !== JSON.stringify(newT)
-						) {
-							// перебираем все элементы у объекта, в котором были произведены изменения
-							const temp = { field_id: Number(old.id) }
-							for (let key in old) {
-								// Сравниваем изменённые поля
-								//if (old[key] !== newT[key]) {
-								// изменение координа
-								if (key === 'x' || key === 'y') {
-									temp.pos_x = newT.x
-									temp.pos_y = newT.y
-								}
-								// изменение имени объекта
-								if (key === 'name') {
-									temp.name = newT.name
-								}
-								// Отключение / включение active
-								if (key === 'active') {
-									temp.enabled = newT.active
-								}
-								// Ширина / высота
-								if (key === 'w' || key === 'h') {
-									if (old.typeObj !== 'lines') {
-										temp.width = Math.round(newT.w * 100) / 100
-										temp.height = Math.round(newT.h * 100) / 100
+			//setTimeout(async () => {
+			if (Object.download_objects === null) {
+				return
+			}
+			Object.download_objects.forEach(old => {
+				Object.objects.filter(newT => {
+					// Ищем объекты, и проверяем что они не равны
+					if (
+						old.id === newT.id &&
+						JSON.stringify(old) !== JSON.stringify(newT)
+					) {
+						// перебираем все элементы у объекта, в котором были произведены изменения
+						const temp = { field_id: Number(old.id) }
+						for (let key in old) {
+							// Сравниваем изменённые поля
+							//if (old[key] !== newT[key]) {
+							// изменение координа
+							if (key === 'x' || key === 'y') {
+								temp.pos_x = newT.x
+								temp.pos_y = newT.y
+							}
+							// изменение имени объекта
+							if (key === 'name') {
+								temp.name = newT.name
+							}
+							// Отключение / включение active
+							if (key === 'active') {
+								temp.enabled = newT.active
+							}
+							// Ширина / высота
+							if (key === 'w' || key === 'h') {
+								if (old.typeObj !== 'lines') {
+									temp.width = Math.round(newT.w * 100) / 100
+									temp.height = Math.round(newT.h * 100) / 100
+								} else {
+									if (
+										String(newT.style.rotate) === '0' ||
+										String(newT.style.rotate) === '180'
+									) {
+										temp.width =
+											Math.round((Number(newT.x) + Number(newT.w)) * 100) / 100
+										temp.height = Math.round(Number(newT.y) * 100) / 100
+										temp.line_thickness = Math.round(Number(newT.h) * 100) / 100
 									} else {
-										if (
-											String(newT.style.rotate) === '0' ||
-											String(newT.style.rotate) === '180'
-										) {
-											temp.width =
-												Math.round((Number(newT.x) + Number(newT.w)) * 100) /
-												100
-											temp.height = Math.round(Number(newT.y) * 100) / 100
-											temp.line_thickness =
-												Math.round(Number(newT.h) * 100) / 100
-										} else {
-											temp.width = Math.round(Number(newT.x) * 100) / 100
-											temp.height =
-												Math.round((Number(newT.y) + Number(newT.h)) * 100) /
-												100
-											temp.line_thickness =
-												Math.round(Number(newT.w) * 100) / 100
-										}
-									}
-								}
-								// Изменение тела
-								if (key === 'body') {
-									temp.data = newT.body
-								}
-								// ИВ шрифта
-								if (key === 'font_family_id') {
-									temp.font_id = newT.font_family_id
-								}
-								// видимость текста шк
-								if (key === 'human_readable') {
-									temp.human_readable = newT.human_readable
-								}
-								// Ширина в пикселях для линейного шк. radius на бэке - pxW, font_size - pxH
-								if (
-									key === 'pxW' &&
-									(old.typeBarcode === 'ean13' || old.typeBarcode === 'code128')
-								) {
-									temp.radius = newT.pxW
-									temp.font_size = newT.pxH
-								}
-								//}
-							}
-							for (let key in old.style) {
-								if (old.style[key] !== newT.style[key]) {
-									// изменение стиля - поворот, шрифты, позиция текста
-									if (key === 'rotate') {
-										if (newT.typeBarcode === 'datamatrix') {
-											temp.rotation = newT.min_size
-										} else {
-											temp.rotation = newT.style.rotate
-										}
-									}
-									if (key === 'fontSize') {
-										temp.font_size = newT.style.fontSize
-									}
-									if (key === 'position') {
-										temp.text_align = newT.style.position
+										temp.width = Math.round(Number(newT.x) * 100) / 100
+										temp.height =
+											Math.round((Number(newT.y) + Number(newT.h)) * 100) / 100
+										temp.line_thickness = Math.round(Number(newT.w) * 100) / 100
 									}
 								}
 							}
-							update_object.push(temp)
+							// Изменение тела
+							if (key === 'body') {
+								temp.data = newT.body
+							}
+							// ИВ шрифта
+							if (key === 'font_family_id') {
+								temp.font_id = newT.font_family_id
+							}
+							// видимость текста шк
+							if (key === 'human_readable') {
+								temp.human_readable = newT.human_readable
+							}
+							// Ширина в пикселях для линейного шк. radius на бэке - pxW, font_size - pxH
+							if (
+								key === 'pxW' &&
+								(old.typeBarcode === 'ean13' || old.typeBarcode === 'code128')
+							) {
+								temp.radius = newT.pxW
+								temp.font_size = newT.pxH
+							}
+							//}
 						}
-					})
+						for (let key in old.style) {
+							if (old.style[key] !== newT.style[key]) {
+								// изменение стиля - поворот, шрифты, позиция текста
+								if (key === 'rotate') {
+									if (newT.typeBarcode === 'datamatrix') {
+										temp.rotation = newT.min_size
+									} else {
+										temp.rotation = newT.style.rotate
+									}
+								}
+								if (key === 'fontSize') {
+									temp.font_size = newT.style.fontSize
+								}
+								if (key === 'position') {
+									temp.text_align = newT.style.position
+								}
+							}
+						}
+						update_object.push(temp)
+					}
 				})
-				let res
-				if (update_object.length !== 0) {
-					res = await service.pathUpdateObj(update_object)
-				}
-				return res
-			}, Object.objects.length * 3)
+			})
+			let res
+			if (update_object.length !== 0) {
+				res = await service.pathUpdateObj(update_object)
+			}
+			return res
+			//}, Object.objects.length * 3)
 			// Перебираем ранее загруженный массив, с тем что на этикетке
 		}
 	}
@@ -325,19 +321,19 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
 		try {
 			Memory.setPostDownLoadFlag(true)
 			// renameTemplate();
-			newObjPost()
-			updateObj()
-			updateLabel()
-			setTimeout(() => {
-				deleteObject()
-			}, 1000)
-			setTimeout(async () => {
-				Object.objects = []
-				await service.getTemplatesID(Templates.template_id)
-				// setTimeout(() => {
-				Object.select()
-				// }, 1500);
-			}, 2000)
+			await newObjPost()
+			await updateObj()
+			await updateLabel()
+			//setTimeout(() => {
+			await deleteObject()
+			//}, 1000)
+			//setTimeout(async () => {
+			Object.objects = []
+			await service.getTemplatesID(Templates.template_id)
+			// setTimeout(() => {
+			Object.select()
+			// }, 1500);
+			//}, 2000)
 			Memory.visiblePost(false)
 		} catch (e) {
 			console.error(e)
