@@ -99,7 +99,7 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
 					ID.h = obj.offsetHeight / Memory.mm
 					ID.pxW = obj.offsetWidth / Memory.mm
 					ID.w = obj.offsetWidth / Memory.mm
-				}, 50)
+				}, block.length)
 			}
 		})
 	}
@@ -250,7 +250,7 @@ export const PostCompanent = observer(({ valueName, setValueName }) => {
 					res = await service.pathUpdateObj(update_object)
 				}
 				return res
-			}, 300)
+			}, Object.objects.length * 3)
 			// Перебираем ранее загруженный массив, с тем что на этикетке
 		}
 	}
