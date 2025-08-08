@@ -29,6 +29,7 @@
 	min-width: 240px;
 	position: sticky;
 	top: 0;
+	overflow-y: auto;
 }
 .templates_preiew_preview {
 	width: 70%;
