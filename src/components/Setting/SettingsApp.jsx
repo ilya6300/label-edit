@@ -64,7 +64,7 @@ export const SettingsApp = observer(() => {
 				onChange={e => handleApiHost(1, e.target.value)}
 				onClick={() => setApi()}
 			/>
-			<LabelPrintSettingRow name='Версия:' option='01:08-08-2025' />
+			<LabelPrintSettingRow name='Версия:' option={config.version} />
 			<li className='setting_info_row'>
 				Вы можете открыть редактор эткеток в браузере любого компьютера, в
 				рамках одной локальной сети. Для этого в браузере пропишите ip-адрес
